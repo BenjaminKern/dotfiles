@@ -1,197 +1,90 @@
-set encoding=utf-8
-scriptencoding utf-8
-setglobal fileencoding=utf-8
-
-silent function! OSX()
-    return has('macunix')
-endfunction
-silent function! LINUX()
-    return has('unix') && !has('macunix') && !has('win32unix')
-endfunction
+set encoding=UTF-8
+set termguicolors
 silent function! WINDOWS()
     return  (has('win32') || has('win64'))
 endfunction
 
 if WINDOWS()
-    set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
-    set renderoptions=type:directx,gamma:1.0,contrast:0.5,level:1,geom:1,renmode:4,taamode:1
-    set fileformats=dos,unix
+call plug#begin('C:/Other/cache/vim-plugins')
+else
+call plug#begin('~/.vim/plugged')
 end
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-commentary'
 
-if OSX()
-    set termguicolors
-    set termencoding=utf-8
-    set fillchars+=stl:\ ,stlnc:\
-end
+Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+" Plug 'neoclide/coc.nvim', {'tag': '*', 'do': 'yarn install'}
+Plug 'morhetz/gruvbox'
 
-" if &compatible
-"   set nocompatible
-" endif
+Plug 'ryanoasis/vim-devicons'
 
-set runtimepath+=~/.vim/bundle/repos/github.com/Shougo/dein.vim
+Plug 'scrooloose/nerdtree'
 
-call dein#begin(expand('~/.vim/bundle'))
+Plug 'easymotion/vim-easymotion'
+Plug 'itchyny/lightline.vim'
 
-call dein#add('Shougo/dein.vim')
-call dein#add('Shougo/vimproc.vim')
-call dein#add('Shougo/vimshell.vim')
-call dein#add('Shougo/vinarise.vim')
-call dein#add('Shougo/neomru.vim')
-call dein#add('Shougo/denite.nvim')
+Plug 'mhinz/vim-startify'
+Plug 'honza/vim-snippets'
 
-" call dein#add('tpope/vim-fugitive')
-call dein#add('tpope/vim-commentary')
-call dein#add('tpope/vim-dispatch')
-
-call dein#add('airblade/vim-rooter')
-call dein#add('airblade/vim-gitgutter')
-
-call dein#add('jreybert/vimagit')
-
-call dein#add('vim-airline/vim-airline')
-call dein#add('vim-airline/vim-airline-themes')
-call dein#add('easymotion/vim-easymotion')
-call dein#add('mhinz/vim-startify')
-call dein#add('w0rp/ale')
-
-call dein#add('rhysd/vim-clang-format')
-
-call dein#add('fatih/vim-go')
-
-call dein#add('lifepillar/vim-solarized8')
-" call dein#add('nanotech/jellybeans.vim')
-
-" Completer 
-" call dein#add('artur-shaik/vim-javacomplete2')
-
-" need this one at some point
-" call dein#add('metakirby5/codi.vim')
-" call dein#add('google/vim-maktaba')
-" call dein#add('google/vim-codefmt')
-" call dein#add('google/vim-glaive')
-
-" call dein#add('gregsexton/gitv')
-" call dein#add('Shougo/vimfiler.vim')
-" call dein#add('Shougo/unite.vim')
-" call dein#add('Shougo/neocomplete.vim')
-" call dein#add('Shougo/neosnippet.vim')
-" call dein#add('Shougo/neoyank.vim')
-" call dein#add('vim-jp/vital.vim')
-" call dein#add('Shougo/neopairs.vim')
-" call dein#add('Shougo/junkfile.vim')
-" call dein#add('Shougo/neoinclude.vim')
-" call dein#add('tsukkee/unite-tag')
-" call dein#add('Shougo/unite-outline')
-" call dein#add('Shougo/unite-session')
-" call dein#add('vim-scripts/MatlabFilesEdition')
-" call dein#add('scrooloose/syntastic')
-" call dein#add('int3/vim-extradite')
-" call dein#add('Yggdroot/indentLine')
-" call dein#add('yjqpro/vim-clang-format')
-" call dein#add('jakykong/vim-zim')
-" call dein#add('joanrivera/vim-zimwiki-syntax')
-call dein#end()
-
-filetype plugin indent on
-
-syntax enable
-
-
-if WINDOWS()
-endif
+call plug#end()
 
 if has('gui_running')
-    set guifont=InconsolataForPowerline_NF:h10:cANSI:qDRAFT
+    set guifont=InconsolataForPowerline_NF:h11
     set guioptions-=m  "remove menu bar
     set guioptions-=T  "remove toolbar
     set guioptions-=r  "remove right-hand scroll bar
     set guioptions-=L  "remove left-hand scroll bar
-    set guicursor+=a:blinkon0 "disable cursor blinking
+    set guioptions-=e  "terminal tablines
 endif
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => General
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Sets how many lines of history VIM has to remember
-set history=700
+" if hidden not set, TextEdit might fail.
+set hidden
 
-" Set to auto read when a file is changed from the outside
-set autoread
+" Better display for messagesset cmdheight=2
+
+" Smaller updatetime for CursorHold & CursorHoldI
+set updatetime=300
+
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+"
+" always show signcolumns
+set signcolumn=yes
+
+if WINDOWS()
+    set undodir=C:/Other/cache/vim-undo
+else
+    set undodir=~/.vim/undo-dir
+end
+set undofile
 
 let leader = ','
 let mapleader = ','
-
-set list
-set listchars=tab:›\ ,trail:•,extends:#,nbsp:.
-
-" Set 7 lines to the cursor - when moving vertically using j/k
-set scrolloff=7
-
-" Turn on the WiLd menu
-set wildmenu
-
-"Always show current position
-set ruler
-
-" Height of the command bar
-set cmdheight=2
-
-" A buffer becomes hidden when it is abandoned
-"set hid
-nmap <cr> :w!<cr>
-
-set diffopt+=vertical
-
-" Configure backspace so it acts as it should act
-set backspace=eol,start,indent
-set whichwrap+=<,>,h,l
-
-" Ignore case when searching
-set ignorecase
-
-" When searching try to be smart about cases 
+set grepprg=rg\ --vimgrep
 set smartcase
-
-" Highlight search results
 set hlsearch
-
-" Makes search act like search in modern browsers
 set incsearch
-
-" Don't redraw while executing macros (good performance config)
 set lazyredraw
-
-" For regular expressions turn magic on
 set magic
 
-" Show matching brackets when text indicator is over them
-set showmatch
-" How many tenths of a second to blink when matching brackets
-set matchtime=2
-
-" No annoying sound on errors
 set noerrorbells
 set novisualbell
 set t_vb=
 set timeoutlen=500
 
 set background=dark
-colorscheme solarized8_dark
-" colorscheme jellybeans
-" set background=light
-" colorscheme solarized8_light
+colorscheme gruvbox
 
-" Set utf8 as standard encoding and en_US as the standard language
-" Turn backup off, since most stuff is in SVN, git et.c anyway...
 set nobackup
 set nowritebackup
 set noswapfile
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Text, tab and indent related
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set bs=2
+
 " Use spaces instead of tabs
 set expandtab
+" set noexpandtab
 
 " Be smart when using tabs ;)
 set smarttab
@@ -202,195 +95,183 @@ set tabstop=4
 
 " Linebreak on 79 characters
 set linebreak
-set textwidth=79
+set textwidth=80
 " Column 80 color indicator
-set colorcolumn=80
+" set colorcolumn=80
 
 set autoindent
 set smartindent
 set wrap "Wrap lines
 
-set formatoptions-=t
-"set fo-=l
 
-set viminfo+=n~/.cache/viminfo
-
-" Treat long lines as break lines (useful when moving around in them)
+map 0 ^
 map j gj
 map k gk
-
 imap ii <Esc>
+nmap <cr> :w!<cr>
 
+map <leader>d :NERDTreeToggle<CR>
 
-" Specify the behavior when switching between buffers 
-try
-  set switchbuf=useopen,usetab,newtab
-  set showtabline=2
-catch
-endtry
+" let g:ycm_error_symbol = ''
+" let g:ycm_warning_symbol = ''
 
-" Return to last edit position when opening files (You want this!)
-" http://vim.wikia.com/wiki/Restore_cursor_to_file_position_in_previous_editing_session
-augroup default_stuff
-    autocmd BufReadPost *
+map ww <Plug>(easymotion-w)
+map bb <Plug>(easymotion-b)
+
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['cs'] = ''
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['csproj'] = ''
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['cmd'] = ''
+
+noremap <leader>f :Files<CR>
+noremap <leader>g :Rg<CR>
+nnoremap <silent><leader>rg :Rg <C-R><C-W><CR>
+
+noremap <expr><Plug>(StopHL) execute('nohlsearch')[-1]
+noremap! <expr><Plug>(StopHL) execute('nohlsearch')[-1]
+
+fu! HlSearch()
+    let s:pos = match(getline('.'), @/, col('.') - 1) + 1
+    if s:pos != col('.')
+        call StopHL()
+    endif
+endfu
+
+fu! StopHL()
+    if !v:hlsearch || mode() isnot 'n'
+        return
+    else
+        sil call feedkeys("\<Plug>(StopHL)", 'm')
+    endif
+endfu
+
+augroup SearchHighlight
+au!
+    au CursorMoved * call HlSearch()
+    au InsertEnter * call StopHL()
+    " Return to last edit position when opening files (You want this!)
+    au BufReadPost *
          \ if line("'\"") > 0 && line("'\"") <= line("$") |
          \   exe "normal! g`\"" |
          \ endif
+augroup end
+
+let g:startify_change_to_dir = 0
+let g:startify_change_to_vcs_root = 1
+
+let NERDTreeHijackNetrw = 0
+set guicursor+=a:blinkon0 "disable cursor blinking
+
+" Make <tab> used for trigger completion, completion confirm, snippet expand and jump
+" inoremap <silent><expr> <TAB>
+"       \ pumvisible() ? coc#_select_confirm() :
+"       \ coc#expandableOrJumpable() ? coc#rpc#request('doKeymap', ['snippets-expand-jump','']) :
+"       \ <SID>check_back_space() ? "\<TAB>" :
+"       \ coc#refresh()
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+" let g:coc_snippet_next = '<tab>'
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+
+" Use <c-space> for trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> for confirm completion, `<C-g>u` means break undo chain at current position.
+" Coc only does snippet and additional edit on confirm.
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Use `[c` and `]c` for navigate diagnostics
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K for show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if &filetype == 'vim'
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+" vmap <leader>f  <Plug>(coc-format-selected)
+" nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+vmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap for do codeAction of current line
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Use `:Format` for format current buffer
+command! -nargs=0 Format :call CocAction('format')
+
+" Use `:Fold` for fold current buffer
+" command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Show all diagnostics
+nnoremap <silent><leader>a  :<C-u>CocList diagnostics<cr>
+" Find symbol of current document
+nnoremap <silent><leader>o  :<C-u>CocList outline<cr>
+" Do default action for next item.
+nnoremap <silent><space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent><space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent><space>p  :<C-u>CocListResume<CR>
+
+augroup DefaultSettings
+    au BufNewFile,BufRead *.xaml,*.fcr,*.arxml set filetype=xml
+    au BufNewFile,BufRead *.c,*.h set noexpandtab
+    au FileType json syntax match Comment +\/\/.\+$+
 augroup END
 
-" Always show the status line
-set laststatus=2
+let g:lightline = {
+      \ 'colorscheme': 'gruvbox',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'cocstatus', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'cocstatus': 'coc#status'
+      \ },
+      \ }
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Editing mappings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Remap VIM 0 to first non-blank character
-map 0 ^
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Misc
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Remove the Windows ^M - when the encodings gets messed up
-noremap <leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
-
-" Toggle paste mode on and off
-map <leader>pp :setlocal paste!<cr>
-
-set tags& tags-=tags tags+=./tags;
-
-" Look and feel
-let g:netrw_liststyle = 3
-let g:netrw_banner = 0
-
-" Take around 25% of space
-let g:netrw_winsize = 25
-
-" 1 - open files in a new horizontal split
-" 2 - open files in a new vertical split
-" 3 - open files in a new tab
-" 4 - open in previous window
-let g:netrw_browse_split = 4
-
-nnoremap <leader>d :<C-u>Lexplore<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plugin Stuff
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:EasyMotion_smartcase = 1
-
-" Airline tabbar and fonts
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#disable_refresh = 1
-
-let g:vinarise_enable_auto_detect = 1
-
-" Denite
-nmap <space> [denite]
-nnoremap [denite] <nop>
-
-if WINDOWS()
-    " Pt command on file_rec source
-    call denite#custom#var('file_rec', 'command',
-                \ ['pt', '--follow', '--nocolor', '--nogroup', '-g:', ''])
-
-    " Pt command on grep source
-    call denite#custom#var('grep', 'command', ['pt'])
-    call denite#custom#var('grep', 'default_opts',
-                \ ['--nogroup', '--nocolor', '--smart-case'])
-    call denite#custom#var('grep', 'recursive_opts', [])
-    call denite#custom#var('grep', 'pattern_opt', [])
-    call denite#custom#var('grep', 'separator', ['--'])
-    call denite#custom#var('grep', 'final_opts', [])
-end
-
-" Change mappings.
-call denite#custom#map(
-            \ 'insert',
-            \ '<C-j>',
-            \ '<denite:move_to_next_line>',
-            \ 'noremap'
-            \)
-
-call denite#custom#map(
-            \ 'insert',
-            \ '<C-k>',
-            \ '<denite:move_to_previous_line>',
-            \ 'noremap'
-            \)
-
-" Change matchers.
-call denite#custom#source(
-            \ 'file_mru', 'matchers', ['matcher_fuzzy', 'matcher_project_files'])
-
-" Change sorters.
-call denite#custom#source(
-            \ 'file_rec', 'sorters', ['sorter_sublime'])
-
-call denite#custom#source('file_mru', 'converters', ['converter_relative_word'])
-
-" Define alias
-call denite#custom#alias('source', 'file_rec/git', 'file_rec')
-call denite#custom#var('file_rec/git', 'command',
-            \ ['git', 'ls-files', '-co', '--exclude-standard'])
-
-" Change default prompt
-call denite#custom#option('default', 'prompt', '>')
-
-" Change ignore_globs
-call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
-            \ [ '.git/', '.ropeproject/', '__pycache__/',
-            \   'venv/', 'images/', '*.min.*', 'img/', 'fonts/'])
-
-" Add custom menus
-" let s:menus = {}
-
-" let s:menus.zsh = {
-" 	\ 'description': 'Edit your import zsh configuration'
-" 	\ }
-" let s:menus.zsh.file_candidates = [
-" 	\ ['zshrc', '~/.config/zsh/.zshrc'],
-" 	\ ['zshenv', '~/.zshenv'],
-" 	\ ]
-
-" let s:menus.my_commands = {
-" 	\ 'description': 'Example commands'
-" 	\ }
-" let s:menus.my_commands.command_candidates = [
-" 	\ ['Split the window', 'vnew'],
-" 	\ ['Open zsh menu', 'Denite menu:zsh'],
-" 	\ ]
-
-" call denite#custom#var('menu', 'menus', s:menus)
-
-nnoremap <silent> [denite]s :<C-u>Denite -buffer-name=source file_rec/git<cr>
-
-nnoremap <silent> [denite]f :<C-u>Denite -buffer-name=files file_rec<cr>
-
-nnoremap <silent> [denite]r :<C-u>Denite -buffer-name=mru file_mru<cr>
-
-nnoremap <silent> [denite]g :<C-u>Denite -no-quit -buffer-name=grep grep<cr>
-
-" Other: Find merge conflict markers
-map <leader>fc /\v^[<\|=>]{7}( .*\|$)<CR>
-
-let g:ale_linters = {
-            \ 'go': ['go build'],
-            \ 'c': ['clang'],
-            \ 'cpp': ['clang']
-            \}
-
-let g:ale_c_clang_options = '-std=c99 -Wall'
-
-let g:ale_sign_error = ''
-let g:ale_sign_warning = ''
-let g:ale_statusline_format = [' %d', ' %d', ' ok']
-
-let g:ale_echo_msg_error_str = ''
-let g:ale_echo_msg_warning_str = ''
-let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-
-call airline#parts#define_function('ALE', 'ALEGetStatusLine')
-call airline#parts#define_condition('ALE', 'exists("*ALEGetStatusLine")')
-let g:airline_section_error = airline#section#create_right(['ALE'])
-
-let g:rooter_targets = '/,*.js,*.java'
+tnoremap <Esc> <C-\><C-n>
+" To simulate |i_CTRL-R| in terminal-mode: >
+tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
