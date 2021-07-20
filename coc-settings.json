@@ -1,15 +1,6 @@
 {
-	"languageserver": {
-        "clangd": {
-          "command": "clangd",
-          "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".vim/", ".git/", ".hg/"],
-          "filetypes": ["c", "cpp", "objc", "objcpp"]
-        }
-	},
-    "coc.source.word.enable": true,
-    "coc.source.word.filetypes": ["txt"],
-    "coc.source.dictionary.enable": true,
-    "coc.source.dictionary.filetypes": ["txt"],
-	"diagnostic.errorSign": "",
-	"diagnostic.infoSign": ""
+  "clangd.semanticHighlighting": true,
+  "diagnostic.infoSign": "ﯦ",
+  "diagnostic.errorSign": "",
+  "diagnostic.warningSign": ""
 }

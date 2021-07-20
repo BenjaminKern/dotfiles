@@ -1,176 +1,97 @@
-set encoding=UTF-8
-set termguicolors
-silent function! WINDOWS()
-    return  (has('win32') || has('win64'))
-endfunction
+set encoding=utf-8
 
-if WINDOWS()
-call plug#begin('C:/Other/cache/vim-plugins')
-else
 call plug#begin('~/.vim/plugged')
-end
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
+Plug 'junegunn/vim-peekaboo'
+Plug 'lotabout/skim'
+Plug 'lotabout/skim.vim'
+Plug 'junegunn/gv.vim'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
-
-Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
-" Plug 'neoclide/coc.nvim', {'tag': '*', 'do': 'yarn install'}
+Plug 'voldikss/vim-floaterm'
 Plug 'morhetz/gruvbox'
-
-Plug 'ryanoasis/vim-devicons'
-
-Plug 'scrooloose/nerdtree'
-
 Plug 'easymotion/vim-easymotion'
-Plug 'itchyny/lightline.vim'
-
+Plug 'vim-airline/vim-airline'
 Plug 'mhinz/vim-startify'
-Plug 'honza/vim-snippets'
-
+Plug 'ryanoasis/vim-devicons'
+Plug 'jackguo380/vim-lsp-cxx-highlight'
 call plug#end()
 
 if has('gui_running')
-    set guifont=InconsolataForPowerline_NF:h11
-    set guioptions-=m  "remove menu bar
-    set guioptions-=T  "remove toolbar
-    set guioptions-=r  "remove right-hand scroll bar
-    set guioptions-=L  "remove left-hand scroll bar
-    set guioptions-=e  "terminal tablines
+set guifont=Hack\ Nerd\ Font\ Mono\ 10
+set guioptions-=m  "remove menu bar
+set guioptions-=T  "remove toolbar
+set guioptions-=r  "remove right-hand scroll bar
+set guioptions-=L  "remove left-hand scroll bar
+set guioptions-=e  "terminal tablines
 endif
 
-" if hidden not set, TextEdit might fail.
-set hidden
+let g:startify_change_to_dir = 0
+let g:startify_change_to_vcs_root = 1
 
-" Better display for messagesset cmdheight=2
+" set laststatus=2
+" set noshowmode
 
-" Smaller updatetime for CursorHold & CursorHoldI
-set updatetime=300
-
-" don't give |ins-completion-menu| messages.
-set shortmess+=c
-"
-" always show signcolumns
-set signcolumn=yes
-
-if WINDOWS()
-    set undodir=C:/Other/cache/vim-undo
-else
-    set undodir=~/.vim/undo-dir
-end
-set undofile
-
-let leader = ','
-let mapleader = ','
-set grepprg=rg\ --vimgrep
-set smartcase
-set hlsearch
-set incsearch
-set lazyredraw
-set magic
-
-set noerrorbells
-set novisualbell
-set t_vb=
-set timeoutlen=500
-
+let g:gruvbox_italic=0
 set background=dark
 colorscheme gruvbox
-
-set nobackup
-set nowritebackup
-set noswapfile
-
-set bs=2
-
-" Use spaces instead of tabs
-set expandtab
-" set noexpandtab
-
-" Be smart when using tabs ;)
-set smarttab
-
-" 1 tab == 4 spaces
-set shiftwidth=4
-set tabstop=4
-
-" Linebreak on 79 characters
-set linebreak
-set textwidth=80
-" Column 80 color indicator
-" set colorcolumn=80
-
-set autoindent
-set smartindent
-set wrap "Wrap lines
-
-
-map 0 ^
-map j gj
-map k gk
-imap ii <Esc>
-nmap <cr> :w!<cr>
-
-map <leader>d :NERDTreeToggle<CR>
-
-" let g:ycm_error_symbol = ''
-" let g:ycm_warning_symbol = ''
-
-map ww <Plug>(easymotion-w)
-map bb <Plug>(easymotion-b)
 
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['cs'] = ''
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['csproj'] = ''
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['cmd'] = ''
 
-noremap <leader>f :Files<CR>
-noremap <leader>g :Rg<CR>
-nnoremap <silent><leader>rg :Rg <C-R><C-W><CR>
+let g:leader = ','
+let g:mapleader = ','
 
-noremap <expr><Plug>(StopHL) execute('nohlsearch')[-1]
-noremap! <expr><Plug>(StopHL) execute('nohlsearch')[-1]
+set expandtab
+set backspace=2
+set smarttab
+set shiftwidth=2
+set tabstop=2
+set linebreak
+set textwidth=80
+set autoindent
+set smartindent
+set smartcase
+set hlsearch
+set incsearch
+set magic
+set autoread
 
-fu! HlSearch()
-    let s:pos = match(getline('.'), @/, col('.') - 1) + 1
-    if s:pos != col('.')
-        call StopHL()
-    endif
-endfu
+nmap 0 ^
+map j gj
+map k gk
 
-fu! StopHL()
-    if !v:hlsearch || mode() isnot 'n'
-        return
-    else
-        sil call feedkeys("\<Plug>(StopHL)", 'm')
-    endif
-endfu
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 
-augroup SearchHighlight
-au!
-    au CursorMoved * call HlSearch()
-    au InsertEnter * call StopHL()
-    " Return to last edit position when opening files (You want this!)
-    au BufReadPost *
-         \ if line("'\"") > 0 && line("'\"") <= line("$") |
-         \   exe "normal! g`\"" |
-         \ endif
-augroup end
+set undodir=~/.vim/undo-dir
 
-let g:startify_change_to_dir = 0
-let g:startify_change_to_vcs_root = 1
+" TextEdit might fail if hidden is not set.
+set hidden
 
-let NERDTreeHijackNetrw = 0
-set guicursor+=a:blinkon0 "disable cursor blinking
+" Some servers have issues with backup files, see #649.
+set nobackup
+set nowritebackup
+set noswapfile
 
-" Make <tab> used for trigger completion, completion confirm, snippet expand and jump
-" inoremap <silent><expr> <TAB>
-"       \ pumvisible() ? coc#_select_confirm() :
-"       \ coc#expandableOrJumpable() ? coc#rpc#request('doKeymap', ['snippets-expand-jump','']) :
-"       \ <SID>check_back_space() ? "\<TAB>" :
-"       \ coc#refresh()
+" Give more space for displaying messages.
+set cmdheight=2
+
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+set signcolumn=number
+
 " Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-" let g:coc_snippet_next = '<tab>'
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? "\<C-n>" :
       \ <SID>check_back_space() ? "\<TAB>" :
@@ -182,96 +103,104 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
 
-" Use <c-space> for trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
+" Make <CR> auto-select the first completion item and notify coc.nvim to
+" format on enter, <cr> could be remapped by other vim plugin
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
-" Use <cr> for confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-" Use `[c` and `]c` for navigate diagnostics
-nmap <silent> [c <Plug>(coc-diagnostic-prev)
-nmap <silent> ]c <Plug>(coc-diagnostic-next)
-
-" Remap keys for gotos
+" GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
-" Use K for show documentation in preview window
+" Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if &filetype == 'vim'
+  if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
   else
-    call CocAction('doHover')
+    execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
 
-" Highlight symbol under cursor on CursorHold
+" Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
-" Remap for rename current word
+" Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
-
-" Remap for format selected region
-" vmap <leader>f  <Plug>(coc-format-selected)
-" nmap <leader>f  <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
   " Setup formatexpr specified filetype(s).
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder
+  " Update signature help on jump placeholder.
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-vmap <leader>a  <Plug>(coc-codeaction-selected)
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
 
-" Remap for do codeAction of current line
+" Remap keys for applying codeAction to the current buffer.
 nmap <leader>ac  <Plug>(coc-codeaction)
-" Fix autofix problem of current line
+" Apply AutoFix to problem on the current line.
 nmap <leader>qf  <Plug>(coc-fix-current)
 
-" Use `:Format` for format current buffer
+" Remap <C-f> and <C-b> for scroll float windows/popups.
+if has('nvim-0.4.0') || has('patch-8.2.0750')
+  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+endif
+
+" Use CTRL-S for selections ranges.
+" Requires 'textDocument/selectionRange' support of language server.
+nmap <silent> <C-s> <Plug>(coc-range-select)
+xmap <silent> <C-s> <Plug>(coc-range-select)
+
+" Add `:Format` command to format current buffer.
 command! -nargs=0 Format :call CocAction('format')
 
-" Use `:Fold` for fold current buffer
-" command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
-" Show all diagnostics
-nnoremap <silent><leader>a  :<C-u>CocList diagnostics<cr>
-" Find symbol of current document
-nnoremap <silent><leader>o  :<C-u>CocList outline<cr>
-" Do default action for next item.
-nnoremap <silent><space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent><space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list
-nnoremap <silent><space>p  :<C-u>CocListResume<CR>
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
-augroup DefaultSettings
-    au BufNewFile,BufRead *.xaml,*.fcr,*.arxml set filetype=xml
-    au BufNewFile,BufRead *.c,*.h set noexpandtab
-    au FileType json syntax match Comment +\/\/.\+$+
-augroup END
+map ww <Plug>(easymotion-w)
+map bb <Plug>(easymotion-b)
 
-let g:lightline = {
-      \ 'colorscheme': 'gruvbox',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'cocstatus', 'readonly', 'filename', 'modified' ] ]
-      \ },
-      \ 'component_function': {
-      \   'cocstatus': 'coc#status'
-      \ },
-      \ }
+noremap <leader>f :Files<CR>
+noremap <leader>g :Rg<CR>
+nnoremap <silent> <leader>t :FloatermToggle<CR>
+tnoremap <silent> <leader>t <C-\><C-n>:FloatermToggle<CR>
 
-tnoremap <Esc> <C-\><C-n>
-" To simulate |i_CTRL-R| in terminal-mode: >
-tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
+autocmd FileType cpp setlocal commentstring=//\ %s
+autocmd FileType c,cpp let b:coc_root_patterns = ['compile_flags.txt', 'compile_commands.json', '.git']
+tnoremap <esc>  <c-\><c-n>
+
+# Fix WSL probems
+set t_u7=
+set ambw=double
