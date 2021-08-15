@@ -201,6 +201,6 @@ autocmd FileType cpp setlocal commentstring=//\ %s
 autocmd FileType c,cpp let b:coc_root_patterns = ['compile_flags.txt', 'compile_commands.json', '.git']
 tnoremap <esc>  <c-\><c-n>
 
-# Fix WSL probems
+" Fix WSL probems
 set t_u7=
 set ambw=double
