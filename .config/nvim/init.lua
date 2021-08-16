@@ -1,5 +1,6 @@
 -- Install packer
 local install_path = vim.fn.stdpath 'data' .. '/site/pack/packer/start/packer.nvim'
+-- local install_path = vim.env.VIM .. '/site/pack/packer/start/packer.nvim'
 
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   vim.fn.execute('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
@@ -22,13 +23,11 @@ require('packer').startup(function()
   use 'junegunn/gv.vim'
   use 'morhetz/gruvbox'
   use 'mhinz/vim-startify'
-  use 'easymotion/vim-easymotion'
-  use 'ryanoasis/vim-devicons'
   use 'tpope/vim-fugitive' -- Git commands in nvim
   use 'tpope/vim-commentary' -- "gc" to comment visual regions/lines
-  -- UI to select things (files, grep results, open buffers...)
-  use { 'nvim-telescope/telescope.nvim', requires = { { 'nvim-lua/popup.nvim' }, { 'nvim-lua/plenary.nvim' } } }
-  use 'itchyny/lightline.vim' -- Fancier statusline
+  use {'shadmansaleh/lualine.nvim', requires = { {'kyazdani42/nvim-web-devicons'} } }
+  use {'ibhagwan/fzf-lua', requires = {{'vijaymarupudi/nvim-fzf'}, {'kyazdani42/nvim-web-devicons'}} }
+  use {'phaazon/hop.nvim'}
   -- Add indentation guides even on blank lines
   use 'lukas-reineke/indent-blankline.nvim'
   -- Add git related info in the signs columns and popups
@@ -63,6 +62,11 @@ vim.cmd [[set undofile]]
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
+vim.o.expandtab = true
+vim.o.smarttab = true
+vim.o.shiftwidth = 2
+vim.o.textwidth = 80
+
 --Decrease update time
 vim.o.updatetime = 250
 vim.wo.signcolumn = 'yes'
@@ -72,17 +76,10 @@ vim.o.termguicolors = true
 -- vim.g.gruvbox_terminal_italics = 0
 vim.cmd [[colorscheme gruvbox]]
 
---Set statusbar
-vim.g.lightline = {
-  colorscheme = 'gruvbox',
-  active = { left = { { 'mode', 'paste' }, { 'gitbranch', 'readonly', 'filename', 'modified' } } },
-  component_function = { gitbranch = 'fugitive#head' },
-}
-
---Remap space as leader key
-vim.api.nvim_set_keymap('', '<Space>', '<Nop>', { noremap = true, silent = true })
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+--Remap , as leader key
+vim.api.nvim_set_keymap('', ',', '<Nop>', { noremap = true, silent = true })
+vim.g.mapleader = ','
+vim.g.maplocalleader = ','
 
 --Remap for dealing with word wrap
 vim.api.nvim_set_keymap('n', 'k', "v:count == 0 ? 'gk' : 'k'", { noremap = true, expr = true, silent = true })
@@ -95,6 +92,13 @@ vim.g.indent_blankline_buftype_exclude = { 'terminal', 'nofile' }
 vim.g.indent_blankline_char_highlight = 'LineNr'
 vim.g.indent_blankline_show_trailing_blankline_indent = false
 
+require('hop').setup {
+  keys = 'etovxqpdygfblzhckisuran', 
+  term_seq_bias = 0.5
+}
+vim.api.nvim_set_keymap('n', 'ww', "<cmd>lua require'hop'.hint_words()<cr>", {})
+require('lualine').setup {}
+
 -- Gitsigns
 require('gitsigns').setup {
   signs = {
@@ -106,24 +110,13 @@ require('gitsigns').setup {
   },
 }
 
--- Telescope
-require('telescope').setup {
-  defaults = {
-    mappings = {
-      i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
-    },
-  },
+local actions = require('fzf-lua.actions')
+require('fzf-lua').setup {
+  fzf_bin = 'sk'
 }
---Add leader shortcuts
-vim.api.nvim_set_keymap('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sf', [[<cmd>lua require('telescope.builtin').find_files({previewer = false})<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sb', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]], { noremap = true, silent = true })
+
+vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('fzf-lua').files()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>g', [[<cmd>lua require('fzf-lua').live_grep()<CR>]], { noremap = true, silent = true })
 
 -- Highlight on yank
 vim.api.nvim_exec(
@@ -162,7 +155,6 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>so', [[<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>]], opts)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 end
 
@@ -170,7 +162,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 -- Enable the following language servers
-local servers = { 'clangd', 'rust_analyzer', 'pyright' }
+local servers = { 'clangd', 'pyright' }
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     on_attach = on_attach,
