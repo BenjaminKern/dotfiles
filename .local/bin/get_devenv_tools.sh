@@ -41,3 +41,8 @@ echo "Downloading dust..."
 curl -sL https://github.com/bootandy/dust/releases/download/v0.6.2/dust-v0.6.2-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 # echo "Downloading broot..."
 # curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
+echo "Create devenv_tools.bash..."
+echo "ISBbWyAtdiBkZXZlbnZfdG9vbHNfZGlyIF1dICYmIHJldHVybgohIFtbIC1mICRkZXZlbnZfdG9vbHNfZGlyL2RldmVudl90b29scy5iYXNoIF1dICYmIHJldHVybgoKUEFUSD0kZGV2ZW52X3Rvb2xzX2Rpci9iaW46JFBBVEgKU1RBUlNISVBfQ09ORklHPSRkZXZlbnZfdG9vbHNfZGlyL2NvbmZpZy9zdGFyc2hpcC50b21sCmV2YWwgIiQoc3RhcnNoaXAgaW5pdCBiYXNoKSIKTFNfQ09MT1JTPSIkKHZpdmlkIGdlbmVyYXRlIG9uZS1kYXJrKSIKYWxpYXMgbHM9J2xzZCcKRURJVE9SPW52aW0KCltbIC12IGRldmVudl90b29sc19wcm94eSBdXSAmJiBIVFRQX1BST1hZPSRkZXZlbnZfdG9vbHNfcHJveHkgJiYgSFRUUFNfUFJPWFk9JGRldmVudl90b29sc19wcm94eSAmJiBodHRwX3Byb3h5PSRkZXZlbnZfdG9vbHNfcHJveHkgJiYgaHR0cHNfcHJveHk9JGRldmVudl90b29sc19wcm94eQo=" | base64 -d - > $DESTDIR/devenv_tools.bash
+
+echo "Add the following to ~/.bashrc"
+echo "source $DESTDIR/devenv_tools.bash"
