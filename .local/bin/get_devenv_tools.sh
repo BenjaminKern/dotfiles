@@ -44,5 +44,6 @@ curl -sL https://github.com/bootandy/dust/releases/download/v0.6.2/dust-v0.6.2-x
 echo "Create devenv_tools.bash..."
 echo "ISBbWyAtdiBkZXZlbnZfdG9vbHNfZGlyIF1dICYmIHJldHVybgohIFtbIC1mICRkZXZlbnZfdG9vbHNfZGlyL2RldmVudl90b29scy5iYXNoIF1dICYmIHJldHVybgoKUEFUSD0kZGV2ZW52X3Rvb2xzX2Rpci9iaW46JFBBVEgKU1RBUlNISVBfQ09ORklHPSRkZXZlbnZfdG9vbHNfZGlyL2NvbmZpZy9zdGFyc2hpcC50b21sCmV2YWwgIiQoc3RhcnNoaXAgaW5pdCBiYXNoKSIKTFNfQ09MT1JTPSIkKHZpdmlkIGdlbmVyYXRlIG9uZS1kYXJrKSIKYWxpYXMgbHM9J2xzZCcKRURJVE9SPW52aW0KCltbIC12IGRldmVudl90b29sc19wcm94eSBdXSAmJiBIVFRQX1BST1hZPSRkZXZlbnZfdG9vbHNfcHJveHkgJiYgSFRUUFNfUFJPWFk9JGRldmVudl90b29sc19wcm94eSAmJiBodHRwX3Byb3h5PSRkZXZlbnZfdG9vbHNfcHJveHkgJiYgaHR0cHNfcHJveHk9JGRldmVudl90b29sc19wcm94eQo=" | base64 -d - > $DESTDIR/devenv_tools.bash
 
-echo "Add the following to ~/.bashrc"
+echo "Add the following lines to ~/.bashrc"
+echo "devenv_tools_dir=$DESTDIR"
 echo "source $DESTDIR/devenv_tools.bash"
