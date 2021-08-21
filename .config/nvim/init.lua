@@ -25,6 +25,7 @@ require('packer').startup(function()
   use 'terrortylor/nvim-comment'
   use 'norcalli/nvim-colorizer.lua'
   use 'ray-x/lsp_signature.nvim'
+  use 'simrat39/symbols-outline.nvim'
   use 'onsails/lspkind-nvim'
   use {'shadmansaleh/lualine.nvim', requires = { {'kyazdani42/nvim-web-devicons'} } }
   use {'kyazdani42/nvim-tree.lua', requires = { {'kyazdani42/nvim-web-devicons'} } }
@@ -109,6 +110,7 @@ vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('fzf-lua').files()<
 vim.api.nvim_set_keymap('n', '<leader>g', [[<cmd>lua require('fzf-lua').live_grep()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>gg', [[<cmd>lua require('fzf-lua').grep_cword()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>d', [[<cmd>lua require('nvim-tree').toggle()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>o', [[<cmd>lua require('symbols-outline').toggle_outline()<CR>]], { noremap = true, silent = true })
 
 -- Highlight on yank
 vim.api.nvim_exec(
