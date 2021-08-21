@@ -19,27 +19,24 @@ local use = require('packer').use
 require('packer').startup(function()
   use 'wbthomason/packer.nvim' -- Package manager
   use 'junegunn/vim-peekaboo'
-  use 'junegunn/gv.vim'
+  use {'junegunn/gv.vim', requires = {{'tpope/vim-fugitive'}} }
   use 'morhetz/gruvbox'
   use 'mhinz/vim-startify'
-  use 'tpope/vim-fugitive' -- Git commands in nvim
-  use 'tpope/vim-commentary' -- "gc" to comment visual regions/lines
+  use 'terrortylor/nvim-comment'
+  use 'norcalli/nvim-colorizer.lua'
+  use 'ray-x/lsp_signature.nvim'
+  use 'onsails/lspkind-nvim'
   use {'shadmansaleh/lualine.nvim', requires = { {'kyazdani42/nvim-web-devicons'} } }
+  use {'kyazdani42/nvim-tree.lua', requires = { {'kyazdani42/nvim-web-devicons'} } }
   use {'ibhagwan/fzf-lua', requires = {{'vijaymarupudi/nvim-fzf'}, {'kyazdani42/nvim-web-devicons'}} }
+  -- use {'glepnir/galaxyline.nvim', requires = { {'kyazdani42/nvim-web-devicons'} } }
+  -- use {'akinsho/nvim-bufferline.lua', requires = 'kyazdani42/nvim-web-devicons'}
   use {'phaazon/hop.nvim'}
-  -- Add indentation guides even on blank lines
   use 'lukas-reineke/indent-blankline.nvim'
-  -- Add git related info in the signs columns and popups
-  use { 'lewis6991/gitsigns.nvim', requires = { 'nvim-lua/plenary.nvim' } }
   use 'neovim/nvim-lspconfig' -- Collection of configurations for built-in LSP client
   use 'hrsh7th/nvim-compe' -- Autocompletion plugin
   use 'L3MON4D3/LuaSnip' -- Snippets plugin
-end,
-config = {
-  display = {
-    open_fn = require('packer.util').float,
-  }
-}
+end
 )
 
 --Incremental live completion
@@ -101,19 +98,7 @@ require('hop').setup {
   keys = 'etovxqpdygfblzhckisuran', 
   term_seq_bias = 0.5
 }
-vim.api.nvim_set_keymap('n', 'ww', "<cmd>lua require'hop'.hint_words()<cr>", {})
-require('lualine').setup {}
-
--- Gitsigns
-require('gitsigns').setup {
-  signs = {
-    add = { hl = 'GitGutterAdd', text = '+' },
-    change = { hl = 'GitGutterChange', text = '~' },
-    delete = { hl = 'GitGutterDelete', text = '_' },
-    topdelete = { hl = 'GitGutterDelete', text = '‾' },
-    changedelete = { hl = 'GitGutterChange', text = '~' },
-  },
-}
+vim.api.nvim_set_keymap('n', 'ww', "<cmd>lua require('hop').hint_words()<cr>", {})
 
 local actions = require('fzf-lua.actions')
 require('fzf-lua').setup {
@@ -122,6 +107,8 @@ require('fzf-lua').setup {
 
 vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('fzf-lua').files()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>g', [[<cmd>lua require('fzf-lua').live_grep()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>gg', [[<cmd>lua require('fzf-lua').grep_cword()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>d', [[<cmd>lua require('nvim-tree').toggle()<CR>]], { noremap = true, silent = true })
 
 -- Highlight on yank
 vim.api.nvim_exec(
@@ -162,6 +149,11 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 end
+
+vim.api.nvim_call_function("sign_define", {"LspDiagnosticsSignError", {text = "", texthl = "GruvboxRed"}})
+vim.api.nvim_call_function("sign_define", {"LspDiagnosticsSignWarning", {text = "", texthl = "GruvboxYellow"}})
+vim.api.nvim_call_function("sign_define", {"LspDiagnosticsSignInformation", {text = "", texthl = "GruvboxBlue"}})
+vim.api.nvim_call_function("sign_define", {"LspDiagnosticsSignHint", {text = "", texthl = "GruvboxAqua"}})
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
@@ -242,3 +234,10 @@ vim.api.nvim_set_keymap('s', '<S-Tab>', 'v:lua.s_tab_complete()', { expr = true 
 -- Map compe confirm and complete functions
 vim.api.nvim_set_keymap('i', '<cr>', 'compe#confirm("<cr>")', { expr = true })
 vim.api.nvim_set_keymap('i', '<c-space>', 'compe#complete()', { expr = true })
+
+require('lualine').setup()
+-- require("bufferline").setup()
+require('colorizer').setup()
+require('lsp_signature').setup()
+require('nvim_comment').setup()
+require('lspkind').init()
