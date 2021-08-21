@@ -39,6 +39,13 @@ echo "Downloading lsd..."
 curl -sL https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd-0.20.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading dust..."
 curl -sL https://github.com/bootandy/dust/releases/download/v0.6.2/dust-v0.6.2-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+echo "Downloading jq..."
+curl -sL https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o $DESTDIR/bin/jq
+chmod u+x $DESTDIR/bin/jq
+echo "Downloading bottom..."
+curl -sL https://github.com/ClementTsang/bottom/releases/download/0.6.3/bottom_x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+echo "Downloading rage..."
+curl -sL https://github.com/str4d/rage/releases/download/v0.6.0/rage-v0.6.0-x86_64-linux.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 # echo "Downloading broot..."
 # curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Create devenv_tools.bash..."
