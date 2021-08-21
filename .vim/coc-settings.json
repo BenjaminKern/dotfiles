@@ -1,0 +1,6 @@
+{
+  "clangd.semanticHighlighting": true,
+  "diagnostic.infoSign": "ﯦ",
+  "diagnostic.errorSign": "",
+  "diagnostic.warningSign": ""
+}

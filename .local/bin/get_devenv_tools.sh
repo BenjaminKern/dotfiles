@@ -54,3 +54,4 @@ echo "ISBbWyAtdiBkZXZlbnZfdG9vbHNfZGlyIF1dICYmIHJldHVybgohIFtbIC1mICRkZXZlbnZfdG
 echo "Add the following lines to ~/.bashrc"
 echo "devenv_tools_dir=$DESTDIR"
 echo "source $DESTDIR/devenv_tools.bash"
+# yarn global add pyright --prefix $DESTDIR
