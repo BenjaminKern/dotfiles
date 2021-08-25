@@ -46,6 +46,9 @@ echo "Downloading bottom..."
 curl -sL https://github.com/ClementTsang/bottom/releases/download/0.6.3/bottom_x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading rage..."
 curl -sL https://github.com/str4d/rage/releases/download/v0.6.0/rage-v0.6.0-x86_64-linux.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+echo "Downloading direnv..."
+curl -sL https://github.com/direnv/direnv/releases/download/v2.28.0/direnv.linux-amd64 -o $DESTDIR/bin/direnv
+chmod u+x $DESTDIR/bin/direnv
 # echo "Downloading broot..."
 # curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Create devenv_tools.bash..."
