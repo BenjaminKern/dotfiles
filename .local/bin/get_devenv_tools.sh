@@ -4,6 +4,7 @@ shopt -s nullglob globstar
 DESTDIR="$(readlink -e $1)"
 
 mkdir -p $DESTDIR/bin
+PATH=$DESTDIR/bin:$PATH
 mkdir -p $DESTDIR/config
 
 echo "Downloading node..."
@@ -58,10 +59,12 @@ curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbin
 # curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Create devenv_tools.bash..."
 echo "ZGV2ZW52X3Rvb2xzX2Rpcj0iJCggY2QgIiQoIGRpcm5hbWUgIiR7QkFTSF9TT1VSQ0VbMF19IiApIiAmPiAvZGV2L251bGwgJiYgcHdkICkiCiEgW1sgLWYgJGRldmVudl90b29sc19kaXIvZGV2ZW52X3Rvb2xzLmJhc2ggXV0gJiYgcmV0dXJuCgpQQVRIPSRkZXZlbnZfdG9vbHNfZGlyL2JpbjokUEFUSApTVEFSU0hJUF9DT05GSUc9JGRldmVudl90b29sc19kaXIvY29uZmlnL3N0YXJzaGlwLnRvbWwKZXZhbCAiJChzdGFyc2hpcCBpbml0IGJhc2gpIgpMU19DT0xPUlM9IiQodml2aWQgZ2VuZXJhdGUgb25lLWRhcmspIgphbGlhcyBscz0nbHNkJwpFRElUT1I9bnZpbQphbGlhcyBjYXQ9J2JhdCAtLXBhZ2luZz1uZXZlcicKZXZhbCAiJChkaXJlbnYgaG9vayBiYXNoKSIKCltbIC12IGRldmVudl90b29sc19wcm94eSBdXSAmJiBcCiAgSFRUUF9QUk9YWT0kZGV2ZW52X3Rvb2xzX3Byb3h5ICYmIFwKICBIVFRQU19QUk9YWT0kZGV2ZW52X3Rvb2xzX3Byb3h5ICYmIFwKICBodHRwX3Byb3h5PSRkZXZlbnZfdG9vbHNfcHJveHkgJiYgXAogIGh0dHBzX3Byb3h5PSRkZXZlbnZfdG9vbHNfcHJveHkK" | base64 -d - > $DESTDIR/devenv_tools.bash
-
+yarn config set global-folder $DESTDIR/config/yarn/global
+echo "Installing pyright"
+yarn global add pyright --prefix $DESTDIR
+echo "Installing prettier"
+yarn global add prettier --prefix $DESTDIR
 echo "Add the following line to ~/.bashrc"
 echo "source $DESTDIR/devenv_tools.bash"
 echo "Add the following line to ~/.gdbinit"
 echo "source $DESTDIR/config/gdbinit-gef.py"
-# yarn global add pyright --prefix $DESTDIR
-# yarn global add prettier --prefix $DESTDIR
