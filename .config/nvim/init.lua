@@ -27,6 +27,7 @@ require('packer').startup(function()
   use 'ray-x/lsp_signature.nvim'
   use 'simrat39/symbols-outline.nvim'
   use 'onsails/lspkind-nvim'
+  use 'kosayoda/nvim-lightbulb'
   use {'shadmansaleh/lualine.nvim', requires = { {'kyazdani42/nvim-web-devicons'} } }
   use {'kyazdani42/nvim-tree.lua', requires = { {'kyazdani42/nvim-web-devicons'} } }
   use {'ibhagwan/fzf-lua', requires = {{'vijaymarupudi/nvim-fzf'}, {'kyazdani42/nvim-web-devicons'}} }
@@ -60,6 +61,9 @@ vim.o.breakindent = true
 
 --Save undo history
 vim.cmd [[set undofile]]
+
+--Lightbulb
+vim.cmd [[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]]
 
 --Case insensitive searching UNLESS /C or capital in search
 vim.o.ignorecase = true
@@ -143,7 +147,7 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   -- vim.api.nvim_buf_set_keymap(bufnr, 'v', '<leader>ca', '<cmd>lua vim.lsp.buf.range_code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
