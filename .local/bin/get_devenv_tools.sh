@@ -3,6 +3,9 @@ set -euo pipefail
 shopt -s nullglob globstar
 DESTDIR="$(readlink -e $1)"
 
+mkdir -p $DESTDIR/bin
+mkdir -p $DESTDIR/config
+
 echo "Downloading node..."
 curl -sL install-node.now.sh/lts | bash -s -- --prefix=$DESTDIR --yes
 echo "Downloading yarn..."
@@ -49,6 +52,8 @@ curl -sL https://github.com/str4d/rage/releases/download/v0.6.0/rage-v0.6.0-x86_
 echo "Downloading direnv..."
 curl -sL https://github.com/direnv/direnv/releases/download/v2.28.0/direnv.linux-amd64 -o $DESTDIR/bin/direnv
 chmod u+x $DESTDIR/bin/direnv
+echo "Downloading gdbinit-gef..."
+curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbinit-gef.py
 # echo "Downloading broot..."
 # curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Create devenv_tools.bash..."
@@ -56,5 +61,7 @@ echo "ZGV2ZW52X3Rvb2xzX2Rpcj0iJCggY2QgIiQoIGRpcm5hbWUgIiR7QkFTSF9TT1VSQ0VbMF19Ii
 
 echo "Add the following line to ~/.bashrc"
 echo "source $DESTDIR/devenv_tools.bash"
+echo "Add the following line to ~/.gdbinit"
+echo "source $DESTDIR/config/gdbinit-gef.py"
 # yarn global add pyright --prefix $DESTDIR
 # yarn global add prettier --prefix $DESTDIR
