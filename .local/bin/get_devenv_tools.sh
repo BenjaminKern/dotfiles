@@ -7,6 +7,12 @@ mkdir -p $DESTDIR/bin
 PATH=$DESTDIR/bin:$PATH
 mkdir -p $DESTDIR/config
 
+echo "Downloading nvim..."
+curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
+echo "Downloading vim plugged..."
+curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o $DESTDIR/share/nvim/runtime/pack/dist/opt/plug/plugin/plug.vim --create-dirs
+echo "Downloading neovim config..."
+curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.config/nvim/init.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
 echo "Downloading node..."
 curl -sL install-node.now.sh/lts | bash -s -- --prefix=$DESTDIR --yes
 echo "Downloading yarn..."
@@ -35,8 +41,6 @@ curl -sL https://github.com/chmln/sd/releases/download/v0.7.6/sd-v0.7.6-x86_64-u
 chmod u+x $DESTDIR/bin/sd
 echo "Downloading starship..."
 curl -sL https://github.com/starship/starship/releases/download/v0.56.0/starship-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
-echo "Downloading nvim..."
-curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
 echo "Downloading tab..."
 curl -sL https://github.com/austinjones/tab-rs/releases/download/v0.5.7/tab-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading lsd..."
@@ -57,8 +61,6 @@ echo "Downloading gdbinit-gef..."
 curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbinit-gef.py
 echo "Downloading abduco..."
 curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.local/pkg/abduco-0.6-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
-echo "Downloading vim plugged..."
-curl -fLo $DESTDIR/share/nvim/runtime/pack/dist/opt/plug/plugin/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 # echo "Downloading broot..."
 # curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Create devenv_tools.bash..."
@@ -72,3 +74,5 @@ echo "Add the following line to ~/.bashrc"
 echo "source $DESTDIR/devenv_tools.bash"
 echo "Add the following line to ~/.gdbinit"
 echo "source $DESTDIR/config/gdbinit-gef.py"
+echo "Add the following line to ~/.config/nvim/init.lua"
+echo "require('devenv_config')"
