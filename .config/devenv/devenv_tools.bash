@@ -2,7 +2,7 @@ devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ! [[ -f $devenv_tools_dir/devenv_tools.bash ]] && return
 
 PATH=$devenv_tools_dir/bin:$PATH
-STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
+export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
 eval "$(starship init bash)"
 LS_COLORS="$(vivid generate one-dark)"
 alias ls='lsd'

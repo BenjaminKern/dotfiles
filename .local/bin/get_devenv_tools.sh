@@ -61,10 +61,10 @@ echo "Downloading gdbinit-gef..."
 curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbinit-gef.py
 echo "Downloading abduco..."
 curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.local/pkg/abduco-0.6-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
-# echo "Downloading broot..."
-# curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
-echo "Create devenv_tools.bash..."
-echo "ZGV2ZW52X3Rvb2xzX2Rpcj0iJCggY2QgIiQoIGRpcm5hbWUgIiR7QkFTSF9TT1VSQ0VbMF19IiApIiAmPiAvZGV2L251bGwgJiYgcHdkICkiCiEgW1sgLWYgJGRldmVudl90b29sc19kaXIvZGV2ZW52X3Rvb2xzLmJhc2ggXV0gJiYgcmV0dXJuCgpQQVRIPSRkZXZlbnZfdG9vbHNfZGlyL2JpbjokUEFUSApTVEFSU0hJUF9DT05GSUc9JGRldmVudl90b29sc19kaXIvY29uZmlnL3N0YXJzaGlwLnRvbWwKZXZhbCAiJChzdGFyc2hpcCBpbml0IGJhc2gpIgpMU19DT0xPUlM9IiQodml2aWQgZ2VuZXJhdGUgb25lLWRhcmspIgphbGlhcyBscz0nbHNkJwpFRElUT1I9bnZpbQphbGlhcyBjYXQ9J2JhdCAtLXBhZ2luZz1uZXZlcicKZXZhbCAiJChkaXJlbnYgaG9vayBiYXNoKSIKCltbIC12IGRldmVudl90b29sc19wcm94eSBdXSAmJiBcCiAgSFRUUF9QUk9YWT0kZGV2ZW52X3Rvb2xzX3Byb3h5ICYmIFwKICBIVFRQU19QUk9YWT0kZGV2ZW52X3Rvb2xzX3Byb3h5ICYmIFwKICBodHRwX3Byb3h5PSRkZXZlbnZfdG9vbHNfcHJveHkgJiYgXAogIGh0dHBzX3Byb3h5PSRkZXZlbnZfdG9vbHNfcHJveHkK" | base64 -d - > $DESTDIR/devenv_tools.bash
+echo "Downloading devenv_tools.bash..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/devenv/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
+echo "Downloading starship.toml..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/starship.toml -o $DESTDIR/config/starship.toml
 yarn config set global-folder $DESTDIR/config/yarn/global
 echo "Installing pyright"
 yarn global add pyright --prefix $DESTDIR
@@ -76,3 +76,5 @@ echo "Add the following line to ~/.gdbinit"
 echo "source $DESTDIR/config/gdbinit-gef.py"
 echo "Add the following line to ~/.config/nvim/init.lua"
 echo "require('devenv_config')"
+# echo "Downloading broot..."
+# curl -sL https://github.com/Canop/broot/releases/download/v1.6.3/broot_1.6.3.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
