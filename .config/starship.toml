@@ -3,4 +3,4 @@ description="Inside container or not"
 when="grep -sq docker /proc/1/cgroup"
 shell=["sh"]
 command="echo ${DOCKER_CONTAINER_NAME-container}"
-formant="inside [🐋 $output](blue bold) "
+format="inside [🐋 $output](blue bold) "
