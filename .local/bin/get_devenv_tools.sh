@@ -26,6 +26,8 @@ echo "Downloading ripgrep..."
 curl -sL https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading skim..."
 curl -sL https://github.com/lotabout/skim/releases/download/v0.9.4/skim-v0.9.4-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+echo "Downloading fzf..."
+curl -sL https://github.com/junegunn/fzf/releases/download/0.27.2/fzf-0.27.2-linux_amd64.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading hexyl..."
 curl -sL https://github.com/sharkdp/hexyl/releases/download/v0.9.0/hexyl-v0.9.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading hyperfine..."
@@ -59,6 +61,8 @@ echo "Downloading gdbinit-gef..."
 curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbinit-gef.py
 echo "Downloading abduco..."
 curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.local/pkg/abduco-0.6-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+echo "Downloading zoxide..."
+curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.5/zoxide-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading devenv_tools.bash..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/devenv/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading starship.toml..."
