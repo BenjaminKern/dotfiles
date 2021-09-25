@@ -8,7 +8,7 @@ PATH=$DESTDIR/bin:$PATH
 mkdir -p $DESTDIR/config
 
 echo "Downloading nvim..."
-# curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
+curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
 echo "Downloading vim plugged..."
 curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o $DESTDIR/share/nvim/runtime/pack/dist/opt/plug/plugin/plug.vim --create-dirs
 echo "Downloading neovim config..."
