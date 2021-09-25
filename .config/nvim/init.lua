@@ -27,6 +27,9 @@ vim.call('plug#begin', plugged_path)
   Plug 'hrsh7th/nvim-compe'
   Plug 'L3MON4D3/LuaSnip'
   Plug 'ahmedkhalf/project.nvim'
+  Plug 'akinsho/toggleterm.nvim'
+  Plug 'antoinemadec/FixCursorHold.nvim' -- https://github.com/neovim/neovim/issues/12587
+  -- Plug 'folke/which-key.nvim'
 vim.call('plug#end')
 
 --Incremental live completion
@@ -236,6 +239,14 @@ require('lsp_signature').setup()
 require('nvim_comment').setup()
 require('lspkind').init()
 require("project_nvim").setup()
+require("toggleterm").setup{
+  direction = "float",
+  float_opts = {
+    border = "double",
+  },
+  open_mapping = [[<leader>t]],
+}
+-- require("which-key").setup()
 
 vim.g.nvim_tree_update_cwd = 1
 vim.g.nvim_tree_respect_buf_cwd = 1
