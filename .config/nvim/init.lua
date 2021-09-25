@@ -26,6 +26,7 @@ vim.call('plug#begin', plugged_path)
   Plug 'neovim/nvim-lspconfig'
   Plug 'hrsh7th/nvim-compe'
   Plug 'L3MON4D3/LuaSnip'
+  Plug 'ahmedkhalf/project.nvim'
 vim.call('plug#end')
 
 --Incremental live completion
@@ -234,3 +235,7 @@ require('colorizer').setup()
 require('lsp_signature').setup()
 require('nvim_comment').setup()
 require('lspkind').init()
+require("project_nvim").setup()
+
+vim.g.nvim_tree_update_cwd = 1
+vim.g.nvim_tree_respect_buf_cwd = 1
