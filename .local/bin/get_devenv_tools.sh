@@ -33,27 +33,25 @@ curl -sL https://github.com/sharkdp/hyperfine/releases/download/v1.11.0/hyperfin
 echo "Downloading fd..."
 curl -sL https://github.com/sharkdp/fd/releases/download/v8.2.1/fd-v8.2.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading bat..."
-curl -sL https://github.com/sharkdp/bat/releases/download/v0.18.2/bat-v0.18.2-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/sharkdp/bat/releases/download/v0.18.3/bat-v0.18.3-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading vivid..."
 curl -sL https://github.com/sharkdp/vivid/releases/download/v0.7.0/vivid-v0.7.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading sd..."
 curl -sL https://github.com/chmln/sd/releases/download/v0.7.6/sd-v0.7.6-x86_64-unknown-linux-musl -o $DESTDIR/bin/sd
 chmod u+x $DESTDIR/bin/sd
 echo "Downloading starship..."
-curl -sL https://github.com/starship/starship/releases/download/v0.56.0/starship-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
-echo "Downloading tab..."
-curl -sL https://github.com/austinjones/tab-rs/releases/download/v0.5.7/tab-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+curl -sL https://github.com/starship/starship/releases/download/v0.58.0/starship-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading lsd..."
 curl -sL https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd-0.20.1-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading dust..."
-curl -sL https://github.com/bootandy/dust/releases/download/v0.6.2/dust-v0.6.2-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/bootandy/dust/releases/download/v0.7.5/dust-v0.7.5-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading jq..."
 curl -sL https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o $DESTDIR/bin/jq
 chmod u+x $DESTDIR/bin/jq
 echo "Downloading bottom..."
-curl -sL https://github.com/ClementTsang/bottom/releases/download/0.6.3/bottom_x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
-echo "Downloading rage..."
-curl -sL https://github.com/str4d/rage/releases/download/v0.6.0/rage-v0.6.0-x86_64-linux.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+curl -sL https://github.com/ClementTsang/bottom/releases/download/0.6.4/bottom_x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+echo "Downloading age..."
+curl -sL https://github.com/FiloSottile/age/releases/download/v1.0.0/age-v1.0.0-linux-amd64.tar.gz| bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading direnv..."
 curl -sL https://github.com/direnv/direnv/releases/download/v2.28.0/direnv.linux-amd64 -o $DESTDIR/bin/direnv
 chmod u+x $DESTDIR/bin/direnv
