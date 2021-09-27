@@ -238,15 +238,14 @@ require('colorizer').setup()
 require('lsp_signature').setup()
 require('nvim_comment').setup()
 require('lspkind').init()
-require("project_nvim").setup()
-require("toggleterm").setup{
+require('project_nvim').setup()
+require('toggleterm').setup{
   direction = "float",
   float_opts = {
     border = "double",
   },
   open_mapping = [[<leader>t]],
 }
--- require("which-key").setup()
-
-vim.g.nvim_tree_update_cwd = 1
-vim.g.nvim_tree_respect_buf_cwd = 1
+require('nvim-tree').setup {
+  update_cwd = true
+}

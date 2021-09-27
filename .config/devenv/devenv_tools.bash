@@ -9,7 +9,7 @@ alias ls='lsd'
 EDITOR=nvim
 alias cat='bat --paging=never'
 eval "$(direnv hook bash)"
-eval "$(zoxide init bash)"
+eval "$(zoxide init --cmd j bash)"
 
 [[ -v devenv_tools_proxy ]] && \
   HTTP_PROXY=$devenv_tools_proxy && \
