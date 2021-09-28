@@ -246,6 +246,7 @@ require('toggleterm').setup{
   },
   open_mapping = [[<leader>t]],
 }
+vim.api.nvim_set_keymap('t', '<esc>', [[<C-\><C-n>]], { noremap = true})
 require('nvim-tree').setup {
   update_cwd = true
 }
