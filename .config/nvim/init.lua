@@ -207,13 +207,10 @@ local on_attach = function(_, bufnr)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 end
 
-vim.api.nvim_call_function("sign_define", {"LspDiagnosticsSignError", {text = "", texthl = "GruvboxRed"}})
-vim.api.nvim_call_function("sign_define", {"LspDiagnosticsSignWarning", {text = "", texthl = "GruvboxYellow"}})
-vim.api.nvim_call_function("sign_define", {"LspDiagnosticsSignInformation", {text = "", texthl = "GruvboxBlue"}})
-vim.api.nvim_call_function("sign_define", {"LspDiagnosticsSignHint", {text = "", texthl = "GruvboxAqua"}})
-
--- local capabilities = vim.lsp.protocol.make_client_capabilities()
--- capabilities.textDocument.completion.completionItem.snippetSupport = true
+vim.api.nvim_call_function("sign_define", {"DiagnosticSignError", {text = "", texthl = "DiagnosticSignError"}})
+vim.api.nvim_call_function("sign_define", {"DiagnosticSignWarning", {text = "", texthl = "DiagnosticSignWarning"}})
+vim.api.nvim_call_function("sign_define", {"DiagnosticSignInformation", {text = "", texthl = "DiagnosticSignInformation"}})
+vim.api.nvim_call_function("sign_define", {"DiagnosticSignHint", {text = "", texthl = "DiagnosticSignHint"}})
 
 -- Enable the following language servers
 local servers = { 'clangd', 'pyright' }
