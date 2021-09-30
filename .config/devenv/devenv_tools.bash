@@ -3,7 +3,7 @@ devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 PATH=$devenv_tools_dir/bin:$PATH
 source $devenv_tools_dir/config/sensible.bash
-source $devenv_tools_dir/config/forgit.plugin.sh
+source $devenv_tools_dir/config/forgit.plugin.bash
 source $devenv_tools_dir/config/fzf-key-bindings.bash
 export FZF_DEFAULT_COMMAND='fd --type f'
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
