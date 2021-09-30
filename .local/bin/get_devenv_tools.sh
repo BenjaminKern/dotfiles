@@ -63,12 +63,14 @@ echo "Downloading abduco..."
 curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.local/pkg/abduco-0.6-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading zoxide..."
 curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.5/zoxide-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
-echo "Downloading mcfly..."
-curl -sL https://github.com/cantino/mcfly/releases/download/v0.5.9/mcfly-v0.5.9-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading delta..."
 curl -sL https://github.com/dandavison/delta/releases/download/0.8.3/delta-0.8.3-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading forgit..."
-curl -sL git.io/forgit -o $DESTDIR/forgit.plugin.sh
+curl -sL git.io/forgit -o $DESTDIR/config/forgit.plugin.bash
+echo "Downloading sensible.bash..."
+curl -sL https://raw.githubusercontent.com/mrzool/bash-sensible/master/sensible.bash -o $DESTDIR/config/sensible.bash
+echo "Downloading fzf.keybindings.bash..."
+curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
 echo "Downloading devenv_tools.bash..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/devenv/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading starship.toml..."
