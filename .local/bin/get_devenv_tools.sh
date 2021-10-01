@@ -8,13 +8,13 @@ PATH=$DESTDIR/bin:$PATH
 mkdir -p $DESTDIR/config
 
 echo "Downloading nvim..."
-# curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
+curl -sL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
 echo "Downloading vim plugged..."
 curl -sL https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o $DESTDIR/share/nvim/runtime/pack/dist/opt/plug/plugin/plug.vim --create-dirs
 echo "Downloading neovim config..."
-curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.config/nvim/init.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nvim/init.lua -o $DESTDIR/share/nvim/runtime/lua/devenv_config.lua
 echo "Downloading node..."
-curl -sL install-node.now.sh/lts | bash -s -- --prefix=$DESTDIR --yes
+curl -sL install-node.now.sh | bash -s -- --prefix=$DESTDIR --yes
 echo "Downloading yarn..."
 curl -sL https://github.com/yarnpkg/yarn/releases/download/v1.22.11/yarn-v1.22.11.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
 echo "Downloading clangd..."
@@ -71,6 +71,8 @@ echo "Downloading sensible.bash..."
 curl -sL https://raw.githubusercontent.com/mrzool/bash-sensible/master/sensible.bash -o $DESTDIR/config/sensible.bash
 echo "Downloading fzf.keybindings.bash..."
 curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
+echo "Downloading fd ignore file..."
+curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/devenv/.fd-ignore -o $DESTDIR/share/nvim/.fd-ignore
 echo "Downloading devenv_tools.bash..."
 curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/devenv/devenv_tools.bash -o $DESTDIR/devenv_tools.bash
 echo "Downloading starship.toml..."

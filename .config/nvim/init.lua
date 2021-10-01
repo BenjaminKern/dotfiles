@@ -27,6 +27,7 @@ vim.call('plug#begin', plugged_path)
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/nvim-cmp'
+  Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/cmp-vsnip'
   Plug 'hrsh7th/vim-vsnip'
   Plug 'ahmedkhalf/project.nvim'
@@ -100,7 +101,11 @@ require('hop').setup {
 vim.api.nvim_set_keymap('n', 'ww', "<cmd>lua require('hop').hint_words()<cr>", {})
 
 local actions = require('fzf-lua.actions')
-require('fzf-lua').setup {}
+require('fzf-lua').setup{
+  files = {
+    cmd = 'fd --color never --type f --hidden --ignore-file ' .. vim.env.VIM .. '/.fd-ignore',
+  }
+}
 
 vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('fzf-lua').files()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>g', [[<cmd>lua require('fzf-lua').live_grep()<CR>]], { noremap = true, silent = true })
@@ -169,6 +174,7 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'vsnip' },
+    { name = 'path' },
     { name = 'buffer' },
   },
   formatting = {

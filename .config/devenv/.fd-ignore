@@ -1,0 +1,10 @@
+.cache
+.git
+node_modules
+*.o
+*.a
+*.so
+*.so.*
+*.gz
+*.xz
+*.pyc
