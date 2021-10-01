@@ -6,8 +6,6 @@ local plugged_path = vim.env.VIM .. '/plugged'
 
 vim.call('plug#begin', plugged_path)
   Plug 'junegunn/vim-peekaboo'
-  Plug 'tpope/vim-fugitive'
-  Plug 'junegunn/gv.vim'
   Plug 'morhetz/gruvbox'
   Plug 'mhinz/vim-startify'
   Plug 'terrortylor/nvim-comment'
@@ -24,6 +22,7 @@ vim.call('plug#begin', plugged_path)
   Plug 'phaazon/hop.nvim'
   Plug 'lukas-reineke/indent-blankline.nvim'
   Plug 'neovim/nvim-lspconfig'
+  Plug 'rafamadriz/friendly-snippets'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/nvim-cmp'
