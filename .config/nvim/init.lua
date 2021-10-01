@@ -5,7 +5,7 @@ local Plug = vim.fn['plug#']
 local plugged_path = vim.env.VIM .. '/plugged'
 
 vim.call('plug#begin', plugged_path)
-  Plug 'junegunn/vim-peekaboo'
+  Plug 'tversteeg/registers.nvim'
   Plug 'morhetz/gruvbox'
   Plug 'mhinz/vim-startify'
   Plug 'terrortylor/nvim-comment'
@@ -92,6 +92,8 @@ vim.g.indent_blankline_filetype_exclude = { 'help' }
 vim.g.indent_blankline_buftype_exclude = { 'terminal', 'nofile' }
 vim.g.indent_blankline_char_highlight = 'LineNr'
 vim.g.indent_blankline_show_trailing_blankline_indent = false
+
+vim.g.registers_window_border = 'rounded'
 
 require('hop').setup {
   keys = 'etovxqpdygfblzhckisuran', 
