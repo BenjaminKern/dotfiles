@@ -69,8 +69,6 @@ echo "Downloading delta..."
 curl -sL https://github.com/dandavison/delta/releases/download/0.8.3/delta-0.8.3-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading forgit..."
 curl -sL git.io/forgit -o $DESTDIR/config/forgit.plugin.bash
-echo "Downloading sensible.bash..."
-curl -sL https://raw.githubusercontent.com/mrzool/bash-sensible/master/sensible.bash -o $DESTDIR/config/sensible.bash
 echo "Downloading fzf.keybindings.bash..."
 curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
 echo "Downloading fd ignore file..."

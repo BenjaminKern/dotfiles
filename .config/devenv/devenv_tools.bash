@@ -2,7 +2,6 @@ devenv_tools_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ! [[ -f $devenv_tools_dir/devenv_tools.bash ]] && return
 
 PATH=$devenv_tools_dir/bin:$PATH
-source $devenv_tools_dir/config/sensible.bash
 source $devenv_tools_dir/config/forgit.plugin.bash
 source $devenv_tools_dir/config/fzf-key-bindings.bash
 export FZF_DEFAULT_COMMAND='fd --type f'
@@ -27,3 +26,18 @@ source $devenv_tools_dir/bin/autocomplete/hyperfine.bash-completion
 source $devenv_tools_dir/bin/autocomplete/lsd.bash-completion
 source $devenv_tools_dir/bin/complete/rg.bash
 source $devenv_tools_dir/bin/completion/btm.bash
+
+# tab completion
+bind "set completion-ignore-case on"
+bind "set completion-map-case on"
+bind "set show-all-if-ambiguous on"
+bind "set mark-symlinked-directories on"
+# history
+shopt -s histappend
+shopt -s cmdhist
+PROMPT_COMMAND='history -a'
+HISTSIZE=500000
+HISTFILESIZE=100000
+HISTCONTROL="erasedups:ignoreboth"
+export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
+HISTTIMEFORMAT='%F %T '
