@@ -60,7 +60,9 @@ chmod u+x $DESTDIR/bin/direnv
 echo "Downloading gdbinit-gef..."
 curl -sL https://github.com/hugsy/gef/raw/master/gef.py -o $DESTDIR/config/gdbinit-gef.py
 echo "Downloading abduco..."
-curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.local/pkg/abduco-0.6-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.local/pkg/abduco-0.6-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
+echo "Downloading alacritty..."
+curl -sL https://github.com/BenjaminKern/dotfiles/raw/main/.local/pkg/alacritty-0.9.0-unknown-linux-gnu.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading zoxide..."
 curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.5/zoxide-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading delta..."
