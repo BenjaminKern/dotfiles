@@ -20,3 +20,10 @@ eval "$(zoxide init --cmd j bash)"
   export HTTPS_PROXY=$devenv_tools_proxy && \
   export http_proxy=$devenv_tools_proxy && \
   export https_proxy=$devenv_tools_proxy
+
+source $devenv_tools_dir/bin/autocomplete/bat.bash
+source $devenv_tools_dir/bin/autocomplete/fd.bash-completion
+source $devenv_tools_dir/bin/autocomplete/hyperfine.bash-completion
+source $devenv_tools_dir/bin/autocomplete/lsd.bash-completion
+source $devenv_tools_dir/bin/complete/rg.bash
+source $devenv_tools_dir/bin/completion/btm.bash
