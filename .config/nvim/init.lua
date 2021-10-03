@@ -6,7 +6,8 @@ local plugged_path = vim.env.VIM .. '/plugged'
 
 vim.call('plug#begin', plugged_path)
   Plug 'tversteeg/registers.nvim'
-  Plug 'morhetz/gruvbox'
+  Plug 'rktjmp/lush.nvim'
+  Plug 'ellisonleao/gruvbox.nvim'
   Plug 'mhinz/vim-startify'
   Plug 'terrortylor/nvim-comment'
   Plug 'norcalli/nvim-colorizer.lua'
