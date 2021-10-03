@@ -6,7 +6,6 @@ source $devenv_tools_dir/config/forgit.plugin.bash
 source $devenv_tools_dir/config/fzf-key-bindings.bash
 export FZF_DEFAULT_COMMAND='fd --type f'
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
-eval "$(starship init bash)"
 LS_COLORS="$(vivid generate one-dark)"
 alias ls='lsd'
 EDITOR=nvim
@@ -41,3 +40,5 @@ HISTFILESIZE=100000
 HISTCONTROL="erasedups:ignoreboth"
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
 HISTTIMEFORMAT='%F %T '
+
+eval "$(starship init bash)"
