@@ -33,6 +33,8 @@ vim.call('plug#begin', plugged_path)
   Plug 'ahmedkhalf/project.nvim'
   Plug 'akinsho/toggleterm.nvim'
   Plug 'antoinemadec/FixCursorHold.nvim' -- https://github.com/neovim/neovim/issues/12587
+  Plug 'sindrets/diffview.nvim'
+  Plug 'f-person/git-blame.nvim'
   -- Plug 'folke/which-key.nvim'
 vim.call('plug#end')
 
@@ -93,6 +95,8 @@ vim.g.indent_blankline_filetype_exclude = { 'help' }
 vim.g.indent_blankline_buftype_exclude = { 'terminal', 'nofile' }
 vim.g.indent_blankline_char_highlight = 'LineNr'
 vim.g.indent_blankline_show_trailing_blankline_indent = false
+
+vim.g.gitblame_enabled = 0
 
 vim.g.registers_window_border = 'rounded'
 
@@ -243,4 +247,7 @@ require('toggleterm').setup{
 vim.api.nvim_set_keymap('t', '<esc>', [[<C-\><C-n>]], { noremap = true})
 require('nvim-tree').setup {
   update_cwd = true
+}
+require('diffview').setup{
+    enhanced_diff_hl = true
 }
