@@ -229,7 +229,7 @@ require('lspconfig').pyright.setup {
 require('lspconfig').clangd.setup {
   on_attach = on_attach,
   capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities()),
-  cmd = { "clangd", "--background-index", "--enable-config", "--header-insertion=iwyu", "--cross-file-rename", "--clang-tidy", "--clang-tidy-checks=cppcoreguidelines-*,modernize-*,performance-*,readability-*"}
+  cmd = { "clangd", "--background-index", "--enable-config", "--header-insertion=iwyu", "--cross-file-rename", "--clang-tidy", "--clang-tidy-checks=bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*"}
 }
 
 require('lualine').setup()
