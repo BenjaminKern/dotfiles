@@ -67,6 +67,9 @@ echo "Downloading zoxide..."
 curl -sL https://github.com/ajeetdsouza/zoxide/releases/download/v0.7.5/zoxide-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
 echo "Downloading delta..."
 curl -sL https://github.com/dandavison/delta/releases/download/0.8.3/delta-0.8.3-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
+echo "Downloading ttyd..."
+curl -sL https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64 -o $DESTDIR/bin/ttyd
+chmod u+x $DESTDIR/bin/ttyd
 echo "Downloading forgit..."
 curl -sL git.io/forgit -o $DESTDIR/config/forgit.plugin.bash
 echo "Downloading fzf.keybindings.bash..."
