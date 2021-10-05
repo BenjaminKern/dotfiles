@@ -16,11 +16,11 @@ curl -sL https://raw.githubusercontent.com/BenjaminKern/dotfiles/main/.config/nv
 echo "Downloading node..."
 curl -sL install-node.now.sh | bash -s -- --prefix=$DESTDIR --yes
 echo "Downloading yarn..."
-curl -sL https://github.com/yarnpkg/yarn/releases/download/v1.22.11/yarn-v1.22.11.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
+curl -sL https://github.com/yarnpkg/yarn/releases/download/v1.22.15/yarn-v1.22.15.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR
 echo "Downloading clangd..."
-curl -sL https://github.com/clangd/clangd/releases/download/12.0.1/clangd-linux-12.0.1.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
+curl -sL https://github.com/clangd/clangd/releases/download/13.0.0/clangd-linux-13.0.0.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 echo "Downloading clangd indexer..."
-curl -sL https://github.com/clangd/clangd/releases/download/12.0.1/clangd_indexing_tools-linux-12.0.1.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
+curl -sL https://github.com/clangd/clangd/releases/download/13.0.0/clangd_indexing_tools-linux-13.0.0.zip | bsdtar xf - --strip-components=1 -C $DESTDIR
 chmod u+x $DESTDIR/bin/clangd*
 echo "Downloading ripgrep..."
 curl -sL https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
