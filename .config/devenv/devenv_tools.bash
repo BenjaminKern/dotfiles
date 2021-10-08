@@ -5,7 +5,6 @@ PATH=$devenv_tools_dir/bin:$devenv_tools_dir/git-fuzzy/bin:$PATH
 source $devenv_tools_dir/config/fzf-key-bindings.bash
 export FZF_DEFAULT_COMMAND="fd --color never --type f --hidden --ignore-file $devenv_tools_dir/share/nvim/.fd-ignore"
 export GF_PREFERRED_PAGER="delta --theme=gruvbox --highlight-removed -w __WIDTH__"
-export BAT_STYLE=gruvbox
 export GF_LOG_MENU_PARAMS='--pretty="%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --topo-order'
 export GF_REFLOG_MENU_PARAMS='--pretty=fuzzyformat'
 export STARSHIP_CONFIG=$devenv_tools_dir/config/starship.toml
