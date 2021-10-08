@@ -24,8 +24,6 @@ curl -sL https://github.com/clangd/clangd/releases/download/13.0.0/clangd_indexi
 chmod u+x $DESTDIR/bin/clangd*
 echo "Downloading ripgrep..."
 curl -sL https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - --strip-components=1 -C $DESTDIR/bin
-echo "Downloading skim..."
-curl -sL https://github.com/lotabout/skim/releases/download/v0.9.4/skim-v0.9.4-x86_64-unknown-linux-musl.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading fzf..."
 curl -sL https://github.com/junegunn/fzf/releases/download/0.27.2/fzf-0.27.2-linux_amd64.tar.gz | bsdtar xfz - -C $DESTDIR/bin
 echo "Downloading hexyl..."
@@ -70,8 +68,8 @@ curl -sL https://github.com/dandavison/delta/releases/download/0.8.3/delta-0.8.3
 echo "Downloading ttyd..."
 curl -sL https://github.com/tsl0922/ttyd/releases/download/1.6.3/ttyd.x86_64 -o $DESTDIR/bin/ttyd
 chmod u+x $DESTDIR/bin/ttyd
-echo "Downloading forgit..."
-curl -sL git.io/forgit -o $DESTDIR/config/forgit.plugin.bash
+echo "Cloning git-fuzzy..."
+git clone https://github.com/bigH/git-fuzzy.git $DESTDIR/git-fuzzy
 echo "Downloading fzf.keybindings.bash..."
 curl -sL https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash -o $DESTDIR/config/fzf-key-bindings.bash
 echo "Downloading fd ignore file..."
