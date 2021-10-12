@@ -241,9 +241,10 @@ require('nvim_comment').setup()
 require('lspkind').init()
 require('project_nvim').setup()
 require('toggleterm').setup{
-  direction = "float",
+  direction = 'float',
+  shell = '/bin/bash',
   float_opts = {
-    border = "double",
+    border = 'double',
   },
   open_mapping = [[<leader>t]],
 }
