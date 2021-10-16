@@ -12,7 +12,6 @@ vim.call('plug#begin', plugged_path)
   Plug 'terrortylor/nvim-comment'
   Plug 'norcalli/nvim-colorizer.lua'
   Plug 'ray-x/lsp_signature.nvim'
-  Plug 'simrat39/symbols-outline.nvim'
   Plug 'onsails/lspkind-nvim'
   Plug 'kosayoda/nvim-lightbulb'
   Plug 'kyazdani42/nvim-web-devicons'
@@ -122,7 +121,6 @@ vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('fzf-lua').files()<
 vim.api.nvim_set_keymap('n', '<leader>g', [[<cmd>lua require('fzf-lua').live_grep()<CR>]], { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap('n', '<leader>d', [[<cmd>lua require('nvim-tree').toggle()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>o', [[<cmd>lua require('symbols-outline').toggle_outline()<CR>]], { noremap = true, silent = true })
 
 
 -- Highlight on yank
@@ -210,15 +208,18 @@ cmp.setup {
 -- LSP settings
 local on_attach = function(_, bufnr)
   local opts = { noremap = true, silent = true }
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', "<cmd>lua require('fzf-lua').lsp_definitions()<CR>", opts)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', "<cmd>lua require('fzf-lua').lsp_declarations()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', "<cmd>lua require('fzf-lua').lsp_references()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', "<cmd>lua require('fzf-lua').lsp_implementations()<CR>", opts)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
   vim.cmd [[ command! LspDiagnostics execute "lua require('fzf-lua').lsp_workspace_diagnostics()<CR>" ]]
+  vim.cmd [[ command! LspSymbols execute "lua require('fzf-lua').lsp_workspace_symbols()<CR>" ]]
 end
 
 vim.api.nvim_call_function("sign_define", {"DiagnosticSignError", {text = "", texthl = "DiagnosticSignError"}})
