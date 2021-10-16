@@ -153,6 +153,8 @@ end
 vim.o.completeopt = 'menu,menuone,noselect'
 
 local cmp = require('cmp')
+local lspkind = require('lspkind')
+lspkind.init()
 cmp.setup {
   snippet = {
     expand = function(args)
@@ -189,25 +191,14 @@ cmp.setup {
     { name = 'buffer' },
   },
   formatting = {
-    format = function(entry, vim_item)
-      -- fancy icons and a name of kind
-      vim_item.kind = require("lspkind").presets.default[vim_item.kind] .. " " .. vim_item.kind
-
-      -- set a name for each source
-      vim_item.menu = ({
-        buffer = "[Buffer]",
-        nvim_lsp = "[LSP]",
-        vsnip = "[VSnip]",
-        nvim_lua = "[Lua]",
-      })[entry.source.name]
-      return vim_item
-    end,
+    format = lspkind.cmp_format(),
   },
 }
 
 -- LSP settings
 local on_attach = function(_, bufnr)
   local opts = { noremap = true, silent = true }
+
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
@@ -243,7 +234,6 @@ require('lualine').setup()
 require('colorizer').setup()
 require('lsp_signature').setup()
 require('nvim_comment').setup()
-require('lspkind').init()
 require('project_nvim').setup()
 require('toggleterm').setup{
   direction = 'float',
