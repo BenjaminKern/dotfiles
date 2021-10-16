@@ -106,18 +106,24 @@ require('hop').setup {
 }
 vim.api.nvim_set_keymap('n', 'ww', "<cmd>lua require('hop').hint_words()<cr>", {})
 
-local actions = require('fzf-lua.actions')
 require('fzf-lua').setup{
   files = {
     cmd = 'fd --color never --type f --hidden --ignore-file ' .. vim.env.VIM .. '/.fd-ignore',
+  },
+  git = {
+    commits = {
+      cmd = 'git log --color --abbrev-commit --pretty=format:\'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\''
+    }
   }
 }
+vim.cmd [[ command! GV execute "lua require('fzf-lua').git_commits()<CR>" ]]
 
 vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('fzf-lua').files()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>g', [[<cmd>lua require('fzf-lua').live_grep()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>gg', [[<cmd>lua require('fzf-lua').grep_cword()<CR>]], { noremap = true, silent = true })
+
 vim.api.nvim_set_keymap('n', '<leader>d', [[<cmd>lua require('nvim-tree').toggle()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>o', [[<cmd>lua require('symbols-outline').toggle_outline()<CR>]], { noremap = true, silent = true })
+
 
 -- Highlight on yank
 vim.api.nvim_exec(
