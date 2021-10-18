@@ -34,6 +34,7 @@ vim.call('plug#begin', plugged_path)
   Plug 'antoinemadec/FixCursorHold.nvim' -- https://github.com/neovim/neovim/issues/12587
   Plug 'sindrets/diffview.nvim'
   Plug 'f-person/git-blame.nvim'
+  Plug 'nvim-telescope/telescope-fzf-native.nvim'
   -- Plug 'folke/which-key.nvim'
 vim.call('plug#end')
 
@@ -118,6 +119,11 @@ require('telescope').setup{
     }
   }
 }
+
+if vim.fn.has('unix') == 1 then
+  require('telescope').load_extension('fzf')
+end
+
 vim.cmd [[ command! GV execute "lua require('telescope.builtin').git_commits()<CR>" ]]
 
 vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('telescope.builtin').find_files()<CR>]], { noremap = true, silent = true })
