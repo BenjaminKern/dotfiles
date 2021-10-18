@@ -8,7 +8,6 @@ vim.call('plug#begin', plugged_path)
   Plug 'tversteeg/registers.nvim'
   Plug 'rktjmp/lush.nvim'
   Plug 'ellisonleao/gruvbox.nvim'
-  Plug 'mhinz/vim-startify'
   Plug 'terrortylor/nvim-comment'
   Plug 'norcalli/nvim-colorizer.lua'
   Plug 'ray-x/lsp_signature.nvim'
@@ -17,8 +16,9 @@ vim.call('plug#begin', plugged_path)
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'shadmansaleh/lualine.nvim'
   Plug 'kyazdani42/nvim-tree.lua'
-  Plug 'vijaymarupudi/nvim-fzf'
-  Plug 'ibhagwan/fzf-lua'
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-telescope/telescope.nvim'
+  Plug 'glepnir/dashboard-nvim'
   Plug 'phaazon/hop.nvim'
   Plug 'lukas-reineke/indent-blankline.nvim'
   Plug 'neovim/nvim-lspconfig'
@@ -90,7 +90,7 @@ vim.api.nvim_set_keymap('n', 'j', "v:count == 0 ? 'gj' : 'j'", { noremap = true,
 
 --Map blankline
 vim.g.indent_blankline_char = '┊'
-vim.g.indent_blankline_filetype_exclude = { 'help' }
+vim.g.indent_blankline_filetype_exclude = { 'help', 'dashboard' }
 vim.g.indent_blankline_buftype_exclude = { 'terminal', 'nofile' }
 vim.g.indent_blankline_char_highlight = 'LineNr'
 vim.g.indent_blankline_show_trailing_blankline_indent = false
@@ -99,26 +99,29 @@ vim.g.gitblame_enabled = 0
 
 vim.g.registers_window_border = 'rounded'
 
+vim.g.dashboard_default_executive = 'telescope'
+
 require('hop').setup {
   keys = 'etovxqpdygfblzhckisuran', 
   term_seq_bias = 0.5
 }
 vim.api.nvim_set_keymap('n', 'ww', "<cmd>lua require('hop').hint_words()<cr>", {})
 
-require('fzf-lua').setup{
-  files = {
-    cmd = 'fd --color never --type f --hidden --ignore-file ' .. vim.env.VIM .. '/.fd-ignore',
-  },
-  git = {
-    commits = {
-      cmd = 'git log --color --abbrev-commit --pretty=format:\'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset\''
+local actions = require('telescope.actions')
+require('telescope').setup{
+  defaults = {
+    mappings = {
+      i = {
+        ["<C-j>"] = actions.move_selection_next,
+        ["<C-k>"] = actions.move_selection_previous,
+      }
     }
   }
 }
-vim.cmd [[ command! GV execute "lua require('fzf-lua').git_commits()<CR>" ]]
+vim.cmd [[ command! GV execute "lua require('telescope.builtin').git_commits()<CR>" ]]
 
-vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('fzf-lua').files()<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>g', [[<cmd>lua require('fzf-lua').live_grep()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('telescope.builtin').find_files()<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>g', [[<cmd>lua require('telescope.builtin').live_grep()<CR>]], { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap('n', '<leader>d', [[<cmd>lua require('nvim-tree').toggle()<CR>]], { noremap = true, silent = true })
 
@@ -203,14 +206,14 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
 
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', "<cmd>lua require('fzf-lua').lsp_definitions()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', "<cmd>lua require('telescope.builtin').lsp_definitions()<CR>", opts)
   -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', "<cmd>lua require('fzf-lua').lsp_declarations()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', "<cmd>lua require('fzf-lua').lsp_references()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', "<cmd>lua require('fzf-lua').lsp_implementations()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', "<cmd>lua require('telescope.builtin').lsp_declarations()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', "<cmd>lua require('telescope.builtin').lsp_references()<CR>", opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', "<cmd>lua require('telescope.builtin').lsp_implementations()<CR>", opts)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
-  vim.cmd [[ command! LspDiagnostics execute "lua require('fzf-lua').lsp_workspace_diagnostics()<CR>" ]]
-  vim.cmd [[ command! LspSymbols execute "lua require('fzf-lua').lsp_workspace_symbols()<CR>" ]]
+  vim.cmd [[ command! LspDiagnostics execute "lua require('telescope.builtin').lsp_workspace_diagnostics()<CR>" ]]
+  vim.cmd [[ command! LspSymbols execute "lua require('telescope.builtin').lsp_workspace_symbols()<CR>" ]]
 end
 
 vim.api.nvim_call_function("sign_define", {"DiagnosticSignError", {text = "", texthl = "DiagnosticSignError"}})
