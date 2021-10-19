@@ -238,6 +238,14 @@ require('lspconfig').clangd.setup {
   cmd = { "clangd", "--background-index", "--enable-config", "--header-insertion=iwyu", "--cross-file-rename", "--clang-tidy", "--clang-tidy-checks=bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*"}
 }
 
+local get_toggleterm_shell = function()
+  if vim.fn.has('unix') == 1 then
+    return '/bin/bash'
+  else
+    return 'cmd.exe'
+  end
+end
+
 require('lualine').setup()
 -- require("bufferline").setup()
 require('colorizer').setup()
@@ -246,7 +254,7 @@ require('nvim_comment').setup()
 require('project_nvim').setup()
 require('toggleterm').setup{
   direction = 'float',
-  shell = '/bin/bash',
+  shell = get_toggleterm_shell(),
   float_opts = {
     border = 'double',
   },
