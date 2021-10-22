@@ -62,6 +62,8 @@ vim.cmd([[set undofile]])
 --Lightbulb
 vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
 
+vim.cmd([[autocmd FileType python,cpp,c setlocal tw=79]])
+
 --Case insensitive searching UNLESS /C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -69,7 +71,6 @@ vim.o.smartcase = true
 vim.o.expandtab = true
 vim.o.smarttab = true
 vim.o.shiftwidth = 2
-vim.o.textwidth = 80
 
 --Decrease update time
 vim.o.updatetime = 250
