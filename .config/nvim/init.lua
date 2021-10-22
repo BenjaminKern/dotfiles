@@ -14,7 +14,7 @@ vim.call('plug#begin', plugged_path)
   Plug 'onsails/lspkind-nvim'
   Plug 'kosayoda/nvim-lightbulb'
   Plug 'kyazdani42/nvim-web-devicons'
-  Plug 'shadmansaleh/lualine.nvim'
+  Plug 'nvim-lualine/lualine.nvim'
   Plug 'kyazdani42/nvim-tree.lua'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
@@ -159,7 +159,7 @@ local feedkey = function(key, mode)
 end
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menu,menuone,noselect'
+vim.o.completeopt = 'menuone,noselect'
 
 local cmp = require('cmp')
 local lspkind = require('lspkind')
@@ -227,14 +227,16 @@ vim.api.nvim_call_function("sign_define", {"DiagnosticSignWarning", {text = "
 vim.api.nvim_call_function("sign_define", {"DiagnosticSignInformation", {text = "", texthl = "DiagnosticSignInformation"}})
 vim.api.nvim_call_function("sign_define", {"DiagnosticSignHint", {text = "", texthl = "DiagnosticSignHint"}})
 
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
 require('lspconfig').pyright.setup {
   on_attach = on_attach,
-  capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities()),
+  capabilities = capabilities
 }
 
 require('lspconfig').clangd.setup {
   on_attach = on_attach,
-  capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities()),
+  capabilities = capabilities,
   cmd = { "clangd", "--background-index", "--enable-config", "--header-insertion=iwyu", "--cross-file-rename", "--clang-tidy", "--clang-tidy-checks=bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*"}
 }
 
