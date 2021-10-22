@@ -73,7 +73,9 @@ vim.o.smarttab = true
 vim.o.shiftwidth = 2
 
 --Decrease update time
-vim.o.updatetime = 250
+-- vim.o.updatetime = 250
+vim.g.cursorhold_updatetime = 100
+
 vim.wo.signcolumn = "yes"
 
 --Set colorscheme (order is important here)
