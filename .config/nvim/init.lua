@@ -185,6 +185,9 @@ local cmp = require("cmp")
 local lspkind = require("lspkind")
 lspkind.init()
 cmp.setup({
+  completion = {
+    keyword_length = 2
+  },
   snippet = {
     expand = function(args)
       vim.fn["vsnip#anonymous"](args.body)
@@ -219,7 +222,7 @@ cmp.setup({
       "i",
       "s",
     }),
-    ["<C-e>"] = cmp.mapping.close(),
+    ['<C-Space>'] = cmp.mapping.complete(),
     ["<CR>"] = cmp.mapping.confirm({ select = true }),
   },
   sources = {
