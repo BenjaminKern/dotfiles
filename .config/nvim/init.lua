@@ -101,6 +101,15 @@ vim.g.indent_blankline_buftype_exclude = { "terminal", "nofile" }
 vim.g.indent_blankline_char_highlight = "LineNr"
 vim.g.indent_blankline_show_trailing_blankline_indent = false
 
+vim.opt.list = true
+vim.opt.listchars:append("eol:↴")
+vim.opt.listchars:append("space:⋅")
+
+require("indent_blankline").setup({
+  show_end_of_line = true,
+  show_char_blankline = " ",
+})
+
 vim.g.gitblame_enabled = 0
 
 vim.g.registers_window_border = "rounded"
