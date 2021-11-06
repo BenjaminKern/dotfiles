@@ -35,7 +35,6 @@ Plug("antoinemadec/FixCursorHold.nvim") -- https://github.com/neovim/neovim/issu
 Plug("sindrets/diffview.nvim")
 Plug("f-person/git-blame.nvim")
 Plug("goolord/alpha-nvim")
--- Plug 'folke/which-key.nvim'
 vim.call("plug#end")
 
 --Incremental live completion
@@ -227,6 +226,7 @@ cmp.setup({
     { name = "nvim_lsp" },
     { name = "vsnip" },
     { name = "buffer" },
+    { name = "path" },
   },
   formatting = {
     format = lspkind.cmp_format(),
