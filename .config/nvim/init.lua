@@ -54,6 +54,8 @@ vim.o.mouse = "a"
 --Enable break indent
 vim.o.breakindent = true
 
+vim.api.nvim_command("set noswapfile")
+
 --Save undo history
 vim.cmd([[set undofile]])
 
