@@ -32,7 +32,6 @@ Plug("hrsh7th/vim-vsnip")
 Plug("ahmedkhalf/project.nvim")
 Plug("akinsho/toggleterm.nvim")
 Plug("antoinemadec/FixCursorHold.nvim") -- https://github.com/neovim/neovim/issues/12587
-Plug("sindrets/diffview.nvim")
 Plug("f-person/git-blame.nvim")
 Plug("goolord/alpha-nvim")
 vim.call("plug#end")
@@ -324,7 +323,4 @@ require("toggleterm").setup({
 vim.api.nvim_set_keymap("t", "<esc>", [[<C-\><C-n>]], { noremap = true })
 require("nvim-tree").setup({
   update_cwd = true,
-})
-require("diffview").setup({
-  enhanced_diff_hl = true,
 })
