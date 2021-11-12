@@ -51,13 +51,11 @@ vim.o.hidden = true
 --Enable mouse mode
 vim.o.mouse = "a"
 
---Enable break indent
 vim.o.breakindent = true
 
-vim.api.nvim_command("set noswapfile")
+vim.o.undofile = false
 
---Save undo history
-vim.cmd([[set undofile]])
+vim.o.swapfile = false
 
 --Lightbulb
 vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
