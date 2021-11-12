@@ -1,4 +1,5 @@
 vim.cmd([[packadd plug]])
+vim.cmd([[packadd termdebug]])
 
 local Plug = vim.fn["plug#"]
 
@@ -56,6 +57,8 @@ vim.o.breakindent = true
 vim.o.undofile = false
 
 vim.o.swapfile = false
+
+vim.g.termdebug_wide = true
 
 --Lightbulb
 vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
