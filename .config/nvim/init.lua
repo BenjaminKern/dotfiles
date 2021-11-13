@@ -1,5 +1,4 @@
 vim.cmd([[packadd plug]])
-vim.cmd([[packadd termdebug]])
 
 local Plug = vim.fn["plug#"]
 
@@ -57,8 +56,6 @@ vim.o.breakindent = true
 vim.o.undofile = false
 
 vim.o.swapfile = false
-
-vim.g.termdebug_wide = true
 
 --Lightbulb
 vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
@@ -327,3 +324,6 @@ vim.api.nvim_set_keymap("t", "<esc>", [[<C-\><C-n>]], { noremap = true })
 require("nvim-tree").setup({
   update_cwd = true,
 })
+
+vim.cmd([[packadd termdebug]])
+vim.g.termdebug_wide = true
