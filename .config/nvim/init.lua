@@ -34,6 +34,7 @@ Plug("akinsho/toggleterm.nvim")
 Plug("antoinemadec/FixCursorHold.nvim") -- https://github.com/neovim/neovim/issues/12587
 Plug("f-person/git-blame.nvim")
 Plug("goolord/alpha-nvim")
+Plug("lukas-reineke/cmp-rg")
 vim.call("plug#end")
 
 --Incremental live completion
@@ -228,6 +229,7 @@ cmp.setup({
     { name = "path" },
     { name = "nvim_lsp" },
     { name = "vsnip" },
+    { name = "rg" },
     { name = "buffer" },
   },
   formatting = {
