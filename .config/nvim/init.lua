@@ -225,10 +225,10 @@ cmp.setup({
     ["<CR>"] = cmp.mapping.confirm({ select = true }),
   },
   sources = {
+    { name = "path" },
     { name = "nvim_lsp" },
     { name = "vsnip" },
     { name = "buffer" },
-    { name = "path" },
   },
   formatting = {
     format = lspkind.cmp_format(),
