@@ -187,6 +187,9 @@ require("mini.tabline").setup()
 require("mini.trailspace").setup()
 require("mini.sessions").setup()
 require("mini.fuzzy").setup()
+-- Gruvbox colorscheme sets an incompatible Error highlight group which can not be used for
+-- the MiniTrailspace highlight group. For that reason we are owerwriting the highlight group here
+vim.api.nvim_exec([[hi MiniTrailspace ctermfg=235 ctermbg=223 guifg=#112641 guibg=#ffcfa0]], false)
 
 -- LSP settings
 local on_attach = function(client, bufnr)
