@@ -8,7 +8,7 @@ vim.call("plug#begin", plugged_path)
 Plug("kyazdani42/nvim-web-devicons")
 Plug("kyazdani42/nvim-tree.lua")
 Plug("lewis6991/gitsigns.nvim")
-Plug("onsails/lspkind-nvim")
+Plug("onsails/lspkind.nvim")
 Plug("echasnovski/mini.nvim")
 Plug("phaazon/hop.nvim")
 Plug("neovim/nvim-lspconfig")
@@ -18,6 +18,7 @@ Plug("nvim-lua/plenary.nvim")
 Plug("nvim-telescope/telescope.nvim")
 Plug("stevearc/aerial.nvim")
 Plug("akinsho/toggleterm.nvim")
+Plug("sainnhe/gruvbox-material")
 Plug("L3MON4D3/LuaSnip")
 vim.call("plug#end")
 
@@ -56,10 +57,11 @@ vim.g.maplocalleader = ","
 
 vim.g.do_filetype_lua = true
 
+vim.g.gruvbox_material_background = "hard"
+vim.opt.background = "dark"
 vim.o.termguicolors = true
 
-local mini_base16 = require("mini.base16")
-mini_base16.setup({palette = mini_base16.mini_palette('#112641', '#e2e98f', 75), name = 'minischeme', use_cterm = true})
+vim.cmd([[colorscheme gruvbox-material]])
 
 vim.api.nvim_create_autocmd("TextYankPost", {
     pattern = "*",
@@ -95,10 +97,16 @@ vim.keymap.set("n", "<leader>ff", function() require('telescope.builtin').find_f
 vim.keymap.set("n", "<leader>fb", function() require('telescope.builtin').buffers() end)
 vim.keymap.set("n", "<leader>fg", function() require('telescope.builtin').grep_string() end)
 
+vim.g.nvim_tree_respect_buf_cwd = 1
+
 require("nvim-tree").setup({
   update_cwd = true,
+  update_focused_file = {
+    enable = true,
+    update_cwd = true
+  },
 })
-require('lspkind').setup({
+require('lspkind').init({
   mode = 'symbol',
 })
 require("gitsigns").setup()
