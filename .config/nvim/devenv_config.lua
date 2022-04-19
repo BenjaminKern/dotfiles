@@ -17,6 +17,7 @@ Plug("norcalli/nvim-colorizer.lua")
 Plug("nvim-lua/plenary.nvim")
 Plug("nvim-telescope/telescope.nvim")
 Plug("stevearc/aerial.nvim")
+Plug("stevearc/dressing.nvim")
 Plug("akinsho/toggleterm.nvim")
 Plug("sainnhe/gruvbox-material")
 Plug("L3MON4D3/LuaSnip")
@@ -58,10 +59,26 @@ vim.g.maplocalleader = ","
 vim.g.do_filetype_lua = true
 
 vim.g.gruvbox_material_background = "hard"
+vim.g.gruvbox_material_disable_italic_comment = true
 vim.opt.background = "dark"
 vim.o.termguicolors = true
-
 vim.cmd([[colorscheme gruvbox-material]])
+
+-- Fake clipboard
+vim.cmd([[
+let g:clipboard = {
+      \   'name': 'fake',
+      \   'copy': {
+      \      '+': {lines, regtype -> extend(g:, {'clipboard_cache': [lines, regtype]}) },
+      \      '*': {lines, regtype -> extend(g:, {'clipboard_cache': [lines, regtype]}) },
+      \    },
+      \   'paste': {
+      \      '+': {-> get(g:, 'clipboard_cache', [])},
+      \      '*': {-> get(g:, 'clipboard_cache', [])},
+      \   },
+      \ }
+]])
+
 
 vim.api.nvim_create_autocmd("TextYankPost", {
     pattern = "*",
@@ -75,22 +92,26 @@ vim.api.nvim_create_autocmd("FileType", {
     command = "setlocal tw=79",
 })
 
+vim.api.nvim_create_user_command('Commits', function() require("telescope.builtin").git_commits() end, {})
+vim.api.nvim_create_user_command('Registers', function() require("telescope.builtin").registers() end, {})
+vim.api.nvim_create_user_command('Trim', function() MiniTrailspace.trim() end, {})
 
-vim.cmd([[ command! GV execute "lua require('telescope.builtin').git_commits()<CR>" ]])
-vim.cmd([[ command! Trim execute "lua MiniTrailspace.trim()<CR>" ]])
+local function t(str)
+    return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
 
 vim.keymap.set("n", "Y", "y$")
 vim.keymap.set("n", "<leader>d", function() require('nvim-tree').toggle() end)
 vim.keymap.set("n", "ww", function() require('hop').hint_words() end)
-vim.keymap.set('i', '<Tab>', function() return vim.fn.pumvisible() == 1 and "<C-n>" or "<Tab>" end, { expr = true })
-vim.keymap.set('i', '<S-Tab>', function() return vim.fn.pumvisible() == 1 and "<C-p>" or "<Tab>" end, { expr = true })
+vim.keymap.set('i', '<Tab>', function() return vim.fn.pumvisible() == 1 and t"<C-n>" or t"<Tab>"  end, { expr = true })
+vim.keymap.set('i', '<S-Tab>', function() return vim.fn.pumvisible() == 1 and t"<C-p>" or t"<Tab>" end, { expr = true })
 vim.keymap.set("i", "<CR>", function()
   if vim.fn.pumvisible() ~= 0 then
     -- If popup is visible, confirm selected item or add new line otherwise
     local item_selected = vim.fn.complete_info()['selected'] ~= -1
-    return item_selected and vim.api.nvim_replace_termcodes('<C-y>', true, true, true) or vim.api.nvim_replace_termcodes('<C-y><CR>', true, true, true)
+    return item_selected and t"<C-y>" or t"<C-y><CR>"
   else
-    return vim.api.nvim_replace_termcodes('<CR>', true, true, true)
+    return t"<CR>"
   end
 end,{ expr = true })
 vim.keymap.set("n", "<leader>ff", function() require('telescope.builtin').find_files() end)
@@ -117,6 +138,7 @@ require("hop").setup({
   term_seq_bias = 0.5,
 })
 require("aerial").setup()
+require("dressing").setup()
 
 local fd_ignore_path = vim.env.VIM .. "/.fd-ignore"
 
@@ -179,10 +201,9 @@ local on_attach = function(client, bufnr)
   vim.keymap.set("n", "ca", function() require('telescope.builtin').lsp_code_actions() end, opts)
   vim.keymap.set("n", "gs", function() require('telescope.builtin').lsp_document_symbols() end, opts)
   vim.keymap.set("n", "gS", function() require('telescope.builtin').lsp_workspace_symbols() end, opts)
-
-  vim.cmd([[ command! Format execute 'lua vim.lsp.buf.formatting()' ]])
+  vim.api.nvim_buf_create_user_command(bufnr, "Format", function() vim.lsp.buf.formatting() end, {})
+  vim.api.nvim_buf_create_user_command(bufnr, "Diagnostics", function() require('telescope.builtin').diagnostics() end, {})
   require("aerial").on_attach(client, bufnr)
-  -- vim.cmd([[ command! LspDiagnostics execute "lua require('fzf-lua').lsp_workspace_diagnostics()<CR>" ]])
 end
 
 vim.api.nvim_call_function("sign_define", { "DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" } })
