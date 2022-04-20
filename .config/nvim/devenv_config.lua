@@ -182,7 +182,10 @@ require("toggleterm").setup({
   open_mapping = [[<leader>t]],
 })
 require("mini.comment").setup()
-require("mini.completion").setup()
+require("mini.completion").setup({
+  source_func = "omnifunc",
+  auto_setup = false
+})
 require("mini.cursorword").setup()
 require("mini.indentscope").setup()
 require("mini.starter").setup()
@@ -199,6 +202,7 @@ vim.api.nvim_exec([[hi MiniTrailspace ctermfg=235 ctermbg=223 guifg=#112641 guib
 -- LSP settings
 local on_attach = function(client, bufnr)
   local opts = { silent = true, buffer = bufnr }
+  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.MiniCompletion.completefunc_lsp')
   vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
   vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
   vim.keymap.set("n", "gi", function() require('telescope.builtin').lsp_implementations() end, opts)
