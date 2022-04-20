@@ -99,6 +99,10 @@ local function t(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
+local function feedkeys(key, mode)
+  vim.api.nvim_feedkeys(t(key), mode, true)
+end
+
 vim.keymap.set("n", "Y", "y$")
 vim.keymap.set("n", "<leader>d", function() require('nvim-tree').toggle() end)
 vim.keymap.set("n", "ww", function() require('hop').hint_words() end)
@@ -110,7 +114,7 @@ vim.keymap.set("i", "<CR>", function()
     local item_selected = vim.fn.complete_info()['selected'] ~= -1
     return item_selected and t"<C-y>" or t"<C-y><CR>"
   else
-    return t"<CR>"
+    return require('mini.pairs').cr()
   end
 end,{ expr = true })
 vim.keymap.set("n", "<leader>ff", function() require('telescope.builtin').find_files() end)
@@ -186,6 +190,7 @@ require("mini.statusline").setup()
 require("mini.tabline").setup()
 require("mini.trailspace").setup()
 require("mini.sessions").setup()
+require("mini.pairs").setup()
 require("mini.fuzzy").setup()
 -- Gruvbox colorscheme sets an incompatible Error highlight group which can not be used for
 -- the MiniTrailspace highlight group. For that reason we are owerwriting the highlight group here
