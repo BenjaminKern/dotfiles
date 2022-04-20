@@ -99,15 +99,39 @@ local function t(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
-local function feedkeys(key, mode)
+local function feedkeys(key)
+  local mode = ""
   vim.api.nvim_feedkeys(t(key), mode, true)
 end
 
 vim.keymap.set("n", "Y", "y$")
 vim.keymap.set("n", "<leader>d", function() require('nvim-tree').toggle() end)
 vim.keymap.set("n", "ww", function() require('hop').hint_words() end)
-vim.keymap.set('i', '<Tab>', function() return vim.fn.pumvisible() == 1 and t"<C-n>" or t"<Tab>"  end, { expr = true })
-vim.keymap.set('i', '<S-Tab>', function() return vim.fn.pumvisible() == 1 and t"<C-p>" or t"<Tab>" end, { expr = true })
+
+local luasnip = require("luasnip")
+luasnip.config.set_config({ history = true })
+require("luasnip.loaders.from_snipmate").lazy_load()
+
+vim.keymap.set({"i", "s"}, "<Tab>", function()
+  if vim.fn.pumvisible() ~= 0 then
+    return t"<C-n>"
+  elseif luasnip.expand_or_jumpable() then
+    return feedkeys"<Plug>luasnip-expand-or-jump"
+  else
+    return t"<Tab>"
+  end
+end, { expr = true })
+
+vim.keymap.set({"i", "s"}, "<S-Tab>", function()
+  if vim.fn.pumvisible() ~= 0 then
+    return t"<C-p>"
+  elseif luasnip.jumpable(-1) then
+    return feedkeys"<Plug>luasnip-jump-prev"
+  else
+    return t"<S-Tab>"
+  end
+end, { expr = true })
+
 vim.keymap.set("i", "<CR>", function()
   if vim.fn.pumvisible() ~= 0 then
     -- If popup is visible, confirm selected item or add new line otherwise
