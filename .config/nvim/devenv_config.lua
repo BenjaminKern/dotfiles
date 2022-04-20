@@ -5,65 +5,48 @@ local Plug = vim.fn["plug#"]
 local plugged_path = vim.env.VIM .. "/plugged"
 
 vim.call("plug#begin", plugged_path)
-Plug("kyazdani42/nvim-web-devicons")
-Plug("kyazdani42/nvim-tree.lua")
-Plug("lewis6991/gitsigns.nvim")
-Plug("onsails/lspkind.nvim")
-Plug("echasnovski/mini.nvim")
-Plug("phaazon/hop.nvim")
-Plug("neovim/nvim-lspconfig")
+Plug("L3MON4D3/LuaSnip")
 Plug("ahmedkhalf/project.nvim")
-Plug("norcalli/nvim-colorizer.lua")
+Plug("akinsho/toggleterm.nvim")
+Plug("benfowler/telescope-luasnip.nvim")
+Plug("echasnovski/mini.nvim")
+Plug("kyazdani42/nvim-tree.lua")
+Plug("kyazdani42/nvim-web-devicons")
+Plug("lewis6991/gitsigns.nvim")
+Plug("neovim/nvim-lspconfig")
 Plug("nvim-lua/plenary.nvim")
 Plug("nvim-telescope/telescope.nvim")
+Plug("onsails/lspkind.nvim")
+Plug("phaazon/hop.nvim")
+Plug("sainnhe/gruvbox-material")
 Plug("stevearc/aerial.nvim")
 Plug("stevearc/dressing.nvim")
-Plug("akinsho/toggleterm.nvim")
-Plug("sainnhe/gruvbox-material")
-Plug("L3MON4D3/LuaSnip")
 vim.call("plug#end")
 
---Incremental live completion
-vim.o.inccommand = "nosplit"
-
---Set highlight on search
-vim.o.hlsearch = false
-
---Make line numbers default
-vim.wo.number = true
-
---Do not save when switching buffers
-vim.o.hidden = true
-
---Enable mouse mode
-vim.o.mouse = "a"
-
-vim.o.breakindent = true
-
-vim.o.undofile = false
-
-vim.o.swapfile = false
-
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
-vim.o.expandtab = true
-vim.o.smarttab = true
-vim.o.shiftwidth = 2
-
-vim.wo.signcolumn = "yes"
-
-vim.g.mapleader = ","
-vim.g.maplocalleader = ","
 
 vim.g.do_filetype_lua = true
-
 vim.g.gruvbox_material_background = "hard"
 vim.g.gruvbox_material_disable_italic_comment = true
-vim.opt.background = "dark"
+vim.g.mapleader = ","
+vim.g.maplocalleader = ","
+vim.o.breakindent = true
+vim.o.expandtab = true
+vim.o.hidden = true
+vim.o.hlsearch = false
+vim.o.ignorecase = true
+vim.o.inccommand = "nosplit"
+vim.o.mouse = "a"
+vim.o.shiftwidth = 2
+vim.o.smartcase = true
+vim.o.smarttab = true
+vim.o.swapfile = false
 vim.o.termguicolors = true
-vim.cmd([[colorscheme gruvbox-material]])
+vim.o.undofile = false
+vim.opt.background = "dark"
+vim.wo.number = true
+vim.wo.signcolumn = "yes"
 
+vim.cmd([[colorscheme gruvbox-material]])
 -- Fake clipboard
 vim.cmd([[
 let g:clipboard = {
@@ -91,8 +74,10 @@ vim.api.nvim_create_autocmd("FileType", {
     command = "setlocal tw=79",
 })
 
+
 vim.api.nvim_create_user_command('Commits', function() require("telescope.builtin").git_commits() end, {})
 vim.api.nvim_create_user_command('Registers', function() require("telescope.builtin").registers() end, {})
+vim.api.nvim_create_user_command('Snippets', function() require("telescope").extensions.luasnip.luasnip() end, {})
 vim.api.nvim_create_user_command('Trim', function() MiniTrailspace.trim() end, {})
 
 local function t(str)
@@ -159,7 +144,6 @@ require('lspkind').init({
 })
 require("gitsigns").setup()
 require("project_nvim").setup()
-require("colorizer").setup()
 require("hop").setup({
   keys = "etovxqpdygfblzhckisuran",
   term_seq_bias = 0.5,
@@ -169,9 +153,10 @@ require("dressing").setup()
 
 local fd_ignore_path = vim.env.VIM .. "/.fd-ignore"
 
+local telescope = require("telescope")
 local actions = require("telescope.actions")
 local config = require("telescope.config")
-require("telescope").setup({
+telescope.setup({
   defaults = {
     sorting_strategy = "ascending",
     layout_strategy = "flex",
@@ -197,7 +182,8 @@ require("telescope").setup({
     file_browser = { hidden = true },
   },
 })
-require('telescope').load_extension('aerial')
+telescope.load_extension('aerial')
+telescope.load_extension('luasnip')
 require("toggleterm").setup({
   direction = "float",
   float_opts = {
