@@ -23,7 +23,6 @@ Plug("stevearc/aerial.nvim")
 Plug("stevearc/dressing.nvim")
 vim.call("plug#end")
 
-
 vim.g.do_filetype_lua = true
 vim.g.gruvbox_material_background = "hard"
 vim.g.gruvbox_material_disable_italic_comment = true
@@ -75,7 +74,12 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 
-vim.api.nvim_create_user_command('Commits', function() require("telescope.builtin").git_commits() end, {})
+vim.api.nvim_create_user_command("Buffers", function() require('telescope.builtin').buffers() end, {})
+vim.api.nvim_create_user_command('Commits', function()
+  if vim.fn.isdirectory('.git') ~= 0 then
+    require("telescope.builtin").git_commits()
+  end
+end, {})
 vim.api.nvim_create_user_command('Registers', function() require("telescope.builtin").registers() end, {})
 vim.api.nvim_create_user_command('Snippets', function() require("telescope").extensions.luasnip.luasnip() end, {})
 vim.api.nvim_create_user_command('Trim', function() MiniTrailspace.trim() end, {})
@@ -128,7 +132,6 @@ vim.keymap.set("i", "<CR>", function()
   end
 end,{ expr = true })
 vim.keymap.set("n", "<leader>ff", function() require('telescope.builtin').find_files() end)
-vim.keymap.set("n", "<leader>fb", function() require('telescope.builtin').buffers() end)
 vim.keymap.set("n", "<leader>fg", function() require('telescope.builtin').grep_string() end)
 
 vim.g.nvim_tree_respect_buf_cwd = 1
