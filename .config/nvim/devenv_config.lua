@@ -92,6 +92,7 @@ end
 vim.keymap.set("n", "Y", "y$")
 vim.keymap.set("n", "<leader>d", function() require('nvim-tree').toggle() end)
 vim.keymap.set("n", "ww", function() require('hop').hint_words() end)
+vim.keymap.set("t", "<esc>", [[<C-\><C-n>]])
 
 local luasnip = require("luasnip")
 luasnip.config.set_config({ history = true })
