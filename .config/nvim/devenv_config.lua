@@ -170,7 +170,7 @@ require('hop').setup({
 require('aerial').setup()
 require('dressing').setup()
 
-local fd_ignore_path = vim.env.VIM .. '/.fd-ignore'
+local fd_ignore_file = vim.env.VIM .. '/.fd-ignore'
 
 local telescope = require('telescope')
 local actions = require('telescope.actions')
@@ -195,7 +195,7 @@ telescope.setup({
   },
   pickers = {
     find_files = {
-      find_command = { 'fd', '--type', 'f', '-H', '--ignore-file', fd_ignore_path },
+      find_command = { 'fd', '--type', 'f', '-H', '--ignore-file', fd_ignore_file },
     },
     buffers = { ignore_current_buffer = true },
     file_browser = { hidden = true },
@@ -221,7 +221,10 @@ require('mini.starter').setup()
 require('mini.statusline').setup()
 require('mini.tabline').setup()
 require('mini.trailspace').setup()
-require('mini.sessions').setup()
+local sessions_path = vim.env.VIM .. '/sessions'
+require('mini.sessions').setup({
+  directory = sessions_path,
+})
 require('mini.pairs').setup()
 require('mini.fuzzy').setup()
 -- Gruvbox colorscheme sets an incompatible Error highlight group which can not be used for
