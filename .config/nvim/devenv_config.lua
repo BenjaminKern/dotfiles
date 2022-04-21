@@ -111,6 +111,7 @@ vim.keymap.set('t', '<esc>', [[<C-\><C-n>]])
 
 local luasnip = require('luasnip')
 luasnip.config.set_config({ history = true })
+luasnip.filetype_extend("all", { "_" })
 require('luasnip.loaders.from_snipmate').lazy_load()
 
 vim.keymap.set({ 'i', 's' }, '<Tab>', function()
