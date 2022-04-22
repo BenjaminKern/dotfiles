@@ -34,6 +34,7 @@ vim.o.hidden = true
 vim.o.hlsearch = false
 vim.o.ignorecase = true
 vim.o.inccommand = 'nosplit'
+vim.o.laststatus = 3
 vim.o.mouse = 'a'
 vim.o.shiftwidth = 2
 vim.o.smartcase = true
@@ -111,7 +112,7 @@ vim.keymap.set('t', '<esc>', [[<C-\><C-n>]])
 
 local luasnip = require('luasnip')
 luasnip.config.set_config({ history = true })
-luasnip.filetype_extend("all", { "_" })
+luasnip.filetype_extend('all', { '_' })
 require('luasnip.loaders.from_snipmate').lazy_load()
 
 vim.keymap.set({ 'i', 's' }, '<Tab>', function()
@@ -219,7 +220,9 @@ require('mini.completion').setup({
 require('mini.cursorword').setup()
 require('mini.indentscope').setup()
 require('mini.starter').setup()
-require('mini.statusline').setup()
+require('mini.statusline').setup({
+  set_vim_settings = false,
+})
 require('mini.tabline').setup()
 require('mini.trailspace').setup()
 local sessions_path = vim.env.VIM .. '/sessions'
