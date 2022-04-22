@@ -29,7 +29,7 @@ snippet Tcls Type Erased Class
 	   * \param ${5:x} ${8:Parameter description}
 	   * \return ${9:Return parameter description}
 	   */
-	  ${2:int} ${3:foo}(${4:int} ${5}) {
+	  ${2:int} ${3:doFoo}(${4:int} ${5}) {
 	    return m_pimpl->${3}(${5});
 	  }
 	private:
@@ -48,10 +48,67 @@ snippet Tcls Type Erased Class
 	      return std::make_unique<Model>(*this);
 	    }
 
-	    ${2} ${3}(${4} ${5}) override { return m_model.foo(${5}); }
+	    ${2} ${3}(${4} ${5}) override { return m_model.${3}(${5}); }
 
 	  private:
 	    T m_model;
 	  };
 	  std::unique_ptr<Concept> m_pimpl;
 	};
+snippet Pcls Pimpl Class
+	#include <memory>
+
+	namespace ${1:foo} {
+	/*! \class ${2:$TM_FILENAME_BASE}
+	 *  \brief ${13:Brief class description}
+	 *
+	 *  ${14:Detailed description}
+	 */
+	class ${2} {
+	public:
+	  explicit ${2}(${3:int} ${4:x});
+	  ${2}();
+	  ${2}(${2} const&) = delete;
+	  ${2}(${2}&&);
+	  ${2} &operator=(${2}&) = delete;
+	  ${2} &operator=(${2}&&);
+	  ~${2}();
+	  /*! \brief ${9:Brief method description}
+	   *
+	   *  ${10:Detailed method description}
+	   *
+	   * \param ${8:x} ${11:Parameter description}
+	   * \return ${12:Return parameter description}
+	   */
+	  ${5:int} ${6:doFoo}(${7:int} ${8});
+	private:
+	  class Impl;
+	  std::unique_ptr<Impl> m_pimpl;
+	};
+
+	} // namespace ${1}
+
+	using namespace ${1};
+
+	class ${2}::Impl {
+	  public:
+	    explicit Impl(${3:int} ${4:x}) : m_${4}{x} {}
+	    ${5} ${6}(${7} ${8}) {
+	      ${0}
+	      return {};
+	    }
+
+	  private:
+	    ${3} m_${4}{};
+	};
+
+	${2}::${2}(${3} ${4}) : m_pimpl{std::make_unique<Impl>(${4})} {}
+
+	${2}::${2}() = default;
+	${2}::${2}(${2}&&) = default;
+	${2}::~${2}() = default;
+	${2}& ${1}::${2}::operator=(${2}&&) = default;
+
+	${5} ${1}::${2}::${6}(${7} ${8}) {
+	    return m_pimpl->${6}(${8});
+	}
