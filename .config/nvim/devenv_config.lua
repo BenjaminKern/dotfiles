@@ -76,21 +76,21 @@ vim.api.nvim_create_autocmd('FileType', {
 
 vim.api.nvim_create_user_command('Buffers', function()
   require('telescope.builtin').buffers()
-end, {})
+end, { desc = 'Telescope show Buffers' })
 vim.api.nvim_create_user_command('Commits', function()
   if vim.fn.isdirectory('.git') ~= 0 then
     require('telescope.builtin').git_commits()
   end
-end, {})
+end, { desc = 'Telescope show Git Commits' })
 vim.api.nvim_create_user_command('Registers', function()
   require('telescope.builtin').registers()
-end, {})
+end, { desc = 'Telescope show Registers' })
 vim.api.nvim_create_user_command('Snippets', function()
   require('telescope').extensions.luasnip.luasnip()
-end, {})
+end, { desc = 'Telescope show Lua Snippets' })
 vim.api.nvim_create_user_command('Trim', function()
   MiniTrailspace.trim()
-end, {})
+end, { desc = 'Trim trailing whitespace' })
 
 local function t(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -101,14 +101,14 @@ local function feedkeys(key)
   vim.api.nvim_feedkeys(t(key), mode, true)
 end
 
-vim.keymap.set('n', 'Y', 'y$')
+vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
 vim.keymap.set('n', '<leader>d', function()
   require('nvim-tree').toggle()
-end)
+end, { desc = 'Toggle nvim tree' })
 vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
-end)
-vim.keymap.set('t', '<esc>', [[<C-\><C-n>]])
+end, { desc = 'Use hop' })
+vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
 local luasnip = require('luasnip')
 luasnip.config.set_config({ history = true })
@@ -123,7 +123,7 @@ vim.keymap.set({ 'i', 's' }, '<Tab>', function()
   else
     return t('<Tab>')
   end
-end, { expr = true })
+end, { expr = true }, { desc = 'Autocomplete/Expand/Jump Luasnip' })
 
 vim.keymap.set({ 'i', 's' }, '<S-Tab>', function()
   if vim.fn.pumvisible() ~= 0 then
@@ -133,23 +133,22 @@ vim.keymap.set({ 'i', 's' }, '<S-Tab>', function()
   else
     return t('<S-Tab>')
   end
-end, { expr = true })
+end, { expr = true }, { desc = 'Autocomplete/Expand/Jump Back Luasnip' })
 
 vim.keymap.set('i', '<CR>', function()
   if vim.fn.pumvisible() ~= 0 then
-    -- If popup is visible, confirm selected item or add new line otherwise
     local item_selected = vim.fn.complete_info()['selected'] ~= -1
     return item_selected and t('<C-y>') or t('<C-y><CR>')
   else
     return require('mini.pairs').cr()
   end
-end, { expr = true })
+end, { expr = true }, { desc = 'Sanitized CR handling/Expand Mini Pairs' })
 vim.keymap.set('n', '<leader>ff', function()
   require('telescope.builtin').find_files()
-end)
+end, { desc = 'Telescope find files' })
 vim.keymap.set('n', '<leader>fg', function()
   require('telescope.builtin').grep_string()
-end)
+end, { desc = 'Telescope grep string under cursor' })
 
 vim.g.nvim_tree_respect_buf_cwd = 1
 
@@ -237,41 +236,40 @@ vim.api.nvim_exec([[hi MiniTrailspace ctermfg=235 ctermbg=223 guifg=#112641 guib
 
 -- LSP settings
 local on_attach = function(client, bufnr)
-  local opts = { silent = true, buffer = bufnr }
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.MiniCompletion.completefunc_lsp')
   vim.keymap.set('n', 'K', function()
     vim.lsp.buf.hover()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Lsp Hover' })
   vim.keymap.set('n', '<leader>rn', function()
     vim.lsp.buf.rename()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Lsp Rename' })
   vim.keymap.set('n', 'gi', function()
     require('telescope.builtin').lsp_implementations()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Telescope show Lsp Implementation' })
   vim.keymap.set('n', 'gd', function()
     require('telescope.builtin').lsp_definitions()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Telescope show Lsp Definition' })
   vim.keymap.set('n', 'gt', function()
     require('telescope.builtin').lsp_type_definitions()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Telescope show Lsp Type Definition' })
   vim.keymap.set('n', 'gr', function()
     require('telescope.builtin').lsp_references()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Telescope show Lsp References' })
   vim.keymap.set('n', 'ca', function()
     require('telescope.builtin').lsp_code_actions()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Telescope show Lsp Code Action' })
   vim.keymap.set('n', 'gs', function()
     require('telescope.builtin').lsp_document_symbols()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Telescope show Lsp Document Symbols' })
   vim.keymap.set('n', 'gS', function()
     require('telescope.builtin').lsp_workspace_symbols()
-  end, opts)
+  end, { silent = true, buffer = bufnr, desc = 'Telescope show Workspace Symbols' })
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function()
     vim.lsp.buf.formatting()
-  end, {})
+  end, { desc = 'Lsp Format' })
   vim.api.nvim_buf_create_user_command(bufnr, 'Diagnostics', function()
     require('telescope.builtin').diagnostics()
-  end, {})
+  end, { desc = 'Telescope show Lsp Diagnostics' })
   require('aerial').on_attach(client, bufnr)
 end
 
