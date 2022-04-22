@@ -280,15 +280,25 @@ vim.api.nvim_call_function('sign_define', { 'DiagnosticSignWarn', { text = ''
 vim.api.nvim_call_function('sign_define', { 'DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' } })
 vim.api.nvim_call_function('sign_define', { 'DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' } })
 
-require('lspconfig').clangd.setup({
-  on_attach = on_attach,
-  cmd = {
-    'clangd',
-    '--background-index',
-    '--enable-config',
-    '--header-insertion=iwyu',
-    '--cross-file-rename',
-    '--clang-tidy',
-    '--clang-tidy-checks=bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*',
-  },
-})
+if vim.fn.executable('clangd') then
+  require('lspconfig').clangd.setup({
+    on_attach = on_attach,
+    cmd = {
+      'clangd',
+      '--background-index',
+      '--enable-config',
+      '--header-insertion=iwyu',
+      '--cross-file-rename',
+      '--clang-tidy',
+      '--completion-style=detailed',
+      '--inlay-hints',
+      '--function-arg-placeholders',
+    },
+  })
+end
+
+if vim.fn.executable('gopls') then
+  require('lspconfig').gopls.setup({
+    on_attach = on_attach,
+  })
+end
