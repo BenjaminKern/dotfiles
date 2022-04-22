@@ -13,10 +13,10 @@ snippet Fun Function definition
 	 * \param ${4:x} ${5:Parameter description}
 	 * \return ${6:Return parameter description}
 	 */
-	${1:void} ${2:function_name}(${3:int} ${4});
+	${1:void} ${2:foo}(${3:int} ${4});
 
 	${1} ${2}(${3} ${4}) {
-		${0}
+	  ${0}
 	}
 snippet Stru Struct definition
 	/*! \struct ${1:$TM_FILENAME_BASE}
@@ -25,6 +25,6 @@ snippet Stru Struct definition
 	 *  ${5:Detailed description}
 	 */
 	struct ${1} {
-		${2:int} ${3:x} /*!< ${6:Description} */
+	  ${2:int} ${3:x} /*!< ${6:Description} */
 	};
 	${0}

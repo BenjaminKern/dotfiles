@@ -1,0 +1,57 @@
+extends c
+
+snippet Inc Preprocessor #include<...>
+	#include <${1:iostream}>
+snippet Tcls Type Erased Class
+	/*! \class ${1:$TM_FILENAME_BASE}
+	 *  \brief ${10:Brief class description}
+	 *
+	 *  ${11:Detailed description}
+	 */
+	class ${1} {
+	public:
+	  template <typename T>
+	  explicit ${1}(T const &x) : m_pimpl{std::make_unique<Model<T>>(x)} {}
+	  ${1}(${1} const &other) : m_pimpl(other.m_pimpl->clone()) {}
+	  ${1}(${1} &&) noexcept = default;
+	  ${1} &operator=(${1} rhs) {
+	    swap(*this, rhs);
+	    return *this;
+	  }
+	  friend void swap(${1} &first, ${1} &second) {
+	    using std::swap;
+	    swap(first.m_pimpl, second.m_pimpl);
+	  }
+	  /*! \brief ${6:Brief method description}
+	   *
+	   *  ${7:Detailed method description}
+	   *
+	   * \param ${5:x} ${8:Parameter description}
+	   * \return ${9:Return parameter description}
+	   */
+	  ${2:int} ${3:foo}(${4:int} ${5}) {
+	    return m_pimpl->${3}(${5});
+	  }
+	private:
+	  class Concept {
+	  public:
+	    virtual ~Concept() = default;
+	    virtual ${2} ${3}(${4} ${5}) = 0;
+	    virtual std::unique_ptr<Concept> clone() const = 0;
+	  };
+	  template <typename T> class Model : public Concept {
+	  public:
+	    explicit Model(T const &model) : m_model{model} {}
+	    explicit Model(T &&model) : m_model{std::move(model)} {}
+
+	    std::unique_ptr<Concept> clone() const override {
+	      return std::make_unique<Model>(*this);
+	    }
+
+	    ${2} ${3}(${4} ${5}) override { return m_model.foo(${5}); }
+
+	  private:
+	    T m_model;
+	  };
+	  std::unique_ptr<Concept> m_pimpl;
+	};
