@@ -3,6 +3,8 @@ extends c
 snippet Inc Preprocessor #include<...>
 	#include <${1:iostream}>
 snippet Tcls Type Erased Class
+	#include <memory>
+
 	/*! \class ${1:$TM_FILENAME_BASE}
 	 *  \brief ${10:Brief class description}
 	 *
@@ -55,6 +57,8 @@ snippet Tcls Type Erased Class
 	  };
 	  std::unique_ptr<Concept> m_pimpl;
 	};
+
+	${0}
 snippet Pcls Pimpl Class
 	#include <memory>
 
@@ -88,13 +92,14 @@ snippet Pcls Pimpl Class
 
 	} // namespace ${1}
 
+	${0}
+
 	using namespace ${1};
 
 	class ${2}::Impl {
 	  public:
 	    explicit Impl(${3:int} ${4:x}) : m_${4}{x} {}
 	    ${5} ${6}(${7} ${8}) {
-	      ${0}
 	      return {};
 	    }
 
@@ -113,7 +118,8 @@ snippet Pcls Pimpl Class
 	    return m_pimpl->${6}(${8});
 	}
 snippet Cls Class
-	#include <utility>
+	#include <functional>
+
 	namespace ${1:foo} {
 	/*! \class ${2:$TM_FILENAME_BASE}
 	 *  \brief ${13:Brief class description}
@@ -126,12 +132,22 @@ snippet Cls Class
 	  ${2}() = delete;
 	  ${2}(${2} const&) = default;
 	  ${2}(${2}&&) = default;
-	  ${2} &operator=(${2}&) = default;
-	  ${2} &operator=(${2}&&) = default;
+	  ${2} &operator=(${2} other) {
+	    swap(*this, other);
+	    return *this;
+	  }
 	  ~${2}() = default;
 	  friend void swap(${2}& first, ${2}& second) {
 	    using std::swap;
 	    swap(first.m_${4}, second.m_${4});
+	  }
+	  friend bool operator==(${2} const& lhs, ${2} const& rhs) {
+	    return lhs.m_${4} == rhs.m_${4};
+	  }
+	  inline std::size_t hash() const {
+	    std::size_t ret = 17;
+	    ret = ret*31 + std::hash<${3}>{}(m_${4});
+	    return ret;
 	  }
 	  /*! \brief ${9:Brief method description}
 	   *
@@ -147,9 +163,22 @@ snippet Cls Class
 
 	} // namespace ${1}
 
+	namespace std {
+
+	template <>
+	  struct hash<${1}::${2}> {
+	    size_t operator()(${1}::${2} const& k) const {
+	      return k.hash();
+	    }
+	  };
+
+	} // namespace std
+
+	${0}
+
 	using namespace ${1};
 
-	${2}::${2}(${3} ${4}) : m_${4}{${4}} {}
+	${1}::${2}::${2}(${3} ${4}) : m_${4}{${4}} {}
 
 	${5} ${1}::${2}::${6}(${7} ${8}) {
 	    return {};
