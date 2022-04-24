@@ -207,13 +207,47 @@ snippet Gtst Google Test Template
 
 	}
 
-	TEST_F(${1:FooTest}State, ShouldBeOk) {
+	TEST_F(${1}State, ShouldBeOk) {
 	  int x = 5;
 	  check(x);
 	}
 
-	TEST(${1:FooTest}, ShouldBeOk) {
+	TEST(${1}, ShouldBeOk) {
 	  EXPECT_TRUE(true);
 	}
+
+	${0}
+snippet Gbench Google Benchmark Template
+	#include "benchmark/benchmark.h"
+
+	namespace {
+
+	template<typename T>
+	static void ${1:fooBench}(T&& data) {
+	}
+
+	template<typename T>
+	class ${1}State : public benchmark::Fixture {
+	  public:
+	    void SetUp(const::benchmark::State& state) {
+	      m_range = state.range(0);
+	    }
+	    void TearDown(const::benchmark::State&) {
+	      m_range = {};
+	    }
+	  T m_data{};
+	  int64_t m_range{};
+	};
+
+	BENCHMARK_TEMPLATE_DEFINE_F(${1}State, ${1}, ${2:int})(benchmark::State& state) {
+	  for (auto _ : state) {
+	    ${1}(m_data);
+	  }
+	}
+
+	}
+
+	BENCHMARK_REGISTER_F(${1}State, ${1})->Name("${3:Benchmark for} ${2} ${1}")->ThreadRange(${4:1}, ${5:4})->DenseRange(0, ${6:512}, ${7:128});
+	BENCHMARK_MAIN();
 
 	${0}
