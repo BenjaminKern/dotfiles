@@ -20,7 +20,6 @@ Plug('onsails/lspkind.nvim')
 Plug('phaazon/hop.nvim')
 Plug('sainnhe/gruvbox-material')
 Plug('stevearc/aerial.nvim')
-Plug('stevearc/dressing.nvim')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -169,7 +168,6 @@ require('hop').setup({
   term_seq_bias = 0.5,
 })
 require('aerial').setup()
-require('dressing').setup()
 
 local fd_ignore_file = vim.env.VIM .. '/.fd-ignore'
 
