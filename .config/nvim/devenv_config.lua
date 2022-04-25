@@ -202,7 +202,15 @@ telescope.setup({
 })
 telescope.load_extension('aerial')
 telescope.load_extension('luasnip')
+local get_toggleterm_shell = function()
+  if vim.fn.has('unix') == 1 then
+    return '/bin/bash'
+  else
+    return 'cmd.exe'
+  end
+end
 require('toggleterm').setup({
+  shell = get_toggleterm_shell(),
   direction = 'float',
   float_opts = {
     border = 'double',
