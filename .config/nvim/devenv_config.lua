@@ -19,7 +19,6 @@ Plug('nvim-telescope/telescope.nvim')
 Plug('onsails/lspkind.nvim')
 Plug('phaazon/hop.nvim')
 Plug('sainnhe/gruvbox-material')
-Plug('stevearc/dressing.nvim')
 Plug('stevearc/aerial.nvim')
 vim.call('plug#end')
 
