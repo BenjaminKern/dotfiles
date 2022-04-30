@@ -19,6 +19,7 @@ Plug('nvim-telescope/telescope.nvim')
 Plug('onsails/lspkind.nvim')
 Plug('phaazon/hop.nvim')
 Plug('sainnhe/gruvbox-material')
+Plug('stevearc/dressing.nvim')
 Plug('stevearc/aerial.nvim')
 vim.call('plug#end')
 
@@ -60,6 +61,9 @@ let g:clipboard = {
       \   },
       \ }
 ]])
+
+-- dressing nvim workaround
+vim.cmd([[au FileType DressingInput lua vim.b.minicompletion_disable = true]])
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
