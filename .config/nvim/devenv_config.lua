@@ -99,6 +99,9 @@ end, { desc = 'Telescope show Lua Snippets' })
 vim.api.nvim_create_user_command('Trim', function()
   MiniTrailspace.trim()
 end, { desc = 'Trim trailing whitespace' })
+vim.api.nvim_create_user_command('Messages', function()
+  require('telescope').extensions.notify.notify()
+end, { desc = 'Telescope show notifications' })
 
 local function t(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -253,13 +256,13 @@ vim.api.nvim_exec([[hi MiniTrailspace ctermfg=235 ctermbg=223 guifg=#112641 guib
 
 -- LSP settings
 local severity = {
-  "error",
-  "warn",
-  "info",
-  "info",
+  'error',
+  'warn',
+  'info',
+  'info',
 }
-vim.lsp.handlers["window/showMessage"] = function(err, method, params, client_id)
-             vim.notify(method.message, severity[params.type])
+vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id)
+  vim.notify(method.message, severity[params.type])
 end
 local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.MiniCompletion.completefunc_lsp')
