@@ -21,6 +21,7 @@ Plug('phaazon/hop.nvim')
 Plug('sainnhe/gruvbox-material')
 Plug('stevearc/dressing.nvim')
 Plug('stevearc/aerial.nvim')
+Plug('rcarriga/nvim-notify')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -76,6 +77,10 @@ vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'python', 'cpp', 'c' },
   command = 'setlocal tw=79',
 })
+
+local notify = require('notify')
+notify.setup()
+vim.notify = notify
 
 vim.api.nvim_create_user_command('Buffers', function()
   require('telescope.builtin').buffers()
@@ -206,6 +211,8 @@ telescope.setup({
 })
 telescope.load_extension('aerial')
 telescope.load_extension('luasnip')
+telescope.load_extension('notify')
+
 local get_toggleterm_shell = function()
   if vim.fn.has('unix') == 1 then
     return '/bin/bash'
@@ -245,14 +252,20 @@ require('mini.fuzzy').setup()
 vim.api.nvim_exec([[hi MiniTrailspace ctermfg=235 ctermbg=223 guifg=#112641 guibg=#ffcfa0]], false)
 
 -- LSP settings
+local severity = {
+  "error",
+  "warn",
+  "info",
+  "info",
+}
+vim.lsp.handlers["window/showMessage"] = function(err, method, params, client_id)
+             vim.notify(method.message, severity[params.type])
+end
 local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.MiniCompletion.completefunc_lsp')
   vim.keymap.set('n', 'K', function()
     vim.lsp.buf.hover()
   end, { silent = true, buffer = bufnr, desc = 'Lsp Hover' })
-  vim.keymap.set('n', '<leader>rn', function()
-    vim.lsp.buf.rename()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp Rename' })
   vim.keymap.set('n', 'gi', function()
     vim.lsp.buf.implementation()
   end, { silent = true, buffer = bufnr, desc = 'Lsp Implementation' })
@@ -277,6 +290,9 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Diagnostics', function()
     require('telescope.builtin').diagnostics()
   end, { desc = 'Telescope show Lsp Diagnostics' })
+  vim.api.nvim_buf_create_user_command(bufnr, 'Rename', function()
+    vim.lsp.buf.rename()
+  end, { desc = 'Lsp Rename' })
   vim.keymap.set('n', 'ca', function()
     vim.lsp.buf.code_action()
   end, { silent = true, buffer = bufnr, desc = 'Show Lsp Code Action' })
