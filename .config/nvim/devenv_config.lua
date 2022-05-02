@@ -10,12 +10,12 @@ Plug('ahmedkhalf/project.nvim')
 Plug('akinsho/toggleterm.nvim')
 Plug('benfowler/telescope-luasnip.nvim')
 Plug('echasnovski/mini.nvim')
-Plug('kyazdani42/nvim-tree.lua')
 Plug('kyazdani42/nvim-web-devicons')
 Plug('lewis6991/gitsigns.nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-telescope/telescope.nvim')
+Plug('nvim-telescope/telescope-file-browser.nvim')
 Plug('onsails/lspkind.nvim')
 Plug('phaazon/hop.nvim')
 Plug('sainnhe/gruvbox-material')
@@ -62,9 +62,6 @@ let g:clipboard = {
       \   },
       \ }
 ]])
-
--- dressing nvim workaround
-vim.cmd([[au FileType DressingInput lua vim.b.minicompletion_disable = true]])
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
@@ -114,7 +111,7 @@ end
 
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
 vim.keymap.set('n', '<leader>d', function()
-  require('nvim-tree').toggle()
+  require('telescope').extensions.file_browser.file_browser()
 end, { desc = 'Toggle nvim tree' })
 vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
@@ -160,16 +157,6 @@ end, { desc = 'Telescope find files' })
 vim.keymap.set('n', '<leader>fg', function()
   require('telescope.builtin').grep_string()
 end, { desc = 'Telescope grep string under cursor' })
-
-vim.g.nvim_tree_respect_buf_cwd = 1
-
-require('nvim-tree').setup({
-  update_cwd = true,
-  update_focused_file = {
-    enable = true,
-    update_cwd = true,
-  },
-})
 require('lspkind').init({
   mode = 'symbol',
 })
@@ -215,6 +202,7 @@ telescope.setup({
 telescope.load_extension('aerial')
 telescope.load_extension('luasnip')
 telescope.load_extension('notify')
+telescope.load_extension('file_browser')
 
 local get_toggleterm_shell = function()
   if vim.fn.has('unix') == 1 then
@@ -288,7 +276,7 @@ local on_attach = function(client, bufnr)
     require('telescope.builtin').lsp_workspace_symbols()
   end, { silent = true, buffer = bufnr, desc = 'Telescope show Workspace Symbols' })
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function()
-    vim.lsp.buf.formatting()
+    vim.lsp.buf.format()
   end, { desc = 'Lsp Format' })
   vim.api.nvim_buf_create_user_command(bufnr, 'Diagnostics', function()
     require('telescope.builtin').diagnostics()
