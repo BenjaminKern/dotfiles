@@ -22,6 +22,9 @@ Plug('sainnhe/gruvbox-material')
 Plug('stevearc/dressing.nvim')
 Plug('stevearc/aerial.nvim')
 Plug('rcarriga/nvim-notify')
+Plug('mfussenegger/nvim-dap')
+Plug('nvim-treesitter/nvim-treesitter')
+Plug('theHamsta/nvim-dap-virtual-text')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -316,4 +319,29 @@ if vim.fn.executable('gopls') then
   require('lspconfig').gopls.setup({
     on_attach = on_attach,
   })
+end
+
+local dap = require('dap')
+require('nvim-dap-virtual-text').setup()
+
+if vim.fn.executable('lldb-vscode') then
+  dap.adapters.lldb = {
+    type = 'executable',
+    command = 'lldb-vscode',
+    name = 'lldb',
+  }
+  dap.configurations.cpp = {
+    {
+      name = 'Launch file',
+      type = 'lldb',
+      request = 'launch',
+      program = function()
+        return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+      end,
+      cwd = '${workspaceFolder}',
+      stopOnEntry = false,
+      runInTerminal = false,
+    },
+  }
+  dap.configurations.c = dap.configurations.cpp
 end
