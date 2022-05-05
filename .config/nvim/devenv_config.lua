@@ -22,9 +22,9 @@ Plug('sainnhe/gruvbox-material')
 Plug('stevearc/dressing.nvim')
 Plug('stevearc/aerial.nvim')
 Plug('rcarriga/nvim-notify')
+Plug('rcarriga/nvim-dap-ui')
 Plug('mfussenegger/nvim-dap')
 Plug('nvim-treesitter/nvim-treesitter')
-Plug('theHamsta/nvim-dap-virtual-text')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -322,7 +322,17 @@ if vim.fn.executable('gopls') then
 end
 
 local dap = require('dap')
-require('nvim-dap-virtual-text').setup()
+local dapui = require('dapui')
+dapui.setup()
+dap.listeners.after.event_initialized['dapui_config'] = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated['dapui_config'] = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited['dapui_config'] = function()
+  dapui.close()
+end
 
 if vim.fn.executable('lldb-vscode') then
   dap.adapters.lldb = {
@@ -345,3 +355,34 @@ if vim.fn.executable('lldb-vscode') then
   }
   dap.configurations.c = dap.configurations.cpp
 end
+
+vim.keymap.set('n', '<F5>', function()
+  dap.continue()
+end, { desc = 'Debug: Start/Continue' })
+vim.keymap.set('n', '<F9>', function()
+  dap.toggle_breakpoint()
+end, { desc = 'Debug: Toggle Breakpoint' })
+vim.keymap.set('n', '<F10>', function()
+  dap.step_over()
+end, { desc = 'Debug: Step Over' })
+vim.keymap.set('n', '<F11>', function()
+  dap.step_into()
+end, { desc = 'Debug: Step Into' })
+vim.keymap.set('n', '<F12>', function()
+  dap.step_out()
+end, { desc = 'Debug: Step Out' })
+vim.api.nvim_create_user_command('DebugListBreakpoints', function()
+  dap.list_breakpoints()
+end, { desc = 'Debug: List Breakpoints' })
+vim.api.nvim_create_user_command('DebugClearBreakpoints', function()
+  dap.clear_breakpoints()
+end, { desc = 'Debug: Clear Breakpoints' })
+vim.api.nvim_create_user_command('DebugSetBreakpoint', function()
+  dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
+end, { desc = 'Debug: Set Conditional Breakpoint' })
+vim.api.nvim_create_user_command('DebugSetLogpoint', function()
+  dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))
+end, { desc = 'Debug: Set Log Point Message' })
+vim.api.nvim_create_user_command('DebugConsole', function()
+  dap.repl.toggle()
+end, { desc = 'Debug: Toggle Debug Console' })
