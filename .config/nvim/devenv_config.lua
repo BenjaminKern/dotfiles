@@ -293,10 +293,10 @@ local on_attach = function(client, bufnr)
   require('aerial').on_attach(client, bufnr)
 end
 
-vim.api.nvim_call_function('sign_define', { 'DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' } })
-vim.api.nvim_call_function('sign_define', { 'DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' } })
-vim.api.nvim_call_function('sign_define', { 'DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' } })
-vim.api.nvim_call_function('sign_define', { 'DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' } })
+vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
+vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
+vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
+vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
 if vim.fn.executable('clangd') then
   require('lspconfig').clangd.setup({
@@ -333,6 +333,28 @@ end
 dap.listeners.before.event_exited['dapui_config'] = function()
   dapui.close()
 end
+
+vim.highlight.create('DapBreakpoint', { ctermbg = 0, guifg = '#993939', guibg = '#31353f' }, false)
+vim.highlight.create('DapLogPoint', { ctermbg = 0, guifg = '#61afef', guibg = '#31353f' }, false)
+vim.highlight.create('DapStopped', { ctermbg = 0, guifg = '#98c379', guibg = '#31353f' }, false)
+
+vim.fn.sign_define(
+  'DapBreakpoint',
+  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapBreakpointCondition',
+  { text = 'ﳁ', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapBreakpointRejected',
+  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapLogPoint',
+  { text = '', texthl = 'DapLogPoint', linehl = 'DapLogPoint', numhl = 'DapLogPoint' }
+)
+vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
 
 if vim.fn.executable('lldb-vscode') then
   dap.adapters.lldb = {
