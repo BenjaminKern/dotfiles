@@ -102,6 +102,15 @@ end, { desc = 'Trim trailing whitespace' })
 vim.api.nvim_create_user_command('Messages', function()
   require('telescope').extensions.notify.notify()
 end, { desc = 'Telescope show notifications' })
+vim.api.nvim_create_user_command('SessionOpen', function()
+  MiniSessions.select('read')
+end, { desc = 'Open session' })
+vim.api.nvim_create_user_command('SessionSave', function()
+  MiniSessions.write('.session.vim')
+end, { desc = 'Save local session' })
+vim.api.nvim_create_user_command('SessionDelete', function()
+  MiniSessions.select('delete')
+end, { desc = 'Delete session' })
 
 local function t(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -238,6 +247,8 @@ require('mini.trailspace').setup()
 local sessions_path = vim.env.VIM .. '/sessions'
 require('mini.sessions').setup({
   directory = sessions_path,
+  file = '.session.vim',
+  verbose = { write = true, delete = true },
 })
 require('mini.pairs').setup()
 require('mini.fuzzy').setup()
