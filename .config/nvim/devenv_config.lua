@@ -17,7 +17,6 @@ Plug('nvim-lua/plenary.nvim')
 Plug('nvim-telescope/telescope.nvim')
 Plug('nvim-telescope/telescope-file-browser.nvim')
 Plug('onsails/lspkind.nvim')
-Plug('phaazon/hop.nvim')
 Plug('sainnhe/gruvbox-material')
 Plug('stevearc/dressing.nvim')
 Plug('stevearc/aerial.nvim')
@@ -79,7 +78,10 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 local notify = require('notify')
-notify.setup()
+notify.setup({
+  timeout = '4000',
+  stages = 'fade',
+})
 vim.notify = notify
 
 vim.api.nvim_create_user_command('Buffers', function()
@@ -126,8 +128,8 @@ vim.keymap.set('n', '<leader>d', function()
   require('telescope').extensions.file_browser.file_browser()
 end, { desc = 'Toggle nvim tree' })
 vim.keymap.set('n', 'ww', function()
-  require('hop').hint_words()
-end, { desc = 'Use hop' })
+  MiniJump2d.start()
+end, { desc = 'Use jump 2d' })
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
 local luasnip = require('luasnip')
@@ -174,9 +176,8 @@ require('lspkind').init({
 })
 require('gitsigns').setup()
 require('project_nvim').setup()
-require('hop').setup({
-  keys = 'etovxqpdygfblzhckisuran',
-  term_seq_bias = 0.5,
+require('mini.jump2d').setup({
+  labels = 'etovxqpdygfblzhckisuran',
 })
 require('aerial').setup()
 
@@ -254,7 +255,8 @@ require('mini.pairs').setup()
 require('mini.fuzzy').setup()
 -- Gruvbox colorscheme sets an incompatible Error highlight group which can not be used for
 -- the MiniTrailspace highlight group. For that reason we are owerwriting the highlight group here
-vim.api.nvim_exec([[hi MiniTrailspace ctermfg=235 ctermbg=223 guifg=#112641 guibg=#ffcfa0]], false)
+vim.api.nvim_exec([[hi MiniTrailspace guibg=Orange]], false)
+vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange gui=bold,nocombine]], false)
 
 -- LSP settings
 local severity = {
