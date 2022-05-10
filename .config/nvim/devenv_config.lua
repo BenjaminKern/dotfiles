@@ -11,11 +11,11 @@ Plug('akinsho/toggleterm.nvim')
 Plug('benfowler/telescope-luasnip.nvim')
 Plug('echasnovski/mini.nvim')
 Plug('kyazdani42/nvim-web-devicons')
+Plug('kyazdani42/nvim-tree.lua')
 Plug('lewis6991/gitsigns.nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-telescope/telescope.nvim')
-Plug('nvim-telescope/telescope-file-browser.nvim')
 Plug('phaazon/hop.nvim')
 Plug('onsails/lspkind.nvim')
 Plug('sainnhe/gruvbox-material')
@@ -126,7 +126,7 @@ end
 
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
 vim.keymap.set('n', '<leader>d', function()
-  require('telescope').extensions.file_browser.file_browser()
+  require('nvim-tree').toggle()
 end, { desc = 'Toggle nvim tree' })
 vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
@@ -182,6 +182,15 @@ require('hop').setup({
   term_seq_bias = 0.5,
 })
 require('aerial').setup()
+vim.g.nvim_tree_respect_buf_cwd = 1
+
+require('nvim-tree').setup({
+  update_cwd = true,
+  update_focused_file = {
+    enable = true,
+    update_cwd = true,
+  },
+})
 
 local fd_ignore_file = vim.env.VIM .. '/.fd-ignore'
 
@@ -217,7 +226,6 @@ telescope.setup({
 telescope.load_extension('aerial')
 telescope.load_extension('luasnip')
 telescope.load_extension('notify')
-telescope.load_extension('file_browser')
 
 local get_toggleterm_shell = function()
   if vim.fn.has('unix') == 1 then
