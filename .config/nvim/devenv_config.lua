@@ -177,8 +177,9 @@ require('lspkind').init({
 })
 require('gitsigns').setup()
 require('project_nvim').setup()
-require('mini.jump2d').setup({
-  labels = 'etovxqpdygfblzhckisuran',
+require('hop').setup({
+  keys = 'etovxqpdygfblzhckisuran',
+  term_seq_bias = 0.5,
 })
 require('aerial').setup()
 
@@ -257,7 +258,7 @@ require('mini.fuzzy').setup()
 -- Gruvbox colorscheme sets an incompatible Error highlight group which can not be used for
 -- the MiniTrailspace highlight group. For that reason we are owerwriting the highlight group here
 vim.api.nvim_exec([[hi MiniTrailspace guibg=Orange]], false)
-vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange gui=bold,nocombine]], false)
+-- vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange gui=bold,nocombine]], false)
 
 -- LSP settings
 local severity = {
