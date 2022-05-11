@@ -25,6 +25,7 @@ Plug('rcarriga/nvim-notify')
 Plug('rcarriga/nvim-dap-ui')
 Plug('mfussenegger/nvim-dap')
 Plug('nvim-treesitter/nvim-treesitter')
+Plug('sindrets/diffview.nvim')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
