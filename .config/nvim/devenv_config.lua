@@ -79,6 +79,8 @@ vim.api.nvim_create_autocmd('FileType', {
   command = 'setlocal tw=79',
 })
 
+vim.cmd([[autocmd FileType cpp setlocal commentstring=//\ %s]])
+
 local notify = require('notify')
 notify.setup({
   timeout = '4000',
