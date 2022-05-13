@@ -432,3 +432,9 @@ end, { desc = 'Debug: Set Log Point Message' })
 vim.api.nvim_create_user_command('DebugConsole', function()
   dap.repl.toggle()
 end, { desc = 'Debug: Toggle Debug Console' })
+require('nvim-treesitter.configs').setup({
+  ensure_installed = { 'c', 'cpp', 'lua', 'go', 'python', 'bash' },
+  highlight = {
+    enable = true,
+  }
+})
