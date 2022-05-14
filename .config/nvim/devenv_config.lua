@@ -10,22 +10,21 @@ Plug('ahmedkhalf/project.nvim')
 Plug('akinsho/toggleterm.nvim')
 Plug('benfowler/telescope-luasnip.nvim')
 Plug('echasnovski/mini.nvim')
-Plug('kyazdani42/nvim-web-devicons')
 Plug('kyazdani42/nvim-tree.lua')
+Plug('kyazdani42/nvim-web-devicons')
 Plug('lewis6991/gitsigns.nvim')
+Plug('mfussenegger/nvim-dap')
 Plug('neovim/nvim-lspconfig')
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-telescope/telescope.nvim')
-Plug('phaazon/hop.nvim')
-Plug('onsails/lspkind.nvim')
-Plug('sainnhe/gruvbox-material')
-Plug('stevearc/dressing.nvim')
-Plug('stevearc/aerial.nvim')
-Plug('rcarriga/nvim-notify')
-Plug('rcarriga/nvim-dap-ui')
-Plug('mfussenegger/nvim-dap')
 Plug('nvim-treesitter/nvim-treesitter')
+Plug('onsails/lspkind.nvim')
+Plug('rcarriga/nvim-dap-ui')
+Plug('rcarriga/nvim-notify')
+Plug('sainnhe/gruvbox-material')
 Plug('sindrets/diffview.nvim')
+Plug('stevearc/aerial.nvim')
+Plug('stevearc/dressing.nvim')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -131,9 +130,6 @@ vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
 vim.keymap.set('n', '<leader>d', function()
   require('nvim-tree').toggle()
 end, { desc = 'Toggle nvim tree' })
-vim.keymap.set('n', 'ww', function()
-  require('hop').hint_words()
-end, { desc = 'Use hop' })
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
 local luasnip = require('luasnip')
@@ -180,9 +176,11 @@ require('lspkind').init({
 })
 require('gitsigns').setup()
 require('project_nvim').setup()
-require('hop').setup({
-  keys = 'etovxqpdygfblzhckisuran',
-  term_seq_bias = 0.5,
+require('mini.jump2d').setup({
+  labels = 'etovxqpdygfblzhckisuran',
+  mappings = {
+    start_jumping = 'ww',
+  },
 })
 require('aerial').setup()
 vim.g.nvim_tree_respect_buf_cwd = 1
@@ -270,6 +268,7 @@ require('mini.fuzzy').setup()
 -- the MiniTrailspace highlight group. For that reason we are owerwriting the highlight group here
 vim.api.nvim_exec([[hi MiniTrailspace guibg=Orange]], false)
 -- vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange gui=bold,nocombine]], false)
+vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange gui=bold,nocombine]], false)
 
 -- LSP settings
 local severity = {
