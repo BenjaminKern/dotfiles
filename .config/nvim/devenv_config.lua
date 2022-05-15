@@ -304,7 +304,7 @@ local on_attach = function(client, bufnr)
   require('vim.lsp.protocol').CompletionItemKind[22] = "פּ"
   require('vim.lsp.protocol').CompletionItemKind[23] = ""
   require('vim.lsp.protocol').CompletionItemKind[24] = ""
-  require('vim.lsp.protocol').CompletionItemKind[25] = ""
+  require('vim.lsp.protocol').CompletionItemKind[25] = "𝙏"
 
   vim.keymap.set('n', 'K', function()
     vim.lsp.buf.hover()
