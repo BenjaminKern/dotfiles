@@ -20,7 +20,6 @@ Plug('neovim/nvim-lspconfig')
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-telescope/telescope.nvim')
 Plug('nvim-treesitter/nvim-treesitter')
-Plug('onsails/lspkind.nvim')
 Plug('rcarriga/nvim-dap-ui')
 Plug('rcarriga/nvim-notify')
 Plug('sainnhe/gruvbox-material')
@@ -173,9 +172,6 @@ end, { desc = 'Telescope find files' })
 vim.keymap.set('n', '<leader>fg', function()
   require('telescope.builtin').grep_string()
 end, { desc = 'Telescope grep string under cursor' })
-require('lspkind').init({
-  mode = 'symbol',
-})
 require('gitsigns').setup()
 require('project_nvim').setup()
 require('mini.jump2d').setup({
@@ -283,6 +279,33 @@ vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id
 end
 local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.MiniCompletion.completefunc_lsp')
+
+  require('vim.lsp.protocol').CompletionItemKind[1] = ""
+  require('vim.lsp.protocol').CompletionItemKind[2] = ""
+  require('vim.lsp.protocol').CompletionItemKind[3] = ""
+  require('vim.lsp.protocol').CompletionItemKind[4] = ""
+  require('vim.lsp.protocol').CompletionItemKind[5] = "ﰠ"
+  require('vim.lsp.protocol').CompletionItemKind[6] = ""
+  require('vim.lsp.protocol').CompletionItemKind[7] = "ﴯ"
+  require('vim.lsp.protocol').CompletionItemKind[8] = ""
+  require('vim.lsp.protocol').CompletionItemKind[9] = ""
+  require('vim.lsp.protocol').CompletionItemKind[10] = "ﰠ"
+  require('vim.lsp.protocol').CompletionItemKind[11] = "塞"
+  require('vim.lsp.protocol').CompletionItemKind[12] = ""
+  require('vim.lsp.protocol').CompletionItemKind[13] = ""
+  require('vim.lsp.protocol').CompletionItemKind[14] = ""
+  require('vim.lsp.protocol').CompletionItemKind[15] = ""
+  require('vim.lsp.protocol').CompletionItemKind[16] = ""
+  require('vim.lsp.protocol').CompletionItemKind[17] = ""
+  require('vim.lsp.protocol').CompletionItemKind[18] = ""
+  require('vim.lsp.protocol').CompletionItemKind[19] = ""
+  require('vim.lsp.protocol').CompletionItemKind[20] = ""
+  require('vim.lsp.protocol').CompletionItemKind[21] = ""
+  require('vim.lsp.protocol').CompletionItemKind[22] = "פּ"
+  require('vim.lsp.protocol').CompletionItemKind[23] = ""
+  require('vim.lsp.protocol').CompletionItemKind[24] = ""
+  require('vim.lsp.protocol').CompletionItemKind[25] = ""
+
   vim.keymap.set('n', 'K', function()
     vim.lsp.buf.hover()
   end, { silent = true, buffer = bufnr, desc = 'Lsp Hover' })
