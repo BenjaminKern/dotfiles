@@ -2,7 +2,9 @@ vim.cmd([[packadd plug]])
 
 local Plug = vim.fn['plug#']
 
-local plugged_path = vim.env.VIM .. '/plugged'
+local root_plugged_path = vim.env.VIM
+
+local plugged_path = root_plugged_path .. '/plugged'
 
 vim.call('plug#begin', plugged_path)
 Plug('L3MON4D3/LuaSnip')
@@ -267,8 +269,7 @@ require('mini.fuzzy').setup()
 -- Gruvbox colorscheme sets an incompatible Error highlight group which can not be used for
 -- the MiniTrailspace highlight group. For that reason we are owerwriting the highlight group here
 vim.api.nvim_exec([[hi MiniTrailspace guibg=Orange]], false)
--- vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange gui=bold,nocombine]], false)
-vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange gui=bold,nocombine]], false)
+vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange guibg=#1d2021]], false)
 
 -- LSP settings
 local severity = {
