@@ -227,13 +227,21 @@ telescope.load_extension('luasnip')
 telescope.load_extension('notify')
 
 require('toggleterm').setup({
-  shell = vim.fn.has('unix') == 1 and '/bin/bash' or 'cmd.exe',
+  shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
   direction = 'float',
   float_opts = {
     border = 'double',
   },
   open_mapping = [[<leader>t]],
 })
+
+local Terminal  = require('toggleterm.terminal').Terminal
+local btop = Terminal:new({ cmd = vim.fn.has('unix') == 1 and 'btop' or 'btm', hidden = true })
+
+vim.api.nvim_create_user_command('Btop', function()
+  btop:toggle()
+end, { desc = 'btop/bottom' })
+
 require('mini.comment').setup()
 require('mini.completion').setup({
   source_func = 'omnifunc',
