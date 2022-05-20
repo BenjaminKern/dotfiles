@@ -6,24 +6,24 @@ snippet Main Main Method
 snippet Inc Preprocessor #include<...>
 	#include <${1:stdio}.h>
 snippet Fun Function definition
-	/*! \brief ${7:Brief description}
-	 *
-	 *  ${8:Detailed description}
-	 *
-	 * \param ${4:x} ${5:Parameter description}
-	 * \return ${6:Return parameter description}
-	 */
+	/// @brief ${7:Brief description}
+	///
+	/// ${8:Detailed description}
+	///
+	/// @param ${4:x} ${5:Parameter description}
+	/// @return ${6:Return parameter description}
+	///
 	${1:void} ${2:foo}(${3:int} ${4});
 
 	${1} ${2}(${3} ${4}) {
 	  ${0}
 	}
 snippet Stru Struct definition
-	/*! \struct ${1:$TM_FILENAME_BASE}
-	 *  \brief ${4:Brief struct description}
-	 *
-	 *  ${5:Detailed description}
-	 */
+	/// @struct ${1:$TM_FILENAME_BASE}
+	/// @brief ${4:Brief struct description}
+	///
+	///  ${5:Detailed description}
+	///
 	struct ${1} {
 	  ${2:int} ${3:x} /*!< ${6:Description} */
 	};

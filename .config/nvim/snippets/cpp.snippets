@@ -5,11 +5,11 @@ snippet Inc Preprocessor #include<...>
 snippet Tcls Type Erased Class Template
 	#include <memory>
 
-	/*! \class ${1:$TM_FILENAME_BASE}
-	 *  \brief ${10:Brief class description}
-	 *
-	 *  ${11:Detailed description}
-	 */
+	/// @class ${1:$TM_FILENAME_BASE}
+	/// @brief ${10:Brief class description}
+	///
+	/// ${11:Detailed description}
+	///
 	class ${1} {
 	public:
 	  template <typename T>
@@ -24,13 +24,13 @@ snippet Tcls Type Erased Class Template
 	    using std::swap;
 	    swap(first.m_pimpl, second.m_pimpl);
 	  }
-	  /*! \brief ${6:Brief method description}
-	   *
-	   *  ${7:Detailed method description}
-	   *
-	   * \param ${5:x} ${8:Parameter description}
-	   * \return ${9:Return parameter description}
-	   */
+	  /// @brief ${6:Brief method description}
+	  ///
+	  /// ${7:Detailed method description}
+	  ///
+	  /// @param ${5:x} ${8:Parameter description}
+	  /// @return ${9:Return parameter description}
+	  ///
 	  ${2:int} ${3:doFoo}(${4:int} ${5}) {
 	    return m_pimpl->${3}(${5});
 	  }
@@ -63,11 +63,11 @@ snippet Pcls Pimpl Class Template
 	#include <memory>
 
 	namespace ${1:foo} {
-	/*! \class ${2:$TM_FILENAME_BASE}
-	 *  \brief ${13:Brief class description}
-	 *
-	 *  ${14:Detailed description}
-	 */
+	/// @class ${2:$TM_FILENAME_BASE}
+	/// @brief ${13:Brief class description}
+	///
+	/// ${14:Detailed description}
+	///
 	class ${2} {
 	public:
 	  explicit ${2}(${3:int} ${4:x});
@@ -77,13 +77,13 @@ snippet Pcls Pimpl Class Template
 	  ${2} &operator=(${2}&) = delete;
 	  ${2} &operator=(${2}&&);
 	  ~${2}();
-	  /*! \brief ${9:Brief method description}
-	   *
-	   *  ${10:Detailed method description}
-	   *
-	   * \param ${8:x} ${11:Parameter description}
-	   * \return ${12:Return parameter description}
-	   */
+	  /// @brief ${9:Brief method description}
+	  ///
+	  ///  ${10:Detailed method description}
+	  ///
+	  /// @param ${8:x} ${11:Parameter description}
+	  /// @return ${12:Return parameter description}
+	  ///
 	  ${5:int} ${6:doFoo}(${7:int} ${8});
 	private:
 	  class Impl;
@@ -121,11 +121,11 @@ snippet Cls Class Template
 	#include <functional>
 
 	namespace ${1:foo} {
-	/*! \class ${2:$TM_FILENAME_BASE}
-	 *  \brief ${13:Brief class description}
-	 *
-	 *  ${14:Detailed description}
-	 */
+	/// @class ${2:$TM_FILENAME_BASE}
+	/// @brief ${13:Brief class description}
+	///
+	///  ${14:Detailed description}
+	///
 	class ${2} {
 	public:
 	  explicit ${2}(${3:int} ${4:x});
@@ -149,13 +149,13 @@ snippet Cls Class Template
 	    ret = ret*31 + std::hash<${3}>{}(m_${4});
 	    return ret;
 	  }
-	  /*! \brief ${9:Brief method description}
-	   *
-	   *  ${10:Detailed method description}
-	   *
-	   * \param ${8:x} ${11:Parameter description}
-	   * \return ${12:Return parameter description}
-	   */
+	  /// @brief ${9:Brief method description}
+	  ///
+	  /// ${10:Detailed method description}
+	  ///
+	  /// @param ${8:x} ${11:Parameter description}
+	  /// @return ${12:Return parameter description}
+	  ///
 	  ${5:int} ${6:doFoo}(${7:int} ${8});
 	private:
 	  ${3} m_${4};
