@@ -20,6 +20,7 @@ Plug('neovim/nvim-lspconfig')
 Plug('nvim-lua/plenary.nvim')
 Plug('nvim-telescope/telescope.nvim')
 Plug('nvim-treesitter/nvim-treesitter')
+Plug('phaazon/hop.nvim')
 Plug('rcarriga/nvim-dap-ui')
 Plug('rcarriga/nvim-notify')
 Plug('sainnhe/gruvbox-material')
@@ -29,8 +30,6 @@ Plug('stevearc/dressing.nvim')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
-vim.g.gruvbox_material_background = 'hard'
-vim.g.gruvbox_material_disable_italic_comment = true
 vim.g.mapleader = ','
 vim.g.maplocalleader = ','
 vim.opt.breakindent = true
@@ -52,7 +51,10 @@ vim.opt.completeopt = { 'menu', 'noinsert', 'noselect' }
 vim.wo.number = true
 vim.wo.signcolumn = 'yes'
 
+vim.g.gruvbox_material_background = 'hard'
+vim.g.gruvbox_material_disable_italic_comment = true
 vim.cmd([[colorscheme gruvbox-material]])
+
 -- Fake clipboard
 vim.cmd([[
 let g:clipboard = {
@@ -175,12 +177,13 @@ vim.keymap.set('n', '<leader>fg', function()
 end, { desc = 'Telescope grep string under cursor' })
 require('gitsigns').setup()
 require('project_nvim').setup()
-require('mini.jump2d').setup({
-  labels = 'etovxqpdygfblzhckisuran',
-  mappings = {
-    start_jumping = 'ww',
-  },
+require('hop').setup({
+  keys = 'etovxqpdygfblzhckisuran',
+  term_seq_bias = 0.5,
 })
+vim.keymap.set('n', 'ww', function()
+  require('hop').hint_words()
+end, { desc = 'Use hop' })
 require('aerial').setup()
 vim.g.nvim_tree_respect_buf_cwd = 1
 
@@ -267,7 +270,6 @@ require('mini.fuzzy').setup()
 -- Gruvbox colorscheme sets an incompatible Error highlight group which can not be used for
 -- the MiniTrailspace highlight group. For that reason we are owerwriting the highlight group here
 vim.api.nvim_exec([[hi MiniTrailspace guibg=Orange]], false)
-vim.api.nvim_exec([[hi MiniJump2dSpot guifg=Orange guibg=#1d2021]], false)
 
 -- LSP settings
 local severity = {
