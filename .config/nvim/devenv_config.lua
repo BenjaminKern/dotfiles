@@ -25,7 +25,6 @@ Plug('rcarriga/nvim-dap-ui')
 Plug('rcarriga/nvim-notify')
 Plug('sainnhe/gruvbox-material')
 Plug('sindrets/diffview.nvim')
-Plug('stevearc/aerial.nvim')
 Plug('stevearc/dressing.nvim')
 vim.call('plug#end')
 
@@ -184,7 +183,6 @@ require('hop').setup({
 vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
 end, { desc = 'Use hop' })
-require('aerial').setup()
 vim.g.nvim_tree_respect_buf_cwd = 1
 
 require('nvim-tree').setup({
@@ -226,7 +224,6 @@ telescope.setup({
     file_browser = { hidden = true },
   },
 })
-telescope.load_extension('aerial')
 telescope.load_extension('luasnip')
 telescope.load_extension('notify')
 
@@ -343,7 +340,6 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', 'ca', function()
     vim.lsp.buf.code_action()
   end, { silent = true, buffer = bufnr, desc = 'Show Lsp Code Action' })
-  require('aerial').on_attach(client, bufnr)
 end
 
 vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
