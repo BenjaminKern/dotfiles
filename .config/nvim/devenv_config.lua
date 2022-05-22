@@ -93,11 +93,6 @@ vim.notify = notify
 vim.api.nvim_create_user_command('Buffers', function()
   require('telescope.builtin').buffers()
 end, { desc = 'Telescope show Buffers' })
-vim.api.nvim_create_user_command('Commits', function()
-  if vim.fn.isdirectory('.git') ~= 0 then
-    require('telescope.builtin').git_commits()
-  end
-end, { desc = 'Telescope show Git Commits' })
 vim.api.nvim_create_user_command('Registers', function()
   require('telescope.builtin').registers()
 end, { desc = 'Telescope show Registers' })
