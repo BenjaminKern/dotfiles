@@ -257,6 +257,7 @@ require('mini.sessions').setup({
   file = '.session.vim',
   verbose = { write = true, delete = true },
 })
+require('mini.align').setup()
 require('mini.pairs').setup()
 require('mini.fuzzy').setup()
 require('mini.pairs').unmap('i', '"', '""')
