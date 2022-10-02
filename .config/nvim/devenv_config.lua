@@ -231,7 +231,7 @@ require('toggleterm').setup({
   open_mapping = [[<leader>t]],
 })
 
-local Terminal  = require('toggleterm.terminal').Terminal
+local Terminal = require('toggleterm.terminal').Terminal
 local btop = Terminal:new({ cmd = vim.fn.has('unix') == 1 and 'btop' or 'btm', hidden = true })
 
 vim.api.nvim_create_user_command('Btop', function()
@@ -259,6 +259,8 @@ require('mini.sessions').setup({
 })
 require('mini.pairs').setup()
 require('mini.fuzzy').setup()
+require('mini.pairs').unmap('i', '"', '""')
+require('mini.pairs').unmap('i', "'", "''")
 
 -- LSP settings
 local severity = {
@@ -273,31 +275,31 @@ end
 local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.MiniCompletion.completefunc_lsp')
 
-  require('vim.lsp.protocol').CompletionItemKind[1] = ""
-  require('vim.lsp.protocol').CompletionItemKind[2] = ""
-  require('vim.lsp.protocol').CompletionItemKind[3] = ""
-  require('vim.lsp.protocol').CompletionItemKind[4] = ""
-  require('vim.lsp.protocol').CompletionItemKind[5] = "ﰠ"
-  require('vim.lsp.protocol').CompletionItemKind[6] = ""
-  require('vim.lsp.protocol').CompletionItemKind[7] = "ﴯ"
-  require('vim.lsp.protocol').CompletionItemKind[8] = ""
-  require('vim.lsp.protocol').CompletionItemKind[9] = ""
-  require('vim.lsp.protocol').CompletionItemKind[10] = "ﰠ"
-  require('vim.lsp.protocol').CompletionItemKind[11] = "塞"
-  require('vim.lsp.protocol').CompletionItemKind[12] = ""
-  require('vim.lsp.protocol').CompletionItemKind[13] = ""
-  require('vim.lsp.protocol').CompletionItemKind[14] = ""
-  require('vim.lsp.protocol').CompletionItemKind[15] = ""
-  require('vim.lsp.protocol').CompletionItemKind[16] = ""
-  require('vim.lsp.protocol').CompletionItemKind[17] = ""
-  require('vim.lsp.protocol').CompletionItemKind[18] = ""
-  require('vim.lsp.protocol').CompletionItemKind[19] = ""
-  require('vim.lsp.protocol').CompletionItemKind[20] = ""
-  require('vim.lsp.protocol').CompletionItemKind[21] = ""
-  require('vim.lsp.protocol').CompletionItemKind[22] = "פּ"
-  require('vim.lsp.protocol').CompletionItemKind[23] = ""
-  require('vim.lsp.protocol').CompletionItemKind[24] = ""
-  require('vim.lsp.protocol').CompletionItemKind[25] = "𝙏"
+  require('vim.lsp.protocol').CompletionItemKind[1] = ''
+  require('vim.lsp.protocol').CompletionItemKind[2] = ''
+  require('vim.lsp.protocol').CompletionItemKind[3] = ''
+  require('vim.lsp.protocol').CompletionItemKind[4] = ''
+  require('vim.lsp.protocol').CompletionItemKind[5] = 'ﰠ'
+  require('vim.lsp.protocol').CompletionItemKind[6] = ''
+  require('vim.lsp.protocol').CompletionItemKind[7] = 'ﴯ'
+  require('vim.lsp.protocol').CompletionItemKind[8] = ''
+  require('vim.lsp.protocol').CompletionItemKind[9] = ''
+  require('vim.lsp.protocol').CompletionItemKind[10] = 'ﰠ'
+  require('vim.lsp.protocol').CompletionItemKind[11] = '塞'
+  require('vim.lsp.protocol').CompletionItemKind[12] = ''
+  require('vim.lsp.protocol').CompletionItemKind[13] = ''
+  require('vim.lsp.protocol').CompletionItemKind[14] = ''
+  require('vim.lsp.protocol').CompletionItemKind[15] = ''
+  require('vim.lsp.protocol').CompletionItemKind[16] = ''
+  require('vim.lsp.protocol').CompletionItemKind[17] = ''
+  require('vim.lsp.protocol').CompletionItemKind[18] = ''
+  require('vim.lsp.protocol').CompletionItemKind[19] = ''
+  require('vim.lsp.protocol').CompletionItemKind[20] = ''
+  require('vim.lsp.protocol').CompletionItemKind[21] = ''
+  require('vim.lsp.protocol').CompletionItemKind[22] = 'פּ'
+  require('vim.lsp.protocol').CompletionItemKind[23] = ''
+  require('vim.lsp.protocol').CompletionItemKind[24] = ''
+  require('vim.lsp.protocol').CompletionItemKind[25] = '𝙏'
 
   vim.keymap.set('n', 'K', function()
     vim.lsp.buf.hover()
@@ -453,5 +455,5 @@ require('nvim-treesitter.configs').setup({
   ensure_installed = { 'c', 'cpp', 'lua', 'go', 'python', 'bash' },
   highlight = {
     enable = true,
-  }
+  },
 })
