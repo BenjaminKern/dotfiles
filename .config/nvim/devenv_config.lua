@@ -368,7 +368,25 @@ end
 
 local dap = require('dap')
 local dapui = require('dapui')
-dapui.setup()
+dapui.setup({
+  controls = {
+    -- Requires Neovim nightly (or 0.8 when released)
+    enabled = true,
+    -- Display controls in this element
+    element = "repl",
+    icons = {
+      pause = "",
+      play = "",
+      step_into = "",
+      step_over = "",
+      step_out = "",
+      step_back = "",
+      run_last = "",
+      terminate = "",
+    },
+  },
+}
+)
 dap.listeners.after.event_initialized['dapui_config'] = function()
   dapui.open()
 end
