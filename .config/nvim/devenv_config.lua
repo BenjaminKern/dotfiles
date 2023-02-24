@@ -370,24 +370,28 @@ end
 local dap = require('dap')
 local dapui = require('dapui')
 dapui.setup({
-  controls = {
-    -- Requires Neovim nightly (or 0.8 when released)
-    enabled = true,
-    -- Display controls in this element
-    element = "repl",
-    icons = {
-      pause = "",
-      play = "",
-      step_into = "",
-      step_over = "",
-      step_out = "",
-      step_back = "",
-      run_last = "",
-      terminate = "",
+  layouts = {
+    {
+      elements = {
+        -- Elements can be strings or table with id and size keys.
+        { id = 'repl', size = 0.25 },
+        { id = 'watches', size = 0.25 },
+        { id = 'breakpoints', size = 0.20 },
+        { id = 'stacks', size = 0.30 },
+      },
+      size = 40,
+      position = 'left',
+    },
+    {
+      elements = {
+        { id = 'scopes', size = 0.60 },
+        { id = 'console', size = 0.40 },
+      },
+      size = 0.30,
+      position = 'bottom',
     },
   },
-}
-)
+})
 dap.listeners.after.event_initialized['dapui_config'] = function()
   dapui.open()
 end
