@@ -238,6 +238,7 @@ vim.api.nvim_create_user_command('Btop', function()
   btop:toggle()
 end, { desc = 'btop/bottom' })
 
+require('mini.bracketed').setup()
 require('mini.comment').setup()
 require('mini.completion').setup({
   source_func = 'omnifunc',
