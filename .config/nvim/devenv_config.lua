@@ -54,6 +54,8 @@ vim.g.gruvbox_material_background = 'hard'
 vim.g.gruvbox_material_disable_italic_comment = true
 vim.cmd([[colorscheme gruvbox-material]])
 
+vim.keymap.set('n', '<C-Z>', '<NOP>')
+
 -- Fake clipboard
 vim.cmd([[
 let g:clipboard = {
