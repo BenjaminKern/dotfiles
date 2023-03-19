@@ -27,6 +27,7 @@ Plug('sainnhe/gruvbox-material')
 Plug('sindrets/diffview.nvim')
 Plug('stevearc/dressing.nvim')
 Plug('theHamsta/nvim-dap-virtual-text')
+Plug('folke/todo-comments.nvim')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -450,6 +451,7 @@ if vim.fn.executable('lldb-vscode') then
 end
 
 require('nvim-dap-virtual-text').setup()
+require('todo-comments').setup()
 
 vim.keymap.set('n', '<F5>', function()
   dap.continue()
