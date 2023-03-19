@@ -28,6 +28,7 @@ Plug('sindrets/diffview.nvim')
 Plug('stevearc/dressing.nvim')
 Plug('theHamsta/nvim-dap-virtual-text')
 Plug('folke/todo-comments.nvim')
+Plug('ThePrimeagen/refactoring.nvim')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -450,6 +451,13 @@ end
 
 require('nvim-dap-virtual-text').setup()
 require('todo-comments').setup()
+require('refactoring').setup()
+vim.api.nvim_set_keymap(
+    "v",
+    "<leader>rr",
+    ":lua require('refactoring').select_refactor()<CR>",
+    { noremap = true, silent = true, expr = false }
+)
 
 vim.keymap.set('n', '<F5>', function()
   dap.continue()
