@@ -29,6 +29,7 @@ Plug('stevearc/dressing.nvim')
 Plug('theHamsta/nvim-dap-virtual-text')
 Plug('folke/todo-comments.nvim')
 Plug('ThePrimeagen/refactoring.nvim')
+Plug('natecraddock/telescope-zf-native.nvim')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -224,6 +225,7 @@ telescope.setup({
 })
 telescope.load_extension('luasnip')
 telescope.load_extension('notify')
+telescope.load_extension('zf-native')
 
 require('toggleterm').setup({
   shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
@@ -264,7 +266,6 @@ require('mini.sessions').setup({
 require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.pairs').setup()
-require('mini.fuzzy').setup()
 require('mini.pairs').unmap('i', '"', '""')
 require('mini.pairs').unmap('i', "'", "''")
 
