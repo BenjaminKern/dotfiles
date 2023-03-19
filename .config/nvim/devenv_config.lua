@@ -129,9 +129,7 @@ local function feedkeys(key)
 end
 
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
-vim.keymap.set('n', '<leader>d', function()
-  require('nvim-tree').toggle()
-end, { desc = 'Toggle nvim tree' })
+vim.keymap.set('n', '<leader>d', ':NvimTreeToggle<CR>', { desc = 'Toggle nvim tree'})
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
 local luasnip = require('luasnip')
