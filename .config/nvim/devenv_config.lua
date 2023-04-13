@@ -227,11 +227,15 @@ telescope.load_extension('luasnip')
 telescope.load_extension('notify')
 telescope.load_extension('zf-native')
 
+local function custom_border()
+  return { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }
+end
+
 require('toggleterm').setup({
   shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
   direction = 'float',
   float_opts = {
-    border = 'double',
+    border = custom_border(),
   },
   open_mapping = [[<leader>t]],
 })
@@ -248,6 +252,14 @@ require('mini.comment').setup()
 require('mini.completion').setup({
   source_func = 'omnifunc',
   auto_setup = false,
+  window = {
+    info = {
+      border = custom_border(),
+    },
+    signature = {
+      border = custom_border(),
+    },
+  },
 })
 require('mini.cursorword').setup()
 require('mini.indentscope').setup()
