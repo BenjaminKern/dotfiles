@@ -23,11 +23,9 @@ Plug('nvim-treesitter/nvim-treesitter')
 Plug('phaazon/hop.nvim')
 Plug('rcarriga/nvim-dap-ui')
 Plug('rcarriga/nvim-notify')
-Plug('sainnhe/gruvbox-material')
 Plug('sindrets/diffview.nvim')
 Plug('stevearc/dressing.nvim')
 Plug('theHamsta/nvim-dap-virtual-text')
-Plug('folke/todo-comments.nvim')
 Plug('ThePrimeagen/refactoring.nvim')
 Plug('natecraddock/telescope-zf-native.nvim')
 vim.call('plug#end')
@@ -53,10 +51,6 @@ vim.opt.background = 'dark'
 vim.opt.completeopt = { 'menu', 'noinsert', 'noselect' }
 vim.wo.number = true
 vim.wo.signcolumn = 'yes'
-
-vim.g.gruvbox_material_background = 'hard'
-vim.g.gruvbox_material_disable_italic_comment = true
-vim.cmd([[colorscheme gruvbox-material]])
 
 vim.keymap.set('n', '<C-Z>', '<NOP>')
 
@@ -280,6 +274,29 @@ require('mini.surround').setup()
 require('mini.pairs').setup()
 require('mini.pairs').unmap('i', '"', '""')
 require('mini.pairs').unmap('i', "'", "''")
+local hipatterns = require('mini.hipatterns')
+hipatterns.setup({
+  highlighters = {
+    -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
+    fixme = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
+    hack  = { pattern = '%f[%w]()HACK()%f[%W]',  group = 'MiniHipatternsHack'  },
+    todo  = { pattern = '%f[%w]()TODO()%f[%W]',  group = 'MiniHipatternsTodo'  },
+    note  = { pattern = '%f[%w]()NOTE()%f[%W]',  group = 'MiniHipatternsNote'  },
+    -- Highlight hex color strings (`#rrggbb`) using that color
+    hex_color = hipatterns.gen_highlighter.hex_color(),
+  },
+})
+
+require('mini.hues').setup({
+  accent = 'bg',
+  background = '#1d2231',
+  foreground = '#c4c6cd',
+  n_hues = 8,
+  plugins = {
+    default = true
+  },
+  saturation = 'medium'
+})
 
 -- LSP settings
 local severity = {
@@ -463,7 +480,6 @@ if vim.fn.executable('lldb-vscode') then
 end
 
 require('nvim-dap-virtual-text').setup()
-require('todo-comments').setup()
 require('refactoring').setup()
 vim.api.nvim_set_keymap(
   'v',
