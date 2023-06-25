@@ -12,7 +12,6 @@ Plug('ahmedkhalf/project.nvim')
 Plug('akinsho/toggleterm.nvim')
 Plug('benfowler/telescope-luasnip.nvim')
 Plug('echasnovski/mini.nvim')
-Plug('nvim-tree/nvim-tree.lua')
 Plug('kyazdani42/nvim-web-devicons')
 Plug('lewis6991/gitsigns.nvim')
 Plug('mfussenegger/nvim-dap')
@@ -27,7 +26,6 @@ Plug('sindrets/diffview.nvim')
 Plug('stevearc/dressing.nvim')
 Plug('theHamsta/nvim-dap-virtual-text')
 Plug('ThePrimeagen/refactoring.nvim')
-Plug('natecraddock/telescope-zf-native.nvim')
 vim.call('plug#end')
 
 vim.g.do_filetype_lua = true
@@ -125,7 +123,11 @@ local function feedkeys(key)
 end
 
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
-vim.keymap.set('n', '<leader>d', ':NvimTreeToggle<CR>', { desc = 'Toggle nvim tree' })
+vim.keymap.set('n', '<leader>d', function()
+  if not MiniFiles.close() then
+    MiniFiles.open()
+  end
+end, { desc = 'Toggle nvim tree' })
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
 local luasnip = require('luasnip')
@@ -176,16 +178,6 @@ require('hop').setup({
 vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
 end, { desc = 'Use hop' })
-
-require('nvim-tree').setup({
-  update_cwd = true,
-  respect_buf_cwd = true,
-  update_focused_file = {
-    enable = true,
-    update_cwd = true,
-  },
-})
-
 local fd_ignore_file = vim.env.VIM .. '/.fd-ignore'
 
 local telescope = require('telescope')
@@ -200,8 +192,6 @@ telescope.setup({
       vertical = { mirror = true },
       flex = { flip_columns = 140 },
     },
-    file_sorter = require('mini.fuzzy').get_telescope_sorter,
-    generic_sorter = require('mini.fuzzy').get_telescope_sorter,
     mappings = {
       i = {
         ['<C-k>'] = actions.move_selection_previous,
@@ -219,7 +209,6 @@ telescope.setup({
 })
 telescope.load_extension('luasnip')
 telescope.load_extension('notify')
-telescope.load_extension('zf-native')
 
 local function custom_border()
   return { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }
@@ -271,6 +260,7 @@ require('mini.sessions').setup({
 })
 require('mini.align').setup()
 require('mini.surround').setup()
+require('mini.files').setup()
 require('mini.pairs').setup()
 require('mini.pairs').unmap('i', '"', '""')
 require('mini.pairs').unmap('i', "'", "''")
@@ -279,9 +269,9 @@ hipatterns.setup({
   highlighters = {
     -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
     fixme = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
-    hack  = { pattern = '%f[%w]()HACK()%f[%W]',  group = 'MiniHipatternsHack'  },
-    todo  = { pattern = '%f[%w]()TODO()%f[%W]',  group = 'MiniHipatternsTodo'  },
-    note  = { pattern = '%f[%w]()NOTE()%f[%W]',  group = 'MiniHipatternsNote'  },
+    hack = { pattern = '%f[%w]()HACK()%f[%W]', group = 'MiniHipatternsHack' },
+    todo = { pattern = '%f[%w]()TODO()%f[%W]', group = 'MiniHipatternsTodo' },
+    note = { pattern = '%f[%w]()NOTE()%f[%W]', group = 'MiniHipatternsNote' },
     -- Highlight hex color strings (`#rrggbb`) using that color
     hex_color = hipatterns.gen_highlighter.hex_color(),
   },
@@ -293,9 +283,9 @@ require('mini.hues').setup({
   foreground = '#c4c6cd',
   n_hues = 8,
   plugins = {
-    default = true
+    default = true,
   },
-  saturation = 'medium'
+  saturation = 'medium',
 })
 
 -- LSP settings
@@ -519,7 +509,23 @@ vim.api.nvim_create_user_command('DebugConsole', function()
   dap.repl.toggle()
 end, { desc = 'Debug: Toggle Debug Console' })
 require('nvim-treesitter.configs').setup({
-  ensure_installed = { 'c', 'cpp', 'lua', 'go', 'python', 'bash' },
+  ensure_installed = {
+    'c',
+    'cpp',
+    'lua',
+    'go',
+    'python',
+    'bash',
+    'cmake',
+    'markdown',
+    'json',
+    'yaml',
+    'diff',
+    'dockerfile',
+    'starlark',
+    'typescript',
+    'javascript',
+  },
   highlight = {
     enable = true,
   },
