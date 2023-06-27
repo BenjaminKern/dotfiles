@@ -22,6 +22,7 @@ Plug('nvim-treesitter/nvim-treesitter')
 Plug('phaazon/hop.nvim')
 Plug('rcarriga/nvim-dap-ui')
 Plug('rcarriga/nvim-notify')
+Plug('sainnhe/gruvbox-material')
 Plug('sindrets/diffview.nvim')
 Plug('stevearc/dressing.nvim')
 Plug('theHamsta/nvim-dap-virtual-text')
@@ -49,6 +50,9 @@ vim.opt.background = 'dark'
 vim.opt.completeopt = { 'menu', 'noinsert', 'noselect' }
 vim.wo.number = true
 vim.wo.signcolumn = 'yes'
+
+vim.g.gruvbox_material_background = 'hard'
+vim.cmd([[colorscheme gruvbox-material]])
 
 vim.keymap.set('n', '<C-Z>', '<NOP>')
 
@@ -261,31 +265,15 @@ require('mini.sessions').setup({
 require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.files').setup()
-require('mini.pairs').setup()
-require('mini.pairs').unmap('i', '"', '""')
-require('mini.pairs').unmap('i', "'", "''")
+-- require('mini.pairs').setup()
+-- require('mini.pairs').unmap('i', '"', '""')
+-- require('mini.pairs').unmap('i', "'", "''")
 local hipatterns = require('mini.hipatterns')
 hipatterns.setup({
   highlighters = {
-    -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
-    fixme = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
-    hack = { pattern = '%f[%w]()HACK()%f[%W]', group = 'MiniHipatternsHack' },
-    todo = { pattern = '%f[%w]()TODO()%f[%W]', group = 'MiniHipatternsTodo' },
-    note = { pattern = '%f[%w]()NOTE()%f[%W]', group = 'MiniHipatternsNote' },
     -- Highlight hex color strings (`#rrggbb`) using that color
     hex_color = hipatterns.gen_highlighter.hex_color(),
   },
-})
-
-require('mini.hues').setup({
-  accent = 'bg',
-  background = '#1d2231',
-  foreground = '#c4c6cd',
-  n_hues = 8,
-  plugins = {
-    default = true,
-  },
-  saturation = 'medium',
 })
 
 -- LSP settings
@@ -375,11 +363,10 @@ if vim.fn.executable('clangd') then
       '--background-index',
       '--enable-config',
       '--header-insertion=iwyu',
-      '--cross-file-rename',
       '--clang-tidy',
-      '--completion-style=detailed',
-      '--inlay-hints',
+      '--completion-style=bundled',
       '--function-arg-placeholders',
+      '--header-insertion-decorators',
     },
   })
 end
@@ -525,6 +512,7 @@ require('nvim-treesitter.configs').setup({
     'starlark',
     'typescript',
     'javascript',
+    'comment',
   },
   highlight = {
     enable = true,
