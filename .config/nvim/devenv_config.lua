@@ -29,47 +29,69 @@ Plug('theHamsta/nvim-dap-virtual-text')
 Plug('ThePrimeagen/refactoring.nvim')
 vim.call('plug#end')
 
+-- General
+vim.opt.undofile = false -- Disable persistent undo (see also `:h undodir`)
+
+vim.opt.backup = false -- Don't store backup while overwriting the file
+vim.opt.writebackup = false -- Don't store backup while overwriting the file
+
+vim.opt.mouse = 'a' -- Enable mouse for all available modes
+
+-- Appearance
+vim.opt.breakindent = true -- Indent wrapped lines to match line start
+vim.opt.cursorline = true -- Highlight current line
+vim.opt.linebreak = true -- Wrap long lines at 'breakat' (if 'wrap' is set)
+vim.opt.number = true -- Show line numbers
+vim.opt.splitbelow = true -- Horizontal splits will be below
+vim.opt.splitright = true -- Vertical splits will be to the right
+vim.opt.termguicolors = true -- Enable gui colors
+
+vim.opt.ruler = false -- Don't show cursor position in command line
+vim.opt.showmode = false -- Don't show mode in command line
+vim.opt.wrap = false -- Display long lines as just one line
+
+vim.opt.signcolumn = 'yes' -- Always show sign column (otherwise it will shift text)
+vim.opt.fillchars = 'eob: ,vert:┃,horiz:━,horizdown:┳,horizup:┻,verthoriz:╋,vertleft:┫,vertright:┣'
+
+vim.opt.pumblend = 10 -- Make builtin completion menus slightly transparent
+vim.opt.pumheight = 10 -- Make popup menu smaller
+vim.opt.winblend = 10 -- Make floating windows slightly transparent
+vim.opt.listchars = 'extends:…,precedes:…,nbsp:␣' -- Define which helper symbols to show
+vim.opt.list = true
+
+-- Editing
+vim.opt.ignorecase = true -- Ignore case when searching (use `\C` to force not doing that)
+vim.opt.incsearch = true -- Show search results while typing
+vim.opt.infercase = true -- Infer letter cases for a richer built-in keyword completion
+vim.opt.smartcase = true -- Don't ignore case when searching if pattern has upper case
+vim.opt.smartindent = true -- Make indenting smart
+
+vim.opt.completeopt = 'menuone,noinsert,noselect' -- Customize completions
+vim.opt.virtualedit = 'block' -- Allow going past the end of line in visual block mode
+vim.opt.formatoptions = 'qjl1' -- Don't autoformat comments
+
 vim.g.do_filetype_lua = true
 vim.g.mapleader = ','
 vim.g.maplocalleader = ','
-vim.opt.breakindent = true
+
 vim.opt.expandtab = true
+
 vim.opt.hidden = true
 vim.opt.hlsearch = false
-vim.opt.ignorecase = true
 vim.opt.inccommand = 'nosplit'
 vim.opt.laststatus = 3
-vim.opt.mouse = 'a'
 vim.opt.shiftwidth = 2
-vim.opt.smartcase = true
 vim.opt.smarttab = true
 vim.opt.swapfile = false
-vim.opt.termguicolors = true
-vim.opt.undofile = false
-vim.opt.background = 'dark'
-vim.opt.completeopt = { 'menu', 'noinsert', 'noselect' }
-vim.wo.number = true
-vim.wo.signcolumn = 'yes'
 
+vim.opt.shortmess:append('WcC')
+vim.opt.splitkeep = 'screen'
+
+vim.opt.background = 'dark'
 vim.g.gruvbox_material_background = 'hard'
 vim.cmd([[colorscheme gruvbox-material]])
 
 vim.keymap.set('n', '<C-Z>', '<NOP>')
-
--- Fake clipboard
-vim.cmd([[
-let g:clipboard = {
-      \   'name': 'fake',
-      \   'copy': {
-      \      '+': {lines, regtype -> extend(g:, {'clipboard_cache': [lines, regtype]}) },
-      \      '*': {lines, regtype -> extend(g:, {'clipboard_cache': [lines, regtype]}) },
-      \    },
-      \   'paste': {
-      \      '+': {-> get(g:, 'clipboard_cache', [])},
-      \      '*': {-> get(g:, 'clipboard_cache', [])},
-      \   },
-      \ }
-]])
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
@@ -117,15 +139,6 @@ vim.api.nvim_create_user_command('SessionDelete', function()
   MiniSessions.select('delete')
 end, { desc = 'Delete session' })
 
-local function t(str)
-  return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
-
-local function feedkeys(key)
-  local mode = ''
-  vim.api.nvim_feedkeys(t(key), mode, true)
-end
-
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
 vim.keymap.set('n', '<leader>d', function()
   if not MiniFiles.close() then
@@ -139,34 +152,24 @@ luasnip.config.set_config({ history = true })
 luasnip.filetype_extend('all', { '_' })
 require('luasnip.loaders.from_snipmate').lazy_load()
 
-vim.keymap.set({ 'i', 's' }, '<Tab>', function()
-  if vim.fn.pumvisible() ~= 0 then
-    return t('<C-n>')
-  elseif luasnip.expand_or_jumpable() then
-    return feedkeys('<Plug>luasnip-expand-or-jump')
-  else
-    return t('<Tab>')
-  end
-end, { expr = true }, { desc = 'Autocomplete/Expand/Jump Luasnip' })
+vim.keymap.set('i', '<Tab>', [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
+vim.keymap.set('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
 
-vim.keymap.set({ 'i', 's' }, '<S-Tab>', function()
-  if vim.fn.pumvisible() ~= 0 then
-    return t('<C-p>')
-  elseif luasnip.jumpable(-1) then
-    return feedkeys('<Plug>luasnip-jump-prev')
-  else
-    return t('<S-Tab>')
-  end
-end, { expr = true }, { desc = 'Autocomplete/Expand/Jump Back Luasnip' })
-
-vim.keymap.set('i', '<CR>', function()
+local keys = {
+  ['cr'] = vim.api.nvim_replace_termcodes('<CR>', true, true, true),
+  ['ctrl-y'] = vim.api.nvim_replace_termcodes('<C-y>', true, true, true),
+  ['ctrl-y_cr'] = vim.api.nvim_replace_termcodes('<C-y><CR>', true, true, true),
+}
+_G.cr_action = function()
   if vim.fn.pumvisible() ~= 0 then
     local item_selected = vim.fn.complete_info()['selected'] ~= -1
-    return item_selected and t('<C-y>') or t('<C-y><CR>')
+    return item_selected and keys['ctrl-y'] or keys['ctrl-y_cr']
   else
-    return require('mini.pairs').cr()
+    return keys['cr']
   end
-end, { expr = true }, { desc = 'Sanitized CR handling/Expand Mini Pairs' })
+end
+vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
+
 vim.keymap.set('n', '<leader>ff', function()
   require('telescope.builtin').find_files()
 end, { desc = 'Telescope find files' })
@@ -214,16 +217,9 @@ telescope.setup({
 telescope.load_extension('luasnip')
 telescope.load_extension('notify')
 
-local function custom_border()
-  return { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }
-end
-
 require('toggleterm').setup({
   shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
   direction = 'float',
-  float_opts = {
-    border = custom_border(),
-  },
   open_mapping = [[<leader>t]],
 })
 
@@ -239,14 +235,6 @@ require('mini.comment').setup()
 require('mini.completion').setup({
   source_func = 'omnifunc',
   auto_setup = false,
-  window = {
-    info = {
-      border = custom_border(),
-    },
-    signature = {
-      border = custom_border(),
-    },
-  },
 })
 require('mini.cursorword').setup()
 require('mini.indentscope').setup()
@@ -265,9 +253,18 @@ require('mini.sessions').setup({
 require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.files').setup()
--- require('mini.pairs').setup()
--- require('mini.pairs').unmap('i', '"', '""')
--- require('mini.pairs').unmap('i', "'", "''")
+local files_set_cwd = function(path)
+  -- Works only if cursor is on the valid file system entry
+  local cur_entry_path = MiniFiles.get_fs_entry().path
+  local cur_directory = vim.fs.dirname(cur_entry_path)
+  vim.fn.chdir(cur_directory)
+end
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'MiniFilesBufferCreate',
+  callback = function(args)
+    vim.keymap.set('n', 'g~', files_set_cwd, { buffer = args.data.buf_id })
+  end,
+})
 local hipatterns = require('mini.hipatterns')
 hipatterns.setup({
   highlighters = {
@@ -371,8 +368,20 @@ if vim.fn.executable('clangd') then
   })
 end
 
+if vim.fn.executable('pylsp') then
+  require('lspconfig').pylsp.setup({
+    on_attach = on_attach,
+  })
+end
+
 if vim.fn.executable('gopls') then
   require('lspconfig').gopls.setup({
+    on_attach = on_attach,
+  })
+end
+
+if vim.fn.executable('starlark') then
+  require('lspconfig').starlark_rust.setup({
     on_attach = on_attach,
   })
 end
@@ -497,6 +506,8 @@ vim.api.nvim_create_user_command('DebugConsole', function()
 end, { desc = 'Debug: Toggle Debug Console' })
 require('nvim-treesitter.configs').setup({
   ensure_installed = {
+    'vim',
+    'regex',
     'c',
     'cpp',
     'lua',
@@ -505,6 +516,7 @@ require('nvim-treesitter.configs').setup({
     'bash',
     'cmake',
     'markdown',
+    'markdown_inline',
     'json',
     'yaml',
     'diff',
