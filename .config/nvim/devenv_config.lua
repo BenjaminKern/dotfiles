@@ -10,14 +10,12 @@ vim.call('plug#begin', plugged_path)
 Plug('L3MON4D3/LuaSnip')
 Plug('ahmedkhalf/project.nvim')
 Plug('akinsho/toggleterm.nvim')
-Plug('benfowler/telescope-luasnip.nvim')
 Plug('echasnovski/mini.nvim')
 Plug('kyazdani42/nvim-web-devicons')
 Plug('lewis6991/gitsigns.nvim')
 Plug('mfussenegger/nvim-dap')
 Plug('neovim/nvim-lspconfig')
 Plug('nvim-lua/plenary.nvim')
-Plug('nvim-telescope/telescope.nvim')
 Plug('nvim-treesitter/nvim-treesitter')
 Plug('phaazon/hop.nvim')
 Plug('rcarriga/nvim-dap-ui')
@@ -115,20 +113,20 @@ notify.setup({
 vim.notify = notify
 
 vim.api.nvim_create_user_command('Buffers', function()
-  require('telescope.builtin').buffers()
-end, { desc = 'Telescope show Buffers' })
-vim.api.nvim_create_user_command('Registers', function()
-  require('telescope.builtin').registers()
-end, { desc = 'Telescope show Registers' })
-vim.api.nvim_create_user_command('Snippets', function()
-  require('telescope').extensions.luasnip.luasnip()
-end, { desc = 'Telescope show Lua Snippets' })
+  MiniPick.builtin.buffers()
+end, { desc = 'Pick show Buffers' })
+-- vim.api.nvim_create_user_command('Registers', function()
+--   require('telescope.builtin').registers()
+-- end, { desc = 'Telescope show Registers' })
+-- vim.api.nvim_create_user_command('Snippets', function()
+--   require('telescope').extensions.luasnip.luasnip()
+-- end, { desc = 'Telescope show Lua Snippets' })
 vim.api.nvim_create_user_command('Trim', function()
   MiniTrailspace.trim()
 end, { desc = 'Trim trailing whitespace' })
-vim.api.nvim_create_user_command('Messages', function()
-  require('telescope').extensions.notify.notify()
-end, { desc = 'Telescope show notifications' })
+-- vim.api.nvim_create_user_command('Messages', function()
+--   require('telescope').extensions.notify.notify()
+-- end, { desc = 'Telescope show notifications' })
 vim.api.nvim_create_user_command('SessionOpen', function()
   MiniSessions.select('read')
 end, { desc = 'Open session' })
@@ -170,12 +168,10 @@ _G.cr_action = function()
 end
 vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
 
-vim.keymap.set('n', '<leader>ff', function()
-  require('telescope.builtin').find_files()
-end, { desc = 'Telescope find files' })
-vim.keymap.set('n', '<leader>fg', function()
-  require('telescope.builtin').grep_string()
-end, { desc = 'Telescope grep string under cursor' })
+vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find files' })
+vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
+vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
+
 require('gitsigns').setup()
 require('project_nvim').setup()
 require('hop').setup({
@@ -186,36 +182,6 @@ vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
 end, { desc = 'Use hop' })
 local fd_ignore_file = vim.env.VIM .. '/.fd-ignore'
-
-local telescope = require('telescope')
-local actions = require('telescope.actions')
-local config = require('telescope.config')
-telescope.setup({
-  defaults = {
-    sorting_strategy = 'ascending',
-    layout_strategy = 'flex',
-    layout_config = {
-      prompt_position = 'top',
-      vertical = { mirror = true },
-      flex = { flip_columns = 140 },
-    },
-    mappings = {
-      i = {
-        ['<C-k>'] = actions.move_selection_previous,
-        ['<C-j>'] = actions.move_selection_next,
-      },
-    },
-  },
-  pickers = {
-    find_files = {
-      find_command = { 'fd', '--type', 'f', '-H', '--ignore-file', fd_ignore_file },
-    },
-    buffers = { ignore_current_buffer = true },
-    file_browser = { hidden = true },
-  },
-})
-telescope.load_extension('luasnip')
-telescope.load_extension('notify')
 
 require('toggleterm').setup({
   shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
@@ -230,6 +196,7 @@ vim.api.nvim_create_user_command('Btop', function()
   btop:toggle()
 end, { desc = 'btop/bottom' })
 
+require('mini.pick').setup()
 require('mini.bracketed').setup()
 require('mini.comment').setup()
 require('mini.completion').setup({
@@ -325,20 +292,20 @@ local on_attach = function(client, bufnr)
     vim.lsp.buf.type_definition()
   end, { silent = true, buffer = bufnr, desc = 'Lsp Type Definition' })
   vim.keymap.set('n', 'gr', function()
-    require('telescope.builtin').lsp_references()
-  end, { silent = true, buffer = bufnr, desc = 'Telescope show Lsp References' })
+    vim.lsp.buf.references()
+  end, { silent = true, buffer = bufnr, desc = 'Lsp References' })
   vim.keymap.set('n', 'gs', function()
-    require('telescope.builtin').lsp_document_symbols()
-  end, { silent = true, buffer = bufnr, desc = 'Telescope show Lsp Document Symbols' })
+    vim.lsp.buf.document_symbol()
+  end, { silent = true, buffer = bufnr, desc = 'Lsp Document Symbols' })
   vim.keymap.set('n', 'gS', function()
-    require('telescope.builtin').lsp_workspace_symbols()
-  end, { silent = true, buffer = bufnr, desc = 'Telescope show Workspace Symbols' })
+    vim.lsp.buf.workspace_symbol()
+  end, { silent = true, buffer = bufnr, desc = 'Workspace Symbols' })
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function()
     vim.lsp.buf.format()
   end, { desc = 'Lsp Format' })
-  vim.api.nvim_buf_create_user_command(bufnr, 'Diagnostics', function()
-    require('telescope.builtin').diagnostics()
-  end, { desc = 'Telescope show Lsp Diagnostics' })
+  -- vim.api.nvim_buf_create_user_command(bufnr, 'Diagnostics', function()
+  --   require('telescope.builtin').diagnostics()
+  -- end, { desc = 'Telescope show Lsp Diagnostics' })
   vim.api.nvim_buf_create_user_command(bufnr, 'Rename', function()
     vim.lsp.buf.rename()
   end, { desc = 'Lsp Rename' })
@@ -352,7 +319,7 @@ vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSig
 vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
 vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
-if vim.fn.executable('clangd') then
+if vim.fn.executable('clangd') == 1 then
   require('lspconfig').clangd.setup({
     on_attach = on_attach,
     cmd = {
@@ -368,19 +335,19 @@ if vim.fn.executable('clangd') then
   })
 end
 
-if vim.fn.executable('pylsp') then
+if vim.fn.executable('pylsp') == 1 then
   require('lspconfig').pylsp.setup({
     on_attach = on_attach,
   })
 end
 
-if vim.fn.executable('gopls') then
+if vim.fn.executable('gopls') == 1 then
   require('lspconfig').gopls.setup({
     on_attach = on_attach,
   })
 end
 
-if vim.fn.executable('starlark') then
+if vim.fn.executable('starlark') == 1 then
   require('lspconfig').starlark_rust.setup({
     on_attach = on_attach,
   })
@@ -443,7 +410,7 @@ vim.fn.sign_define(
 )
 vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
 
-if vim.fn.executable('lldb-vscode') then
+if vim.fn.executable('lldb-vscode') == 1 then
   dap.adapters.lldb = {
     type = 'executable',
     command = 'lldb-vscode',
