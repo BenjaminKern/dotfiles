@@ -53,7 +53,7 @@ vim.opt.fillchars = 'eob: ,vert:┃,horiz:━,horizdown:┳,horizup:┻,verthori
 vim.opt.pumblend = 10 -- Make builtin completion menus slightly transparent
 vim.opt.pumheight = 10 -- Make popup menu smaller
 vim.opt.winblend = 10 -- Make floating windows slightly transparent
-vim.opt.listchars = 'extends:…,precedes:…,nbsp:␣' -- Define which helper symbols to show
+vim.opt.listchars = 'tab:> ,extends:…,precedes:…,nbsp:␣' -- Define which helper symbols to show
 vim.opt.list = true
 
 -- Editing
