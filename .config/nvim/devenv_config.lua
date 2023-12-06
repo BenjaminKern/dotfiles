@@ -176,6 +176,10 @@ require('conform').setup({
   formatters_by_ft = {
     lua = { 'stylua' },
     python = { 'black' },
+    json = { 'deno_fmt' },
+    markdown = { 'deno_fmt' },
+    javascript = { 'deno_fmt' },
+    typescript = { 'deno_fmt' },
   },
 })
 vim.api.nvim_create_user_command('Format', function()
