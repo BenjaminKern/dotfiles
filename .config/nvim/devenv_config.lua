@@ -23,6 +23,7 @@ Plug('rcarriga/nvim-notify')
 Plug('sainnhe/gruvbox-material')
 Plug('sindrets/diffview.nvim')
 Plug('stevearc/dressing.nvim')
+Plug('stevearc/conform.nvim')
 Plug('theHamsta/nvim-dap-virtual-text')
 vim.call('plug#end')
 
@@ -171,6 +172,15 @@ vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find f
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
 
+require('conform').setup({
+  formatters_by_ft = {
+    lua = { 'stylua' },
+    python = { 'black' },
+  },
+})
+vim.api.nvim_create_user_command('Format', function()
+  require('conform').format({ lsp_fallback = true })
+end, { desc = 'Format' })
 require('gitsigns').setup()
 require('hop').setup({
   keys = 'etovxqpdygfblzhckisuran',
@@ -301,9 +311,6 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', 'gS', function()
     vim.lsp.buf.workspace_symbol()
   end, { silent = true, buffer = bufnr, desc = 'Workspace Symbols' })
-  vim.api.nvim_buf_create_user_command(bufnr, 'Format', function()
-    vim.lsp.buf.format()
-  end, { desc = 'Lsp Format' })
   vim.api.nvim_buf_create_user_command(bufnr, 'Rename', function()
     vim.lsp.buf.rename()
   end, { desc = 'Lsp Rename' })
