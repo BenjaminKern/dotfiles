@@ -178,8 +178,6 @@ require('conform').setup({
     python = { 'black' },
     json = { 'deno_fmt' },
     markdown = { 'deno_fmt' },
-    javascript = { 'deno_fmt' },
-    typescript = { 'deno_fmt' },
   },
 })
 vim.api.nvim_create_user_command('Format', function()
@@ -358,6 +356,12 @@ end
 
 if vim.fn.executable('starlark') == 1 then
   require('lspconfig').starlark_rust.setup({
+    on_attach = on_attach,
+  })
+end
+
+if vim.fn.executable('deno') == 1 then
+  require('lspconfig').denols.setup({
     on_attach = on_attach,
   })
 end
