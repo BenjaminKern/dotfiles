@@ -33,7 +33,7 @@ if not vim.loop.fs_stat(lazypath) then
   })
 end
 vim.opt.rtp:prepend(lazypath)
-require('lazy').setup(plugins, { root = lazyplugins })
+require('lazy').setup(plugins, { root = lazyplugins, dev = { path = '~/workspace/projects/xyz' } })
 
 -- General
 vim.opt.undofile = false -- Disable persistent undo (see also `:h undodir`)
