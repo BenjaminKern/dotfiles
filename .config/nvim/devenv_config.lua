@@ -1,40 +1,4 @@
-local plugins = {
-  'L3MON4D3/LuaSnip',
-  'akinsho/toggleterm.nvim',
-  { 'echasnovski/mini.nvim', dependencies = { 'kyazdani42/nvim-web-devicons' } },
-  'lewis6991/gitsigns.nvim',
-  'neovim/nvim-lspconfig',
-  'phaazon/hop.nvim',
-  { 'rcarriga/nvim-dap-ui', dependencies = { 'mfussenegger/nvim-dap' } },
-  'rcarriga/nvim-notify',
-  {
-    'sainnhe/gruvbox-material',
-    lazy = false,
-    config = function()
-      vim.cmd([[colorscheme gruvbox-material]])
-    end,
-  },
-  'sindrets/diffview.nvim',
-  'stevearc/dressing.nvim',
-  'stevearc/conform.nvim',
-  { 'theHamsta/nvim-dap-virtual-text', dependencies = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' } },
-}
-
-local lazypath = vim.env.VIM .. '/lazy/lazy.nvim'
-local lazyplugins = vim.env.VIM .. '/lazy'
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
-    'git',
-    'clone',
-    '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
-    lazypath,
-  })
-end
-vim.opt.rtp:prepend(lazypath)
-require('lazy').setup(plugins, { root = lazyplugins, dev = { path = '~/workspace/projects/xyz' } })
-
+vim.opt.termguicolors = true -- Enable gui colors
 -- General
 vim.opt.undofile = false -- Disable persistent undo (see also `:h undodir`)
 
@@ -50,7 +14,6 @@ vim.opt.linebreak = true -- Wrap long lines at 'breakat' (if 'wrap' is set)
 vim.opt.number = true -- Show line numbers
 vim.opt.splitbelow = true -- Horizontal splits will be below
 vim.opt.splitright = true -- Vertical splits will be to the right
-vim.opt.termguicolors = true -- Enable gui colors
 
 vim.opt.ruler = false -- Don't show cursor position in command line
 vim.opt.showmode = false -- Don't show mode in command line
@@ -94,7 +57,77 @@ vim.opt.shortmess:append('WcC')
 vim.opt.splitkeep = 'screen'
 
 vim.opt.background = 'dark'
-vim.g.gruvbox_material_background = 'hard'
+
+local plugins = {
+  'L3MON4D3/LuaSnip',
+  'akinsho/toggleterm.nvim',
+  { 'echasnovski/mini.nvim', dependencies = { 'kyazdani42/nvim-web-devicons' } },
+  'lewis6991/gitsigns.nvim',
+  'neovim/nvim-lspconfig',
+  {
+    'phaazon/hop.nvim',
+    opts = {
+      keys = 'etovxqpdygfblzhckisuran',
+      term_seq_bias = 0.5,
+    },
+    init = function()
+      vim.keymap.set('n', 'ww', function()
+        require('hop').hint_words()
+      end, { desc = 'Use hop' })
+    end,
+  },
+  { 'rcarriga/nvim-dap-ui', dependencies = { 'mfussenegger/nvim-dap' } },
+  {
+    'rcarriga/nvim-notify',
+    opts = { timeout = '4000', stages = 'fade' },
+    init = function()
+      vim.notify = require('notify')
+    end,
+  },
+  {
+    'sainnhe/gruvbox-material',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.g.gruvbox_material_background = 'hard'
+      vim.cmd([[colorscheme gruvbox-material]])
+    end,
+  },
+  'sindrets/diffview.nvim',
+  'stevearc/dressing.nvim',
+  {
+    'stevearc/conform.nvim',
+    opts = {
+      formatters_by_ft = {
+        lua = { 'stylua' },
+        python = { 'black' },
+        json = { 'deno_fmt' },
+        markdown = { 'deno_fmt' },
+      },
+    },
+    init = function()
+      vim.api.nvim_create_user_command('Format', function()
+        require('conform').format({ lsp_fallback = true })
+      end, { desc = 'Format' })
+    end,
+  },
+  { 'theHamsta/nvim-dap-virtual-text', dependencies = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' } },
+}
+
+local lazypath = vim.env.VIM .. '/lazy/lazy.nvim'
+local lazyplugins = vim.env.VIM .. '/lazy'
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    'git',
+    'clone',
+    '--filter=blob:none',
+    'https://github.com/folke/lazy.nvim.git',
+    '--branch=stable', -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+require('lazy').setup(plugins, { root = lazyplugins, dev = { path = '~/workspace/projects/xyz' } })
 
 vim.keymap.set('n', '<C-Z>', '<NOP>')
 
@@ -111,13 +144,6 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 vim.cmd([[autocmd FileType cpp setlocal commentstring=//\ %s]])
-
-local notify = require('notify')
-notify.setup({
-  timeout = '4000',
-  stages = 'fade',
-})
-vim.notify = notify
 
 vim.api.nvim_create_user_command('Buffers', function()
   MiniPick.builtin.buffers()
@@ -179,25 +205,7 @@ vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find f
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
 
-require('conform').setup({
-  formatters_by_ft = {
-    lua = { 'stylua' },
-    python = { 'black' },
-    json = { 'deno_fmt' },
-    markdown = { 'deno_fmt' },
-  },
-})
-vim.api.nvim_create_user_command('Format', function()
-  require('conform').format({ lsp_fallback = true })
-end, { desc = 'Format' })
 require('gitsigns').setup()
-require('hop').setup({
-  keys = 'etovxqpdygfblzhckisuran',
-  term_seq_bias = 0.5,
-})
-vim.keymap.set('n', 'ww', function()
-  require('hop').hint_words()
-end, { desc = 'Use hop' })
 local fd_ignore_file = vim.env.VIM .. '/.fd-ignore'
 
 require('toggleterm').setup({
