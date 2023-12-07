@@ -75,7 +75,7 @@ local plugins = {
       end, { desc = 'btop/bottom' })
     end,
   },
-  { 'echasnovski/mini.nvim', dependencies = { 'kyazdani42/nvim-web-devicons' } },
+  { 'nvim-tree/nvim-web-devicons', lazy = true },
   { 'lewis6991/gitsigns.nvim', config = true },
   'neovim/nvim-lspconfig',
   {
@@ -287,6 +287,118 @@ local plugins = {
       },
     },
   },
+  {
+    'echasnovski/mini.pick',
+    config = true,
+    init = function()
+      vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find files' })
+      vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
+      vim.keymap.set(
+        'n',
+        '<leader>fG',
+        [[<Cmd>Pick grep pattern='<cword>'<CR>]],
+        { desc = 'Pick grep string under cursor' }
+      )
+      vim.api.nvim_create_user_command('Buffers', function()
+        MiniPick.builtin.buffers()
+      end, { desc = 'Pick show Buffers' })
+      vim.api.nvim_create_user_command('Registers', function()
+        MiniExtra.pickers.registers()
+      end, { desc = 'Pick show Registers' })
+    end,
+  },
+  {
+    'echasnovski/mini.extra',
+    config = true,
+    init = function()
+      vim.api.nvim_create_user_command('Diagnostic', function()
+        MiniExtra.pickers.diagnostic()
+      end, { desc = 'Pick show diagnostic' })
+    end,
+  },
+  {
+    'echasnovski/mini.misc',
+    config = true,
+  },
+  { 'echasnovski/mini.align', config = true },
+  { 'echasnovski/mini.bracketed', config = true },
+  { 'echasnovski/mini.comment', config = true },
+  { 'echasnovski/mini.completion', config = true },
+  { 'echasnovski/mini.cursorword', config = true },
+  { 'echasnovski/mini.indentscope', config = true },
+  { 'echasnovski/mini.starter', config = true },
+  { 'echasnovski/mini.statusline', opts = { set_vim_settings = false } },
+  { 'echasnovski/mini.surround', config = true },
+  { 'echasnovski/mini.tabline', config = true },
+  {
+    'echasnovski/mini.trailspace',
+    config = true,
+    init = function()
+      vim.api.nvim_create_user_command('Trim', function()
+        MiniTrailspace.trim()
+      end, { desc = 'Trim trailing whitespace' })
+    end,
+  },
+  {
+    'echasnovski/mini.sessions',
+    opts = {
+      directory = vim.env.VIM .. '/sessions',
+      file = '.session.vim',
+      verbose = { write = true, delete = true },
+    },
+    init = function()
+      vim.api.nvim_create_user_command('SessionOpen', function()
+        MiniSessions.select('read')
+      end, { desc = 'Open session' })
+      vim.api.nvim_create_user_command('SessionSave', function()
+        MiniSessions.write('.session.vim')
+      end, { desc = 'Save local session' })
+      vim.api.nvim_create_user_command('SessionDelete', function()
+        MiniSessions.select('delete')
+      end, { desc = 'Delete session' })
+    end,
+  },
+  {
+    'echasnovski/mini.files',
+    config = true,
+    init = function()
+      local files_set_cwd = function(path)
+        -- Works only if cursor is on the valid file system entry
+        local cur_entry_path = MiniFiles.get_fs_entry().path
+        local cur_directory = vim.fs.dirname(cur_entry_path)
+        vim.fn.chdir(cur_directory)
+      end
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'MiniFilesBufferCreate',
+        callback = function(args)
+          vim.keymap.set('n', 'g~', files_set_cwd, { buffer = args.data.buf_id })
+        end,
+      })
+    end,
+    keys = {
+      {
+        '<leader>d',
+        function()
+          if not MiniFiles.close() then
+            MiniFiles.open()
+          end
+        end,
+        desc = 'Toggle mini files',
+        mode = 'n',
+      },
+    },
+  },
+  {
+    'echasnovski/mini.hipatterns',
+    opts = function()
+      local hi = require('mini.hipatterns')
+      return {
+        highlighters = {
+          hex_color = hi.gen_highlighter.hex_color(),
+        },
+      }
+    end,
+  },
 }
 
 local lazypath = vim.env.VIM .. '/lazy/lazy.nvim'
@@ -320,34 +432,7 @@ vim.api.nvim_create_autocmd('FileType', {
 
 vim.cmd([[autocmd FileType cpp setlocal commentstring=//\ %s]])
 
-vim.api.nvim_create_user_command('Buffers', function()
-  MiniPick.builtin.buffers()
-end, { desc = 'Pick show Buffers' })
-vim.api.nvim_create_user_command('Registers', function()
-  MiniExtra.pickers.registers()
-end, { desc = 'Pick show Registers' })
-vim.api.nvim_create_user_command('Trim', function()
-  MiniTrailspace.trim()
-end, { desc = 'Trim trailing whitespace' })
-vim.api.nvim_create_user_command('Diagnostic', function()
-  MiniExtra.pickers.diagnostic()
-end, { desc = 'Pick show diagnostic' })
-vim.api.nvim_create_user_command('SessionOpen', function()
-  MiniSessions.select('read')
-end, { desc = 'Open session' })
-vim.api.nvim_create_user_command('SessionSave', function()
-  MiniSessions.write('.session.vim')
-end, { desc = 'Save local session' })
-vim.api.nvim_create_user_command('SessionDelete', function()
-  MiniSessions.select('delete')
-end, { desc = 'Delete session' })
-
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
-vim.keymap.set('n', '<leader>d', function()
-  if not MiniFiles.close() then
-    MiniFiles.open()
-  end
-end, { desc = 'Toggle nvim tree' })
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
 vim.keymap.set('i', '<Tab>', [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
@@ -367,56 +452,6 @@ _G.cr_action = function()
   end
 end
 vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
-
-vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find files' })
-vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
-vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
-
-require('mini.pick').setup()
-require('mini.extra').setup()
-require('mini.misc').setup()
-MiniMisc.setup_auto_root()
-require('mini.bracketed').setup()
-require('mini.comment').setup()
-require('mini.completion').setup({
-  source_func = 'omnifunc',
-  auto_setup = false,
-})
-require('mini.cursorword').setup()
-require('mini.indentscope').setup()
-require('mini.starter').setup()
-require('mini.statusline').setup({
-  set_vim_settings = false,
-})
-require('mini.tabline').setup()
-require('mini.trailspace').setup()
-require('mini.sessions').setup({
-  directory = vim.env.VIM .. '/sessions',
-  file = '.session.vim',
-  verbose = { write = true, delete = true },
-})
-require('mini.align').setup()
-require('mini.surround').setup()
-require('mini.files').setup()
-local files_set_cwd = function(path)
-  -- Works only if cursor is on the valid file system entry
-  local cur_entry_path = MiniFiles.get_fs_entry().path
-  local cur_directory = vim.fs.dirname(cur_entry_path)
-  vim.fn.chdir(cur_directory)
-end
-vim.api.nvim_create_autocmd('User', {
-  pattern = 'MiniFilesBufferCreate',
-  callback = function(args)
-    vim.keymap.set('n', 'g~', files_set_cwd, { buffer = args.data.buf_id })
-  end,
-})
-local hipatterns = require('mini.hipatterns')
-hipatterns.setup({
-  highlighters = {
-    -- Highlight hex color strings (`#rrggbb`) using that color
-    hex_color = hipatterns.gen_highlighter.hex_color(),
-  },
-})
 
 -- LSP settings
 local severity = {
@@ -485,6 +520,8 @@ local on_attach = function(client, bufnr)
     vim.lsp.buf.code_action()
   end, { silent = true, buffer = bufnr, desc = 'Show Lsp Code Action' })
 end
+
+MiniMisc.setup_auto_root()
 
 vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
 vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
