@@ -1,31 +1,39 @@
-vim.cmd([[packadd plug]])
+local plugins = {
+  'L3MON4D3/LuaSnip',
+  'akinsho/toggleterm.nvim',
+  { 'echasnovski/mini.nvim', dependencies = { 'kyazdani42/nvim-web-devicons' } },
+  'lewis6991/gitsigns.nvim',
+  'neovim/nvim-lspconfig',
+  'phaazon/hop.nvim',
+  { 'rcarriga/nvim-dap-ui', dependencies = { 'mfussenegger/nvim-dap' } },
+  'rcarriga/nvim-notify',
+  {
+    'sainnhe/gruvbox-material',
+    lazy = false,
+    config = function()
+      vim.cmd([[colorscheme gruvbox-material]])
+    end,
+  },
+  'sindrets/diffview.nvim',
+  'stevearc/dressing.nvim',
+  'stevearc/conform.nvim',
+  { 'theHamsta/nvim-dap-virtual-text', dependencies = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' } },
+}
 
-local Plug = vim.fn['plug#']
-
-local root_plugged_path = vim.env.VIM
-
-local plugged_path = root_plugged_path .. '/plugged'
-
-vim.call('plug#begin', plugged_path)
-Plug('L3MON4D3/LuaSnip')
-Plug('ThePrimeagen/refactoring.nvim')
-Plug('akinsho/toggleterm.nvim')
-Plug('echasnovski/mini.nvim')
-Plug('kyazdani42/nvim-web-devicons')
-Plug('lewis6991/gitsigns.nvim')
-Plug('mfussenegger/nvim-dap')
-Plug('neovim/nvim-lspconfig')
-Plug('nvim-lua/plenary.nvim')
-Plug('nvim-treesitter/nvim-treesitter')
-Plug('phaazon/hop.nvim')
-Plug('rcarriga/nvim-dap-ui')
-Plug('rcarriga/nvim-notify')
-Plug('sainnhe/gruvbox-material')
-Plug('sindrets/diffview.nvim')
-Plug('stevearc/dressing.nvim')
-Plug('stevearc/conform.nvim')
-Plug('theHamsta/nvim-dap-virtual-text')
-vim.call('plug#end')
+local lazypath = vim.env.VIM .. '/lazy/lazy.nvim'
+local lazyplugins = vim.env.VIM .. '/lazy'
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    'git',
+    'clone',
+    '--filter=blob:none',
+    'https://github.com/folke/lazy.nvim.git',
+    '--branch=stable', -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+require('lazy').setup(plugins, { root = lazyplugins })
 
 -- General
 vim.opt.undofile = false -- Disable persistent undo (see also `:h undodir`)
@@ -87,7 +95,6 @@ vim.opt.splitkeep = 'screen'
 
 vim.opt.background = 'dark'
 vim.g.gruvbox_material_background = 'hard'
-vim.cmd([[colorscheme gruvbox-material]])
 
 vim.keymap.set('n', '<C-Z>', '<NOP>')
 
@@ -446,13 +453,6 @@ if vim.fn.executable('lldb-vscode') == 1 then
 end
 
 require('nvim-dap-virtual-text').setup()
-require('refactoring').setup()
-vim.api.nvim_set_keymap(
-  'v',
-  '<leader>rr',
-  ":lua require('refactoring').select_refactor()<CR>",
-  { noremap = true, silent = true, expr = false }
-)
 
 vim.keymap.set('n', '<F5>', function()
   dap.continue()
