@@ -59,7 +59,6 @@ vim.opt.splitkeep = 'screen'
 vim.opt.background = 'dark'
 
 local plugins = {
-  'L3MON4D3/LuaSnip',
   'akinsho/toggleterm.nvim',
   { 'echasnovski/mini.nvim', dependencies = { 'kyazdani42/nvim-web-devicons' } },
   'lewis6991/gitsigns.nvim',
@@ -151,9 +150,6 @@ end, { desc = 'Pick show Buffers' })
 vim.api.nvim_create_user_command('Registers', function()
   MiniExtra.pickers.registers()
 end, { desc = 'Telescope show Registers' })
--- vim.api.nvim_create_user_command('Snippets', function()
---   require('telescope').extensions.luasnip.luasnip()
--- end, { desc = 'Telescope show Lua Snippets' })
 vim.api.nvim_create_user_command('Trim', function()
   MiniTrailspace.trim()
 end, { desc = 'Trim trailing whitespace' })
@@ -177,11 +173,6 @@ vim.keymap.set('n', '<leader>d', function()
   end
 end, { desc = 'Toggle nvim tree' })
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
-
-local luasnip = require('luasnip')
-luasnip.config.set_config({ history = true })
-luasnip.filetype_extend('all', { '_' })
-require('luasnip.loaders.from_snipmate').lazy_load()
 
 vim.keymap.set('i', '<Tab>', [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
 vim.keymap.set('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
