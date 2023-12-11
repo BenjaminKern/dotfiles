@@ -24,8 +24,8 @@ vim.opt.fillchars = 'eob: ,vert:┃,horiz:━,horizdown:┳,horizup:┻,verthori
 
 vim.opt.pumblend = 10 -- Make builtin completion menus slightly transparent
 vim.opt.pumheight = 10 -- Make popup menu smaller
-vim.opt.winblend = 10 -- Make floating windows slightly transparent
-vim.opt.listchars = 'tab:> ,extends:…,precedes:…,nbsp:␣' -- Define which helper symbols to show
+vim.opt.winblend = 10 -- Make floating windows slightl transparent
+vim.opt.listchars = 'tab: ,extends:…,precedes:…,nbsp:␣,eol:' -- Define which helper symbols to show
 vim.opt.list = true
 
 -- Editing
@@ -57,10 +57,12 @@ vim.opt.shortmess:append('WcC')
 vim.opt.splitkeep = 'screen'
 
 vim.opt.background = 'dark'
+vim.cmd([[colorscheme xyztokyo]])
 
 local plugins = {
   'akinsho/toggleterm.nvim',
-  { 'echasnovski/mini.nvim', dependencies = { 'kyazdani42/nvim-web-devicons' } },
+  'nvim-tree/nvim-web-devicons',
+  'echasnovski/mini.nvim',
   'lewis6991/gitsigns.nvim',
   'neovim/nvim-lspconfig',
   {
@@ -75,7 +77,6 @@ local plugins = {
       end, { desc = 'Use hop' })
     end,
   },
-  { 'rcarriga/nvim-dap-ui', dependencies = { 'mfussenegger/nvim-dap' } },
   {
     'rcarriga/nvim-notify',
     opts = { timeout = '4000', stages = 'fade' },
@@ -83,17 +84,21 @@ local plugins = {
       vim.notify = require('notify')
     end,
   },
+  { 'sindrets/diffview.nvim', opts = {} },
   {
-    'sainnhe/gruvbox-material',
-    lazy = false,
-    priority = 1000,
-    config = function()
-      vim.g.gruvbox_material_background = 'hard'
-      vim.cmd([[colorscheme gruvbox-material]])
+    'stevearc/dressing.nvim',
+    lazy = true,
+    init = function()
+      vim.ui.select = function(...)
+        require('lazy').load({ plugins = { 'dressing.nvim' } })
+        return vim.ui.select(...)
+      end
+      vim.ui.input = function(...)
+        require('lazy').load({ plugins = { 'dressing.nvim' } })
+        return vim.ui.input(...)
+      end
     end,
   },
-  'sindrets/diffview.nvim',
-  'stevearc/dressing.nvim',
   {
     'stevearc/conform.nvim',
     opts = {
@@ -110,7 +115,10 @@ local plugins = {
       end, { desc = 'Format' })
     end,
   },
-  { 'theHamsta/nvim-dap-virtual-text', dependencies = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' } },
+  'rcarriga/nvim-dap-ui',
+  'mfussenegger/nvim-dap',
+  'nvim-treesitter/nvim-treesitter',
+  'theHamsta/nvim-dap-virtual-text',
 }
 
 local lazypath = vim.env.VIM .. '/lazy/lazy.nvim'
