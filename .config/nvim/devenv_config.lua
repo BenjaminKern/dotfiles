@@ -437,10 +437,10 @@ vim.fn.sign_define(
 )
 vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
 
-if vim.fn.executable('lldb-vscode') == 1 then
+if vim.fn.executable('lldb-dap') == 1 then
   dap.adapters.lldb = {
     type = 'executable',
-    command = 'lldb-vscode',
+    command = 'lldb-dap',
     name = 'lldb',
   }
   dap.configurations.cpp = {
