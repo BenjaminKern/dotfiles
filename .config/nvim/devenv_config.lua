@@ -449,7 +449,14 @@ if vim.fn.executable('lldb-dap') == 1 then
       type = 'lldb',
       request = 'launch',
       program = function()
-        return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        return coroutine.create(function(dap_run_co)
+          vim.ui.input(
+            { prompt = 'Path to executable: ', default = vim.fn.getcwd() .. '/', completion = 'file' },
+            function(input)
+              coroutine.resume(dap_run_co, input)
+            end
+          )
+        end)
       end,
       cwd = '${workspaceFolder}',
       stopOnEntry = false,
