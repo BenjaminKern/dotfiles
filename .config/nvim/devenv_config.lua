@@ -57,13 +57,20 @@ vim.opt.shortmess:append('WcC')
 vim.opt.splitkeep = 'screen'
 
 vim.opt.background = 'dark'
-vim.cmd([[colorscheme xyztokyo]])
+vim.cmd.colorscheme('xyztokyo')
 
 local plugins = {
-  'akinsho/toggleterm.nvim',
-  'nvim-tree/nvim-web-devicons',
+  {
+    'akinsho/toggleterm.nvim',
+    opts = {
+      shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
+      direction = 'horizontal',
+      open_mapping = [[<leader>t]],
+    },
+  },
+  { 'nvim-tree/nvim-web-devicons', opts = {} },
   'echasnovski/mini.nvim',
-  'lewis6991/gitsigns.nvim',
+  { 'lewis6991/gitsigns.nvim', opts = {} },
   'neovim/nvim-lspconfig',
   {
     'phaazon/hop.nvim',
@@ -71,33 +78,15 @@ local plugins = {
       keys = 'etovxqpdygfblzhckisuran',
       term_seq_bias = 0.5,
     },
-    init = function()
-      vim.keymap.set('n', 'ww', function()
-        require('hop').hint_words()
-      end, { desc = 'Use hop' })
-    end,
   },
   {
     'rcarriga/nvim-notify',
     opts = { timeout = '4000', stages = 'fade' },
-    init = function()
-      vim.notify = require('notify')
-    end,
   },
   { 'sindrets/diffview.nvim', opts = {} },
   {
     'stevearc/dressing.nvim',
-    lazy = true,
-    init = function()
-      vim.ui.select = function(...)
-        require('lazy').load({ plugins = { 'dressing.nvim' } })
-        return vim.ui.select(...)
-      end
-      vim.ui.input = function(...)
-        require('lazy').load({ plugins = { 'dressing.nvim' } })
-        return vim.ui.input(...)
-      end
-    end,
+    opts = {},
   },
   {
     'stevearc/conform.nvim',
@@ -109,16 +98,39 @@ local plugins = {
         markdown = { 'deno_fmt' },
       },
     },
-    init = function()
-      vim.api.nvim_create_user_command('Format', function()
-        require('conform').format({ lsp_fallback = true })
-      end, { desc = 'Format' })
-    end,
   },
   'rcarriga/nvim-dap-ui',
   'mfussenegger/nvim-dap',
-  'nvim-treesitter/nvim-treesitter',
   'theHamsta/nvim-dap-virtual-text',
+  {
+    'nvim-treesitter/nvim-treesitter',
+    opts = {
+      ensure_installed = {
+        'vim',
+        'regex',
+        'c',
+        'cpp',
+        'lua',
+        'go',
+        'python',
+        'bash',
+        'cmake',
+        'markdown',
+        'markdown_inline',
+        'json',
+        'yaml',
+        'diff',
+        'dockerfile',
+        'starlark',
+        'typescript',
+        'javascript',
+        'comment',
+      },
+      highlight = {
+        enable = true,
+      },
+    },
+  },
 }
 
 local lazypath = vim.env.VIM .. '/lazy/lazy.nvim'
@@ -136,6 +148,16 @@ end
 vim.opt.rtp:prepend(lazypath)
 require('lazy').setup(plugins, { root = lazyplugins, dev = { path = '~/workspace/projects/xyz' } })
 
+vim.keymap.set('n', 'ww', function()
+  require('hop').hint_words()
+end, { desc = 'Use hop' })
+
+vim.notify = require('notify')
+
+vim.api.nvim_create_user_command('Format', function()
+  require('conform').format({ lsp_fallback = true })
+end, { desc = 'Format' })
+
 vim.keymap.set('n', '<C-Z>', '<NOP>')
 
 vim.api.nvim_create_autocmd('TextYankPost', {
@@ -147,39 +169,28 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'python', 'cpp', 'c' },
-  command = 'setlocal tw=79',
+  callback = function(ev)
+    vim.api.nvim_set_option_value('tw', 79, { scope = 'local' })
+  end,
 })
 
-vim.cmd([[autocmd FileType cpp setlocal commentstring=//\ %s]])
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'cpp' },
+  callback = function(ev)
+    vim.api.nvim_set_option_value('commentstring', '// %s', { scope = 'local' })
+  end,
+})
 
-vim.api.nvim_create_user_command('Buffers', function()
-  MiniPick.builtin.buffers()
-end, { desc = 'Pick show Buffers' })
-vim.api.nvim_create_user_command('Registers', function()
-  MiniExtra.pickers.registers()
-end, { desc = 'Pick show Registers' })
 vim.api.nvim_create_user_command('Trim', function()
   MiniTrailspace.trim()
 end, { desc = 'Trim trailing whitespace' })
-vim.api.nvim_create_user_command('Diagnostic', function()
-  MiniExtra.pickers.diagnostic()
-end, { desc = 'Pick show diagnostic' })
-vim.api.nvim_create_user_command('SessionOpen', function()
-  MiniSessions.select('read')
-end, { desc = 'Open session' })
-vim.api.nvim_create_user_command('SessionSave', function()
-  MiniSessions.write('.session.vim')
-end, { desc = 'Save local session' })
-vim.api.nvim_create_user_command('SessionDelete', function()
-  MiniSessions.select('delete')
-end, { desc = 'Delete session' })
 
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Yank till the end of the line' })
 vim.keymap.set('n', '<leader>d', function()
   if not MiniFiles.close() then
     MiniFiles.open()
   end
-end, { desc = 'Toggle nvim tree' })
+end, { desc = 'Toggle file tree' })
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
 vim.keymap.set('i', '<Tab>', [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
@@ -204,32 +215,14 @@ vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find f
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
 
-require('gitsigns').setup()
-local fd_ignore_file = vim.env.VIM .. '/.fd-ignore'
-
-require('toggleterm').setup({
-  shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
-  direction = 'float',
-  open_mapping = [[<leader>t]],
-})
-
-local Terminal = require('toggleterm.terminal').Terminal
-local btop = Terminal:new({ cmd = vim.fn.has('unix') == 1 and 'btop' or 'btm', hidden = true })
-
-vim.api.nvim_create_user_command('Btop', function()
-  btop:toggle()
-end, { desc = 'btop/bottom' })
-
+require('mini.visits').setup()
 require('mini.pick').setup()
 require('mini.extra').setup()
 require('mini.misc').setup()
 MiniMisc.setup_auto_root()
 require('mini.bracketed').setup()
 require('mini.comment').setup()
-require('mini.completion').setup({
-  source_func = 'omnifunc',
-  auto_setup = false,
-})
+require('mini.completion').setup()
 require('mini.cursorword').setup()
 require('mini.indentscope').setup()
 require('mini.starter').setup()
@@ -238,12 +231,6 @@ require('mini.statusline').setup({
 })
 require('mini.tabline').setup()
 require('mini.trailspace').setup()
-local sessions_path = vim.env.VIM .. '/sessions'
-require('mini.sessions').setup({
-  directory = sessions_path,
-  file = '.session.vim',
-  verbose = { write = true, delete = true },
-})
 require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.files').setup()
@@ -278,8 +265,6 @@ vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id
   vim.notify(method.message, severity[params.type])
 end
 local on_attach = function(client, bufnr)
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.MiniCompletion.completefunc_lsp')
-
   require('vim.lsp.protocol').CompletionItemKind[1] = ''
   require('vim.lsp.protocol').CompletionItemKind[2] = ''
   require('vim.lsp.protocol').CompletionItemKind[3] = ''
@@ -498,29 +483,3 @@ end, { desc = 'Debug: Set Log Point Message' })
 vim.api.nvim_create_user_command('DebugConsole', function()
   dap.repl.toggle()
 end, { desc = 'Debug: Toggle Debug Console' })
-require('nvim-treesitter.configs').setup({
-  ensure_installed = {
-    'vim',
-    'regex',
-    'c',
-    'cpp',
-    'lua',
-    'go',
-    'python',
-    'bash',
-    'cmake',
-    'markdown',
-    'markdown_inline',
-    'json',
-    'yaml',
-    'diff',
-    'dockerfile',
-    'starlark',
-    'typescript',
-    'javascript',
-    'comment',
-  },
-  highlight = {
-    enable = true,
-  },
-})
