@@ -35,7 +35,7 @@ vim.opt.infercase = true -- Infer letter cases for a richer built-in keyword com
 vim.opt.smartcase = true -- Don't ignore case when searching if pattern has upper case
 vim.opt.smartindent = true -- Make indenting smart
 
-vim.opt.completeopt = 'menuone,noinsert,noselect' -- Customize completions
+vim.opt.completeopt = 'menu,menuone,noselect' -- Customize completions
 vim.opt.virtualedit = 'block' -- Allow going past the end of line in visual block mode
 vim.opt.formatoptions = 'qjl1' -- Don't autoformat comments
 
@@ -60,6 +60,12 @@ vim.opt.background = 'dark'
 vim.cmd.colorscheme('xyztokyo')
 
 local plugins = {
+  {
+    'nvimdev/epo.nvim',
+    opts = {
+      signature = false,
+    },
+  },
   {
     'akinsho/toggleterm.nvim',
     opts = {
@@ -193,8 +199,32 @@ vim.keymap.set('n', '<leader>d', function()
 end, { desc = 'Toggle file tree' })
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
-vim.keymap.set('i', '<Tab>', [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
-vim.keymap.set('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
+vim.keymap.set('i', '<TAB>', function()
+  if vim.fn.pumvisible() == 1 then
+    return '<C-n>'
+  elseif vim.snippet.jumpable(1) then
+    return '<cmd>lua vim.snippet.jump(1)<cr>'
+  else
+    return '<TAB>'
+  end
+end, { expr = true })
+
+vim.keymap.set('i', '<S-TAB>', function()
+  if vim.fn.pumvisible() == 1 then
+    return '<C-p>'
+  elseif vim.snippet.jumpable(-1) then
+    return '<cmd>lua vim.snippet.jump(-1)<CR>'
+  else
+    return '<S-TAB>'
+  end
+end, { expr = true })
+
+vim.keymap.set('i', '<C-e>', function()
+  if vim.fn.pumvisible() == 1 then
+    require('epo').disable_trigger()
+  end
+  return '<C-e>'
+end, { expr = true })
 
 local keys = {
   ['cr'] = vim.api.nvim_replace_termcodes('<CR>', true, true, true),
@@ -222,7 +252,6 @@ require('mini.misc').setup()
 MiniMisc.setup_auto_root()
 require('mini.bracketed').setup()
 require('mini.comment').setup()
-require('mini.completion').setup()
 require('mini.cursorword').setup()
 require('mini.indentscope').setup()
 require('mini.starter').setup({
@@ -333,6 +362,9 @@ vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSig
 vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
 vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
+local capabilities =
+  vim.tbl_deep_extend('force', vim.lsp.protocol.make_client_capabilities(), require('epo').register_cap())
+
 if vim.fn.executable('clangd') == 1 then
   require('lspconfig').clangd.setup({
     on_attach = on_attach,
@@ -346,30 +378,35 @@ if vim.fn.executable('clangd') == 1 then
       '--function-arg-placeholders',
       '--header-insertion-decorators',
     },
+    capabilities = capabilities,
   })
 end
 
 if vim.fn.executable('pylsp') == 1 then
   require('lspconfig').pylsp.setup({
     on_attach = on_attach,
+    capabilities = capabilities,
   })
 end
 
 if vim.fn.executable('gopls') == 1 then
   require('lspconfig').gopls.setup({
     on_attach = on_attach,
+    capabilities = capabilities,
   })
 end
 
 if vim.fn.executable('starlark') == 1 then
   require('lspconfig').starlark_rust.setup({
     on_attach = on_attach,
+    capabilities = capabilities,
   })
 end
 
 if vim.fn.executable('deno') == 1 then
   require('lspconfig').denols.setup({
     on_attach = on_attach,
+    capabilities = capabilities,
   })
 end
 
