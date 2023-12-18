@@ -225,7 +225,15 @@ require('mini.comment').setup()
 require('mini.completion').setup()
 require('mini.cursorword').setup()
 require('mini.indentscope').setup()
-require('mini.starter').setup()
+require('mini.starter').setup({
+  header = [[
+██╗  ██╗██╗   ██╗███████╗
+╚██╗██╔╝╚██╗ ██╔╝╚══███╔╝
+ ╚███╔╝  ╚████╔╝   ███╔╝ 
+ ██╔██╗   ╚██╔╝   ███╔╝  
+██╔╝ ██╗   ██║   ███████╗
+╚═╝  ╚═╝   ╚═╝   ╚══════╝]],
+})
 require('mini.statusline').setup({
   set_vim_settings = false,
 })
