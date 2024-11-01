@@ -59,6 +59,10 @@ vim.opt.splitkeep = 'screen'
 vim.opt.background = 'dark'
 vim.opt.completeopt:append('fuzzy')
 
+vim.o.foldtext = ''
+vim.o.spelllang = 'en,de' -- Define spelling dictionaries
+vim.o.spelloptions = 'camel' -- Treat parts of camelCase words as seprate words
+
 vim.cmd.colorscheme('xyztokyo')
 
 local path_package = vim.env.VIM .. '/deps'
