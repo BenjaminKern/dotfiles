@@ -59,101 +59,103 @@ vim.opt.splitkeep = 'screen'
 vim.opt.background = 'dark'
 vim.cmd.colorscheme('xyztokyo')
 
-local plugins = {
-  {
-    'akinsho/toggleterm.nvim',
-    opts = {
-      shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
-      direction = 'horizontal',
-      open_mapping = [[<leader>t]],
-    },
-  },
-  { 'nvim-tree/nvim-web-devicons', opts = {} },
-  'echasnovski/mini.nvim',
-  { 'lewis6991/gitsigns.nvim', opts = {} },
-  'neovim/nvim-lspconfig',
-  {
-    'phaazon/hop.nvim',
-    opts = {
-      keys = 'etovxqpdygfblzhckisuran',
-      term_seq_bias = 0.5,
-    },
-  },
-  {
-    'rcarriga/nvim-notify',
-    opts = { timeout = '4000', stages = 'fade' },
-  },
-  { 'sindrets/diffview.nvim', opts = {} },
-  {
-    'stevearc/dressing.nvim',
-    opts = {},
-  },
-  {
-    'stevearc/conform.nvim',
-    opts = {
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        python = { 'black' },
-        json = { 'deno_fmt' },
-        markdown = { 'deno_fmt' },
-      },
-    },
-  },
-  'rcarriga/nvim-dap-ui',
-  'nvim-neotest/nvim-nio',
-  'mfussenegger/nvim-dap',
-  'theHamsta/nvim-dap-virtual-text',
-  {
-    'nvim-treesitter/nvim-treesitter',
-    opts = {
-      ensure_installed = {
-        'vim',
-        'regex',
-        'c',
-        'cpp',
-        'lua',
-        'go',
-        'python',
-        'bash',
-        'cmake',
-        'markdown',
-        'markdown_inline',
-        'json',
-        'yaml',
-        'diff',
-        'dockerfile',
-        'starlark',
-        'typescript',
-        'javascript',
-        'comment',
-      },
-      highlight = {
-        enable = true,
-      },
-    },
-  },
-}
+local path_package = vim.env.VIM .. '/deps'
 
-local lazypath = vim.env.VIM .. '/lazy/lazy.nvim'
-local lazyplugins = vim.env.VIM .. '/lazy'
-if not vim.loop.fs_stat(lazypath) then
+local mini_path = vim.env.VIM .. '/runtime/pack/dist/opt/mini.deps'
+if not vim.loop.fs_stat(mini_path) then
   vim.fn.system({
     'git',
     'clone',
     '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
-    lazypath,
+    'https://github.com/echasnovski/mini.deps',
+    mini_path,
   })
 end
-vim.opt.rtp:prepend(lazypath)
-require('lazy').setup(plugins, { root = lazyplugins, dev = { path = '~/workspace/projects/xyz' } })
+-- vim.opt.rtp:prepend(mini_path)
+vim.cmd([[packadd mini.deps]])
+require('mini.deps').setup({ path = { package = path_package } })
+
+local add = MiniDeps.add
+add({
+  source = 'echasnovski/mini.nvim',
+})
+add({
+  source = 'akinsho/toggleterm.nvim',
+})
+require('toggleterm').setup({
+  shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
+  direction = 'horizontal',
+  open_mapping = [[<leader>t]],
+  size = 30,
+})
+add({
+  source = 'neovim/nvim-lspconfig',
+})
+add({
+  source = 'stevearc/dressing.nvim',
+})
+add({
+  source = 'stevearc/conform.nvim',
+})
+require('conform').setup({
+  formatters_by_ft = {
+    lua = { 'stylua' },
+    python = { 'black' },
+    json = { 'deno_fmt' },
+    markdown = { 'deno_fmt' },
+  },
+})
+add({
+  source = 'smoka7/hop.nvim',
+})
+require('hop').setup({
+  keys = 'etovxqpdygfblzhckisuran',
+  term_seq_bias = 0.5,
+})
+add({
+  source = 'nvim-treesitter/nvim-treesitter',
+  hooks = {
+    post_checkout = function()
+      vim.cmd([[TSUpdate]])
+    end,
+  },
+})
+require('nvim-treesitter.configs').setup({
+  ensure_installed = {
+    'vim',
+    'regex',
+    'c',
+    'cpp',
+    'lua',
+    'go',
+    'python',
+    'bash',
+    'cmake',
+    'markdown',
+    'markdown_inline',
+    'json',
+    'yaml',
+    'diff',
+    'dockerfile',
+    'starlark',
+    'typescript',
+    'javascript',
+    'comment',
+  },
+  highlight = { enable = true },
+})
+add({
+  source = 'rcarriga/nvim-dap-ui',
+  depends = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' },
+})
+add({
+  source = 'theHamsta/nvim-dap-virtual-text',
+  depends = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' },
+})
 
 vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
 end, { desc = 'Use hop' })
-
-vim.notify = require('notify')
 
 vim.api.nvim_create_user_command('Format', function()
   require('conform').format({ lsp_fallback = true })
@@ -216,6 +218,7 @@ vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find f
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
 
+require('mini.icons').setup()
 require('mini.visits').setup()
 require('mini.pick').setup()
 require('mini.extra').setup()
@@ -243,6 +246,7 @@ require('mini.trailspace').setup()
 require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.files').setup()
+require('mini.notify').setup()
 local files_set_cwd = function(path)
   -- Works only if cursor is on the valid file system entry
   local cur_entry_path = MiniFiles.get_fs_entry().path
