@@ -1,50 +1,36 @@
 vim.opt.termguicolors = true -- Enable gui colors
--- General
 vim.opt.undofile = false -- Disable persistent undo (see also `:h undodir`)
-
 vim.opt.backup = false -- Don't store backup while overwriting the file
 vim.opt.writebackup = false -- Don't store backup while overwriting the file
-
 vim.opt.mouse = 'a' -- Enable mouse for all available modes
-
--- Appearance
 vim.opt.breakindent = true -- Indent wrapped lines to match line start
 vim.opt.cursorline = true -- Highlight current line
 vim.opt.linebreak = true -- Wrap long lines at 'breakat' (if 'wrap' is set)
 vim.opt.number = true -- Show line numbers
 vim.opt.splitbelow = true -- Horizontal splits will be below
 vim.opt.splitright = true -- Vertical splits will be to the right
-
 vim.opt.ruler = false -- Don't show cursor position in command line
 vim.opt.showmode = false -- Don't show mode in command line
 vim.opt.wrap = false -- Display long lines as just one line
-
 vim.opt.signcolumn = 'yes' -- Always show sign column (otherwise it will shift text)
 vim.opt.fillchars = 'eob: ,vert:┃,horiz:━,horizdown:┳,horizup:┻,verthoriz:╋,vertleft:┫,vertright:┣'
-
 vim.opt.pumblend = 10 -- Make builtin completion menus slightly transparent
 vim.opt.pumheight = 10 -- Make popup menu smaller
 vim.opt.winblend = 10 -- Make floating windows slightl transparent
 vim.opt.listchars = 'tab: ,extends:…,precedes:…,nbsp:␣,eol:' -- Define which helper symbols to show
 vim.opt.list = true
-
--- Editing
 vim.opt.ignorecase = true -- Ignore case when searching (use `\C` to force not doing that)
 vim.opt.incsearch = true -- Show search results while typing
 vim.opt.infercase = true -- Infer letter cases for a richer built-in keyword completion
 vim.opt.smartcase = true -- Don't ignore case when searching if pattern has upper case
 vim.opt.smartindent = true -- Make indenting smart
-
 vim.opt.completeopt = 'menuone,noinsert,noselect' -- Customize completions
 vim.opt.virtualedit = 'block' -- Allow going past the end of line in visual block mode
 vim.opt.formatoptions = 'qjl1' -- Don't autoformat comments
-
 vim.g.do_filetype_lua = true
 vim.g.mapleader = ','
 vim.g.maplocalleader = ','
-
 vim.opt.expandtab = true
-
 vim.opt.hidden = true
 vim.opt.hlsearch = false
 vim.opt.inccommand = 'nosplit'
@@ -52,17 +38,13 @@ vim.opt.laststatus = 3
 vim.opt.shiftwidth = 2
 vim.opt.smarttab = true
 vim.opt.swapfile = false
-
 vim.opt.shortmess:append('WcC')
 vim.opt.splitkeep = 'screen'
-
 vim.opt.background = 'dark'
 vim.opt.completeopt:append('fuzzy')
-
 vim.o.foldtext = ''
 vim.o.spelllang = 'en,de' -- Define spelling dictionaries
 vim.o.spelloptions = 'camel' -- Treat parts of camelCase words as seprate words
-
 vim.cmd.colorscheme('xyztokyo')
 
 local path_package = vim.env.VIM .. '/deps'
@@ -77,11 +59,12 @@ if not vim.loop.fs_stat(mini_path) then
     mini_path,
   })
 end
--- vim.opt.rtp:prepend(mini_path)
 vim.cmd([[packadd mini.deps]])
 require('mini.deps').setup({ path = { package = path_package } })
 
 local add = MiniDeps.add
+local later = MiniDeps.later
+local now = MiniDeps.now
 add({
   source = 'echasnovski/mini.nvim',
 })
@@ -100,18 +83,20 @@ add({
 add({
   source = 'stevearc/dressing.nvim',
 })
-add({
-  source = 'stevearc/conform.nvim',
-})
-require('conform').setup({
-  formatters_by_ft = {
-    lua = { 'stylua' },
-    python = { 'black' },
-    json = { 'deno_fmt' },
-    markdown = { 'deno_fmt' },
-    bazel = { 'buildifier' },
-  },
-})
+later(function()
+  add({
+    source = 'stevearc/conform.nvim',
+  })
+  require('conform').setup({
+    formatters_by_ft = {
+      lua = { 'stylua' },
+      python = { 'black' },
+      json = { 'deno_fmt' },
+      markdown = { 'deno_fmt' },
+      bazel = { 'buildifier' },
+    },
+  })
+end)
 add({
   source = 'smoka7/hop.nvim',
 })
@@ -159,6 +144,18 @@ add({
   source = 'theHamsta/nvim-dap-virtual-text',
   depends = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' },
 })
+
+later(function()
+  add('danymat/neogen')
+  require('neogen').setup({
+    snippet_engine = 'nvim',
+    languages = {
+      python = { template = { annotation_convention = 'numpydoc' } },
+      c = { template = { annotation_convention = 'doxygen' } },
+      cpp = { template = { annotation_convention = 'doxygen' } },
+    },
+  })
+end)
 
 vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
@@ -226,7 +223,10 @@ vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick gr
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
 
 require('mini.icons').setup()
+later(MiniIcons.tweak_lsp_kind)
+MiniIcons.mock_nvim_web_devicons()
 require('mini.visits').setup()
+require('mini.diff').setup()
 require('mini.pick').setup()
 require('mini.extra').setup()
 require('mini.misc').setup()
@@ -266,13 +266,52 @@ vim.api.nvim_create_autocmd('User', {
     vim.keymap.set('n', 'g~', files_set_cwd, { buffer = args.data.buf_id })
   end,
 })
-local hipatterns = require('mini.hipatterns')
-hipatterns.setup({
-  highlighters = {
-    -- Highlight hex color strings (`#rrggbb`) using that color
-    hex_color = hipatterns.gen_highlighter.hex_color(),
-  },
-})
+later(function()
+  local hipatterns = require('mini.hipatterns')
+  hipatterns.setup({
+    highlighters = {
+      -- Highlight hex color strings (`#rrggbb`) using that color
+      hex_color = hipatterns.gen_highlighter.hex_color(),
+    },
+  })
+end)
+later(function()
+  local miniclue = require('mini.clue')
+  --stylua: ignore
+  miniclue.setup({
+    clues = {
+      miniclue.gen_clues.builtin_completion(),
+      miniclue.gen_clues.g(),
+      miniclue.gen_clues.marks(),
+      miniclue.gen_clues.registers(),
+      miniclue.gen_clues.windows({ submode_resize = true }),
+      miniclue.gen_clues.z(),
+    },
+    triggers = {
+      { mode = 'n', keys = '<Leader>' }, -- Leader triggers
+      { mode = 'x', keys = '<Leader>' },
+      { mode = 'n', keys = '[' },        -- mini.bracketed
+      { mode = 'n', keys = ']' },
+      { mode = 'x', keys = '[' },
+      { mode = 'x', keys = ']' },
+      { mode = 'i', keys = '<C-x>' },    -- Built-in completion
+      { mode = 'n', keys = 'g' },        -- `g` key
+      { mode = 'x', keys = 'g' },
+      { mode = 'n', keys = "'" },        -- Marks
+      { mode = 'n', keys = '`' },
+      { mode = 'x', keys = "'" },
+      { mode = 'x', keys = '`' },
+      { mode = 'n', keys = '"' },        -- Registers
+      { mode = 'x', keys = '"' },
+      { mode = 'i', keys = '<C-r>' },
+      { mode = 'c', keys = '<C-r>' },
+      { mode = 'n', keys = '<C-w>' },    -- Window commands
+      { mode = 'n', keys = 'z' },        -- `z` key
+      { mode = 'x', keys = 'z' },
+    },
+    window = { config = { border = 'double' } },
+  })
+end)
 
 -- LSP settings
 local severity = {
@@ -285,32 +324,6 @@ vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id
   vim.notify(method.message, severity[params.type])
 end
 local on_attach = function(client, bufnr)
-  require('vim.lsp.protocol').CompletionItemKind[1] = ''
-  require('vim.lsp.protocol').CompletionItemKind[2] = ''
-  require('vim.lsp.protocol').CompletionItemKind[3] = ''
-  require('vim.lsp.protocol').CompletionItemKind[4] = ''
-  require('vim.lsp.protocol').CompletionItemKind[5] = 'ﰠ'
-  require('vim.lsp.protocol').CompletionItemKind[6] = ''
-  require('vim.lsp.protocol').CompletionItemKind[7] = 'ﴯ'
-  require('vim.lsp.protocol').CompletionItemKind[8] = ''
-  require('vim.lsp.protocol').CompletionItemKind[9] = ''
-  require('vim.lsp.protocol').CompletionItemKind[10] = 'ﰠ'
-  require('vim.lsp.protocol').CompletionItemKind[11] = '塞'
-  require('vim.lsp.protocol').CompletionItemKind[12] = ''
-  require('vim.lsp.protocol').CompletionItemKind[13] = ''
-  require('vim.lsp.protocol').CompletionItemKind[14] = ''
-  require('vim.lsp.protocol').CompletionItemKind[15] = ''
-  require('vim.lsp.protocol').CompletionItemKind[16] = ''
-  require('vim.lsp.protocol').CompletionItemKind[17] = ''
-  require('vim.lsp.protocol').CompletionItemKind[18] = ''
-  require('vim.lsp.protocol').CompletionItemKind[19] = ''
-  require('vim.lsp.protocol').CompletionItemKind[20] = ''
-  require('vim.lsp.protocol').CompletionItemKind[21] = ''
-  require('vim.lsp.protocol').CompletionItemKind[22] = 'פּ'
-  require('vim.lsp.protocol').CompletionItemKind[23] = ''
-  require('vim.lsp.protocol').CompletionItemKind[24] = ''
-  require('vim.lsp.protocol').CompletionItemKind[25] = '𝙏'
-
   vim.keymap.set('n', 'K', function()
     vim.lsp.buf.hover()
   end, { silent = true, buffer = bufnr, desc = 'Lsp Hover' })
@@ -340,10 +353,10 @@ local on_attach = function(client, bufnr)
   end, { silent = true, buffer = bufnr, desc = 'Show Lsp Code Action' })
 end
 
-vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
-vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
+vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
+vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
 vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
-vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
+vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
 if vim.fn.executable('clangd') == 1 then
   require('lspconfig').clangd.setup({
@@ -426,19 +439,19 @@ vim.api.nvim_set_hl(0, 'DapStopped', { fg = '#98c379', bg = '#31353f' })
 
 vim.fn.sign_define(
   'DapBreakpoint',
-  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
 )
 vim.fn.sign_define(
   'DapBreakpointCondition',
-  { text = 'ﳁ', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
 )
 vim.fn.sign_define(
   'DapBreakpointRejected',
-  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
 )
 vim.fn.sign_define(
   'DapLogPoint',
-  { text = '', texthl = 'DapLogPoint', linehl = 'DapLogPoint', numhl = 'DapLogPoint' }
+  { text = '', texthl = 'DapLogPoint', linehl = 'DapLogPoint', numhl = 'DapLogPoint' }
 )
 vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
 
