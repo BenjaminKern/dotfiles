@@ -57,6 +57,8 @@ vim.opt.shortmess:append('WcC')
 vim.opt.splitkeep = 'screen'
 
 vim.opt.background = 'dark'
+vim.opt.completeopt:append('fuzzy')
+
 vim.cmd.colorscheme('xyztokyo')
 
 local path_package = vim.env.VIM .. '/deps'
@@ -103,6 +105,7 @@ require('conform').setup({
     python = { 'black' },
     json = { 'deno_fmt' },
     markdown = { 'deno_fmt' },
+    bazel = { 'buildifier' },
   },
 })
 add({
