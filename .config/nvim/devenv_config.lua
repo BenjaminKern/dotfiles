@@ -254,7 +254,12 @@ require('mini.trailspace').setup()
 require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.files').setup()
-require('mini.notify').setup()
+now(function()
+  require('mini.notify').setup({
+    window = { config = { border = 'double' } },
+  })
+  vim.notify = MiniNotify.make_notify()
+end)
 local files_set_cwd = function(path)
   -- Works only if cursor is on the valid file system entry
   local cur_entry_path = MiniFiles.get_fs_entry().path
