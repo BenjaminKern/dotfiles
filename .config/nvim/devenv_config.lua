@@ -222,6 +222,7 @@ vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find f
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
 
+require('mini.git').setup()
 require('mini.icons').setup()
 later(MiniIcons.tweak_lsp_kind)
 MiniIcons.mock_nvim_web_devicons()
