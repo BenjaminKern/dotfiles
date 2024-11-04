@@ -1,6 +1,143 @@
-[custom.inside_container]
-description="Inside container or not"
-when="grep -sq docker /proc/1/cgroup"
-shell=["sh"]
-command="echo ${DOCKER_CONTAINER_NAME-container}"
-format="inside [🐋 $output](blue bold) "
+# Chevron Glance
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+[](fg:sec)\
+$container\
+$os\
+$jobs\
+$username\
+$hostname\
+$localip\
+$directory\
+$git_commit$git_state$git_metrics\
+$git_branch\
+$memory_usage\
+$status\
+[ ](fg:prim)\
+$cmd_duration\
+$line_break$character
+"""
+
+add_newline = false
+
+palette = "chevron_glance"
+
+[palettes.chevron_glance]
+prim = '#a7906f'
+sec = '#3a3a3a'
+red = '#9c454e'
+blue = '#2596be'
+green = '#50925b'
+
+[os]
+format = "[$symbol ]($style)"
+style = "fg:prim bg:sec"
+disabled = false
+
+[os.symbols]
+Alpine = ""
+Amazon = ""
+Arch = ""
+Debian = ""
+Fedora = ""
+Linux = ""
+Mint = ""
+openSUSE = ""
+OracleLinux = "⊂⊃"
+Redhat = ""
+RedHatEnterprise = ""
+SUSE = ""
+Ubuntu = ""
+Unknown = ""
+Windows = ""
+
+[jobs]
+format = '[]($style)[$symbol$number](fg:sec bg:prim)[]($style)'
+style = 'fg:prim bg:sec'
+symbol = '󰇺 '
+symbol_threshold = 1
+number_threshold = 2
+disabled = false
+
+[username]
+format = '[](fg:sec bg:green)[ $user ]($style)[](fg:green bg:sec)'
+style_user = 'fg:sec bold bg:green'
+style_root = 'fg:sec bold bg:red'
+show_always = false
+disabled = false
+
+[hostname]
+format = '[ ](bg:sec)[@](fg:prim bold bg:sec)[ ](bg:sec)[](fg:sec bg:blue)[$ssh_symbol](fg:sec bold bg:blue)[ $hostname ](fg:sec bold bg:blue)[](fg:blue bg:sec)'
+ssh_only = true
+ssh_symbol = ' '
+#trim_at = '.companyname.com'
+disabled = false
+
+[localip]
+format = '[](fg:sec bg:blue)[ $localipv4 ](fg:sec bold bg:blue)[](fg:blue bg:sec)'
+ssh_only = true
+disabled = false
+
+[directory]
+format = '[ ]($style)[$read_only](fg:sec bg:prim)[$repo_root]($repo_root_style)[$path](fg:sec bold bg:prim)'
+style = 'fg:sec bg:prim'
+home_symbol = ' ~'
+read_only = '󰉐 '
+#read_only_style = 'fg: bg:'
+truncation_length = 2
+truncation_symbol = '…/'
+truncate_to_repo = true
+repo_root_format = '[  ](fg:sec bg:prim)[$read_only]($read_only_style)[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[ ](bg:prim)'
+repo_root_style	= 'fg:sec bold bg:prim'
+use_os_path_sep = true
+disabled = false
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+".config" = ". "
+
+[git_branch]
+format = '[](fg:sec bg:prim)[$symbol $branch(:$remote_branch)]($style)[](fg:sec bg:prim)'
+style = 'fg:prim bold bg:sec'
+symbol = ''
+
+[memory_usage]
+format = '[](fg:prim bg:sec)[$symbol]($style)[](fg:sec bg:prim)'
+style = 'fg:red bg:sec'
+symbol = '  !'
+threshold = 75
+disabled = false
+
+[status]
+format = '[$symbol]($style)'
+style = 'fg:red bg:prim'
+symbol = '  '
+disabled = false
+
+[cmd_duration]
+format = '[󰾨 $duration ]($style)'
+style = 'fg:prim'
+min_time = 500
+disabled = false
+
+[line_break]
+disabled = false
+
+[character]
+disabled = false
+success_symbol = '[ 󱞩](bold fg:prim)'
+error_symbol = '[ 󱞩](bold fg:red)'
+vimcmd_symbol = '[ ](bold fg:prim)'
+vimcmd_replace_one_symbol = '[ ](bold fg:purple)'
+vimcmd_replace_symbol = '[ ](bold fg:purple)'
+vimcmd_visual_symbol = '[ ](bold fg:yellow)'
+
+[container]
+format = '[🐋 ]($style)'
+style = 'fg:prim bg:sec'
+disabled = false
