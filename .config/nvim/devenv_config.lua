@@ -65,24 +65,36 @@ require('mini.deps').setup({ path = { package = path_package } })
 local add = MiniDeps.add
 local later = MiniDeps.later
 local now = MiniDeps.now
-add({
-  source = 'echasnovski/mini.nvim',
-})
-add({
-  source = 'akinsho/toggleterm.nvim',
-})
-require('toggleterm').setup({
-  shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
-  direction = 'horizontal',
-  open_mapping = [[<leader>t]],
-  size = 30,
-})
-add({
-  source = 'neovim/nvim-lspconfig',
-})
-add({
-  source = 'stevearc/dressing.nvim',
-})
+
+now(function()
+  add({
+    source = 'echasnovski/mini.nvim',
+  })
+end)
+now(function()
+  require('mini.notify').setup({
+    window = { config = { border = 'double' } },
+  })
+  vim.notify = MiniNotify.make_notify()
+end)
+later(function()
+  add({
+    source = 'akinsho/toggleterm.nvim',
+  })
+  require('toggleterm').setup({
+    shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
+    direction = 'horizontal',
+    open_mapping = [[<leader>t]],
+    size = 30,
+  })
+end)
+
+now(function()
+  add({
+    source = 'stevearc/dressing.nvim',
+  })
+end)
+
 later(function()
   add({
     source = 'stevearc/conform.nvim',
@@ -97,53 +109,59 @@ later(function()
     },
   })
 end)
-add({
-  source = 'smoka7/hop.nvim',
-})
-require('hop').setup({
-  keys = 'etovxqpdygfblzhckisuran',
-  term_seq_bias = 0.5,
-})
-add({
-  source = 'nvim-treesitter/nvim-treesitter',
-  hooks = {
-    post_checkout = function()
-      vim.cmd([[TSUpdate]])
-    end,
-  },
-})
-require('nvim-treesitter.configs').setup({
-  ensure_installed = {
-    'vim',
-    'regex',
-    'c',
-    'cpp',
-    'lua',
-    'go',
-    'python',
-    'bash',
-    'cmake',
-    'markdown',
-    'markdown_inline',
-    'json',
-    'yaml',
-    'diff',
-    'dockerfile',
-    'starlark',
-    'typescript',
-    'javascript',
-    'comment',
-  },
-  highlight = { enable = true },
-})
-add({
-  source = 'rcarriga/nvim-dap-ui',
-  depends = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' },
-})
-add({
-  source = 'theHamsta/nvim-dap-virtual-text',
-  depends = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' },
-})
+
+later(function()
+  add({
+    source = 'smoka7/hop.nvim',
+  })
+  require('hop').setup({
+    keys = 'etovxqpdygfblzhckisuran',
+    term_seq_bias = 0.5,
+  })
+end)
+
+later(function()
+  add({
+    source = 'nvim-treesitter/nvim-treesitter',
+    hooks = {
+      post_checkout = function()
+        vim.cmd([[TSUpdate]])
+      end,
+    },
+  })
+  require('nvim-treesitter.configs').setup({
+    ensure_installed = {
+      'vim',
+      'regex',
+      'c',
+      'cpp',
+      'lua',
+      'go',
+      'python',
+      'bash',
+      'cmake',
+      'markdown',
+      'markdown_inline',
+      'json',
+      'yaml',
+      'diff',
+      'dockerfile',
+      'starlark',
+      'typescript',
+      'javascript',
+      'comment',
+    },
+    highlight = { enable = true },
+  })
+end)
+
+later(function()
+  add({
+    source = 'theHamsta/nvim-dap-virtual-text',
+    depends = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' },
+  })
+  require('nvim-dap-virtual-text').setup()
+end)
 
 later(function()
   add('danymat/neogen')
@@ -230,8 +248,13 @@ require('mini.visits').setup()
 require('mini.diff').setup()
 require('mini.pick').setup()
 require('mini.extra').setup()
-require('mini.misc').setup()
-MiniMisc.setup_auto_root()
+
+later(function()
+  require('mini.misc').setup()
+  MiniMisc.setup_auto_root()
+  MiniMisc.setup_termbg_sync()
+end)
+
 require('mini.bracketed').setup()
 require('mini.comment').setup()
 require('mini.completion').setup()
@@ -254,12 +277,7 @@ require('mini.trailspace').setup()
 require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.files').setup()
-now(function()
-  require('mini.notify').setup({
-    window = { config = { border = 'double' } },
-  })
-  vim.notify = MiniNotify.make_notify()
-end)
+
 local files_set_cwd = function(path)
   -- Works only if cursor is on the valid file system entry
   local cur_entry_path = MiniFiles.get_fs_entry().path
@@ -364,161 +382,169 @@ vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSig
 vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
 vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
-if vim.fn.executable('clangd') == 1 then
-  require('lspconfig').clangd.setup({
-    on_attach = on_attach,
-    cmd = {
-      'clangd',
-      '--background-index',
-      '--enable-config',
-      '--header-insertion=iwyu',
-      '--clang-tidy',
-      '--completion-style=bundled',
-      '--function-arg-placeholders',
-      '--header-insertion-decorators',
-    },
+later(function()
+  add({
+    source = 'neovim/nvim-lspconfig',
   })
-end
-
-if vim.fn.executable('pylsp') == 1 then
-  require('lspconfig').pylsp.setup({
-    on_attach = on_attach,
-  })
-end
-
-if vim.fn.executable('gopls') == 1 then
-  require('lspconfig').gopls.setup({
-    on_attach = on_attach,
-  })
-end
-
-if vim.fn.executable('starlark') == 1 then
-  require('lspconfig').starlark_rust.setup({
-    on_attach = on_attach,
-  })
-end
-
-if vim.fn.executable('deno') == 1 then
-  require('lspconfig').denols.setup({
-    on_attach = on_attach,
-  })
-end
-
-local dap = require('dap')
-local dapui = require('dapui')
-dapui.setup({
-  layouts = {
-    {
-      elements = {
-        -- Elements can be strings or table with id and size keys.
-        { id = 'repl', size = 0.25 },
-        { id = 'watches', size = 0.25 },
-        { id = 'breakpoints', size = 0.20 },
-        { id = 'stacks', size = 0.30 },
+  if vim.fn.executable('clangd') == 1 then
+    require('lspconfig').clangd.setup({
+      on_attach = on_attach,
+      cmd = {
+        'clangd',
+        '--background-index',
+        '--enable-config',
+        '--header-insertion=iwyu',
+        '--clang-tidy',
+        '--completion-style=bundled',
+        '--function-arg-placeholders',
+        '--header-insertion-decorators',
       },
-      size = 40,
-      position = 'left',
-    },
-    {
-      elements = {
-        { id = 'scopes', size = 0.60 },
-        { id = 'console', size = 0.40 },
+    })
+  end
+
+  if vim.fn.executable('pylsp') == 1 then
+    require('lspconfig').pylsp.setup({
+      on_attach = on_attach,
+    })
+  end
+
+  if vim.fn.executable('gopls') == 1 then
+    require('lspconfig').gopls.setup({
+      on_attach = on_attach,
+    })
+  end
+
+  if vim.fn.executable('starlark') == 1 then
+    require('lspconfig').starlark_rust.setup({
+      on_attach = on_attach,
+    })
+  end
+
+  if vim.fn.executable('deno') == 1 then
+    require('lspconfig').denols.setup({
+      on_attach = on_attach,
+    })
+  end
+end)
+later(function()
+  add({
+    source = 'rcarriga/nvim-dap-ui',
+    depends = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' },
+  })
+  local dap = require('dap')
+  local dapui = require('dapui')
+  dapui.setup({
+    layouts = {
+      {
+        elements = {
+          -- Elements can be strings or table with id and size keys.
+          { id = 'repl', size = 0.25 },
+          { id = 'watches', size = 0.25 },
+          { id = 'breakpoints', size = 0.20 },
+          { id = 'stacks', size = 0.30 },
+        },
+        size = 40,
+        position = 'left',
       },
-      size = 0.30,
-      position = 'bottom',
+      {
+        elements = {
+          { id = 'scopes', size = 0.60 },
+          { id = 'console', size = 0.40 },
+        },
+        size = 0.30,
+        position = 'bottom',
+      },
     },
-  },
-})
-dap.listeners.after.event_initialized['dapui_config'] = function()
-  dapui.open()
-end
-dap.listeners.before.event_terminated['dapui_config'] = function()
-  dapui.close()
-end
-dap.listeners.before.event_exited['dapui_config'] = function()
-  dapui.close()
-end
+  })
+  dap.listeners.after.event_initialized['dapui_config'] = function()
+    dapui.open()
+  end
+  dap.listeners.before.event_terminated['dapui_config'] = function()
+    dapui.close()
+  end
+  dap.listeners.before.event_exited['dapui_config'] = function()
+    dapui.close()
+  end
 
-vim.api.nvim_set_hl(0, 'DapBreakpoint', { fg = '#993939', bg = '#31353f' })
-vim.api.nvim_set_hl(0, 'DapLogPoint', { fg = '#61afef', bg = '#31353f' })
-vim.api.nvim_set_hl(0, 'DapStopped', { fg = '#98c379', bg = '#31353f' })
+  vim.api.nvim_set_hl(0, 'DapBreakpoint', { fg = '#993939', bg = '#31353f' })
+  vim.api.nvim_set_hl(0, 'DapLogPoint', { fg = '#61afef', bg = '#31353f' })
+  vim.api.nvim_set_hl(0, 'DapStopped', { fg = '#98c379', bg = '#31353f' })
 
-vim.fn.sign_define(
-  'DapBreakpoint',
-  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
-)
-vim.fn.sign_define(
-  'DapBreakpointCondition',
-  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
-)
-vim.fn.sign_define(
-  'DapBreakpointRejected',
-  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
-)
-vim.fn.sign_define(
-  'DapLogPoint',
-  { text = '', texthl = 'DapLogPoint', linehl = 'DapLogPoint', numhl = 'DapLogPoint' }
-)
-vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
+  vim.fn.sign_define(
+    'DapBreakpoint',
+    { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+  )
+  vim.fn.sign_define(
+    'DapBreakpointCondition',
+    { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+  )
+  vim.fn.sign_define(
+    'DapBreakpointRejected',
+    { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+  )
+  vim.fn.sign_define(
+    'DapLogPoint',
+    { text = '', texthl = 'DapLogPoint', linehl = 'DapLogPoint', numhl = 'DapLogPoint' }
+  )
+  vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
 
-if vim.fn.executable('lldb-dap') == 1 then
-  dap.adapters.lldb = {
-    type = 'executable',
-    command = 'lldb-dap',
-    name = 'lldb',
-  }
-  dap.configurations.cpp = {
-    {
-      name = 'Launch file',
-      type = 'lldb',
-      request = 'launch',
-      program = function()
-        return coroutine.create(function(dap_run_co)
-          vim.ui.input(
-            { prompt = 'Path to executable: ', default = vim.fn.getcwd() .. '/', completion = 'file' },
-            function(input)
-              coroutine.resume(dap_run_co, input)
-            end
-          )
-        end)
-      end,
-      cwd = '${workspaceFolder}',
-      stopOnEntry = false,
-      runInTerminal = false,
-    },
-  }
-  dap.configurations.c = dap.configurations.cpp
-end
+  if vim.fn.executable('lldb-dap') == 1 then
+    dap.adapters.lldb = {
+      type = 'executable',
+      command = 'lldb-dap',
+      name = 'lldb',
+    }
+    dap.configurations.cpp = {
+      {
+        name = 'Launch file',
+        type = 'lldb',
+        request = 'launch',
+        program = function()
+          return coroutine.create(function(dap_run_co)
+            vim.ui.input(
+              { prompt = 'Path to executable: ', default = vim.fn.getcwd() .. '/', completion = 'file' },
+              function(input)
+                coroutine.resume(dap_run_co, input)
+              end
+            )
+          end)
+        end,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+        runInTerminal = false,
+      },
+    }
+    dap.configurations.c = dap.configurations.cpp
+  end
 
-require('nvim-dap-virtual-text').setup()
-
-vim.keymap.set('n', '<F5>', function()
-  dap.continue()
-end, { desc = 'Debug: Start/Continue' })
-vim.keymap.set('n', '<F9>', function()
-  dap.toggle_breakpoint()
-end, { desc = 'Debug: Toggle Breakpoint' })
-vim.keymap.set('n', '<F10>', function()
-  dap.step_over()
-end, { desc = 'Debug: Step Over' })
-vim.keymap.set('n', '<F11>', function()
-  dap.step_into()
-end, { desc = 'Debug: Step Into' })
-vim.keymap.set('n', '<F12>', function()
-  dap.step_out()
-end, { desc = 'Debug: Step Out' })
-vim.api.nvim_create_user_command('DebugListBreakpoints', function()
-  dap.list_breakpoints()
-end, { desc = 'Debug: List Breakpoints' })
-vim.api.nvim_create_user_command('DebugClearBreakpoints', function()
-  dap.clear_breakpoints()
-end, { desc = 'Debug: Clear Breakpoints' })
-vim.api.nvim_create_user_command('DebugSetBreakpoint', function()
-  dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
-end, { desc = 'Debug: Set Conditional Breakpoint' })
-vim.api.nvim_create_user_command('DebugSetLogpoint', function()
-  dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))
-end, { desc = 'Debug: Set Log Point Message' })
-vim.api.nvim_create_user_command('DebugConsole', function()
-  dap.repl.toggle()
-end, { desc = 'Debug: Toggle Debug Console' })
+  vim.keymap.set('n', '<F5>', function()
+    dap.continue()
+  end, { desc = 'Debug: Start/Continue' })
+  vim.keymap.set('n', '<F9>', function()
+    dap.toggle_breakpoint()
+  end, { desc = 'Debug: Toggle Breakpoint' })
+  vim.keymap.set('n', '<F10>', function()
+    dap.step_over()
+  end, { desc = 'Debug: Step Over' })
+  vim.keymap.set('n', '<F11>', function()
+    dap.step_into()
+  end, { desc = 'Debug: Step Into' })
+  vim.keymap.set('n', '<F12>', function()
+    dap.step_out()
+  end, { desc = 'Debug: Step Out' })
+  vim.api.nvim_create_user_command('DebugListBreakpoints', function()
+    dap.list_breakpoints()
+  end, { desc = 'Debug: List Breakpoints' })
+  vim.api.nvim_create_user_command('DebugClearBreakpoints', function()
+    dap.clear_breakpoints()
+  end, { desc = 'Debug: Clear Breakpoints' })
+  vim.api.nvim_create_user_command('DebugSetBreakpoint', function()
+    dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
+  end, { desc = 'Debug: Set Conditional Breakpoint' })
+  vim.api.nvim_create_user_command('DebugSetLogpoint', function()
+    dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))
+  end, { desc = 'Debug: Set Log Point Message' })
+  vim.api.nvim_create_user_command('DebugConsole', function()
+    dap.repl.toggle()
+  end, { desc = 'Debug: Toggle Debug Console' })
+end)
