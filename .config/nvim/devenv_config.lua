@@ -216,25 +216,43 @@ vim.keymap.set('n', '<leader>d', function()
     MiniFiles.open()
   end
 end, { desc = 'Toggle file tree' })
-vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
-vim.keymap.set('i', '<Tab>', [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
-vim.keymap.set('i', '<S-Tab>', [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
+vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
 local keys = {
   ['cr'] = vim.api.nvim_replace_termcodes('<CR>', true, true, true),
   ['ctrl-y'] = vim.api.nvim_replace_termcodes('<C-y>', true, true, true),
   ['ctrl-y_cr'] = vim.api.nvim_replace_termcodes('<C-y><CR>', true, true, true),
+  ['ctrl-n'] = vim.api.nvim_replace_termcodes('<C-n>', true, true, true),
+  ['ctrl-p'] = vim.api.nvim_replace_termcodes('<C-p>', true, true, true),
+  ['tab'] = vim.api.nvim_replace_termcodes('<Tab>', true, true, true),
+  ['s-tab'] = vim.api.nvim_replace_termcodes('<S-Tab>', true, true, true),
 }
 _G.cr_action = function()
   if vim.fn.pumvisible() ~= 0 then
+    -- If popup is visible, confirm selected item or add new line
     local item_selected = vim.fn.complete_info()['selected'] ~= -1
     return item_selected and keys['ctrl-y'] or keys['ctrl-y_cr']
   else
+    -- If popup is not visible, use plain `<CR>`
     return keys['cr']
   end
 end
+
+_G.tab_comple_action = function()
+  if vim.fn.pumvisible() == 1 then
+    return keys['ctrl-n']
+  -- elseif vim.snippet.active({ direction = -1 }) then
+  --   return '<Cmd>lua vim.snippet.jump(-1)<CR>'
+  else
+    return keys['tab']
+  end
+end
+
 vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
+vim.keymap.set('i', [[<Tab>]], 'v:lua._G.tab_comple_action()', { expr = true })
+-- vim.keymap.set('i', [[<S-Tab>]], [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
+
 
 vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find files' })
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
@@ -348,33 +366,9 @@ vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id
   vim.notify(method.message, severity[params.type])
 end
 local on_attach = function(client, bufnr)
-  vim.keymap.set('n', 'K', function()
-    vim.lsp.buf.hover()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp Hover' })
-  vim.keymap.set('n', 'gi', function()
-    vim.lsp.buf.implementation()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp Implementation' })
-  vim.keymap.set('n', 'gd', function()
-    vim.lsp.buf.definition()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp Definition' })
-  vim.keymap.set('n', 'gt', function()
-    vim.lsp.buf.type_definition()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp Type Definition' })
-  vim.keymap.set('n', 'gr', function()
-    vim.lsp.buf.references()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp References' })
-  vim.keymap.set('n', 'gs', function()
-    vim.lsp.buf.document_symbol()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp Document Symbols' })
-  vim.keymap.set('n', 'gS', function()
-    vim.lsp.buf.workspace_symbol()
-  end, { silent = true, buffer = bufnr, desc = 'Workspace Symbols' })
   vim.api.nvim_buf_create_user_command(bufnr, 'Rename', function()
     vim.lsp.buf.rename()
   end, { desc = 'Lsp Rename' })
-  vim.keymap.set('n', 'ca', function()
-    vim.lsp.buf.code_action()
-  end, { silent = true, buffer = bufnr, desc = 'Show Lsp Code Action' })
 end
 
 vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
@@ -382,7 +376,7 @@ vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSig
 vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
 vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
-later(function()
+now(function()
   add({
     source = 'neovim/nvim-lspconfig',
   })
