@@ -24,7 +24,7 @@ vim.opt.incsearch = true -- Show search results while typing
 vim.opt.infercase = true -- Infer letter cases for a richer built-in keyword completion
 vim.opt.smartcase = true -- Don't ignore case when searching if pattern has upper case
 vim.opt.smartindent = true -- Make indenting smart
-vim.opt.completeopt = 'menuone,noinsert,noselect' -- Customize completions
+vim.opt.completeopt = 'menu,menuone,noinsert,noselect' -- Customize completions
 vim.opt.virtualedit = 'block' -- Allow going past the end of line in visual block mode
 vim.opt.formatoptions = 'qjl1' -- Don't autoformat comments
 vim.g.do_filetype_lua = true
@@ -253,7 +253,6 @@ vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
 vim.keymap.set('i', [[<Tab>]], 'v:lua._G.tab_comple_action()', { expr = true })
 -- vim.keymap.set('i', [[<S-Tab>]], [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
 
-
 vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find files' })
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
@@ -275,7 +274,12 @@ end)
 
 require('mini.bracketed').setup()
 require('mini.comment').setup()
-require('mini.completion').setup()
+require('mini.completion').setup({
+  lsp_completion = {
+    source_func = 'omnifunc',
+    auto_setup = false,
+  },
+})
 require('mini.cursorword').setup()
 require('mini.indentscope').setup()
 require('mini.starter').setup({
@@ -366,6 +370,9 @@ vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id
   vim.notify(method.message, severity[params.type])
 end
 local on_attach = function(client, bufnr)
+  -- vim.bo[bufnr].omnifunc = 'v:lua.vim.lsp.omnifunc'
+  vim.bo[bufnr].omnifunc = 'v:lua.MiniCompletion.completefunc_lsp'
+
   vim.keymap.set('n', 'gd', function()
     vim.lsp.buf.definition()
   end, { silent = true, buffer = bufnr, desc = 'Lsp Definition' })
@@ -378,6 +385,9 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Rename', function()
     vim.lsp.buf.rename()
   end, { desc = 'Lsp Rename' })
+  if client.supports_method('textDocument/inlayHint') then
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+  end
 end
 
 vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
