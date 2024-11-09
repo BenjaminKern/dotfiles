@@ -369,9 +369,15 @@ local severity = {
 vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id)
   vim.notify(method.message, severity[params.type])
 end
+
+local use_lsp_completion = false
+
 local on_attach = function(client, bufnr)
-  -- vim.bo[bufnr].omnifunc = 'v:lua.vim.lsp.omnifunc'
-  vim.bo[bufnr].omnifunc = 'v:lua.MiniCompletion.completefunc_lsp'
+  if use_lsp_completion then
+    vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
+  else
+    vim.bo[bufnr].omnifunc = 'v:lua.MiniCompletion.completefunc_lsp'
+  end
 
   vim.keymap.set('n', 'gd', function()
     vim.lsp.buf.definition()
