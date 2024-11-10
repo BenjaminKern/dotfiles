@@ -70,12 +70,12 @@ now(function()
   add({
     source = 'echasnovski/mini.nvim',
   })
-end)
-now(function()
   require('mini.notify').setup({
     window = { config = { border = 'double' } },
   })
   vim.notify = MiniNotify.make_notify()
+  require('mini.pick').setup()
+  vim.ui.select = MiniPick.ui_select
 end)
 later(function()
   add({
@@ -92,6 +92,11 @@ end)
 now(function()
   add({
     source = 'stevearc/dressing.nvim',
+  })
+  require('dressing').setup({
+    select = {
+      enabled = false,
+    },
   })
 end)
 
@@ -250,7 +255,7 @@ _G.tab_comple_action = function()
 end
 
 vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
-vim.keymap.set('i', [[<Tab>]], 'v:lua._G.tab_comple_action()', { expr = true })
+vim.keymap.set('i', '<Tab>', 'v:lua._G.tab_comple_action()', { expr = true })
 -- vim.keymap.set('i', [[<S-Tab>]], [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
 
 vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find files' })
@@ -259,19 +264,14 @@ vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { de
 
 require('mini.git').setup()
 require('mini.icons').setup()
-later(MiniIcons.tweak_lsp_kind)
+MiniIcons.tweak_lsp_kind()
 MiniIcons.mock_nvim_web_devicons()
 require('mini.visits').setup()
 require('mini.diff').setup()
-require('mini.pick').setup()
 require('mini.extra').setup()
-
-later(function()
-  require('mini.misc').setup()
-  MiniMisc.setup_auto_root()
-  MiniMisc.setup_termbg_sync()
-end)
-
+require('mini.misc').setup()
+MiniMisc.setup_auto_root()
+MiniMisc.setup_termbg_sync()
 require('mini.bracketed').setup()
 require('mini.comment').setup()
 require('mini.completion').setup({
@@ -396,10 +396,10 @@ local on_attach = function(client, bufnr)
   end
 end
 
-vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
-vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
-vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
-vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
+vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
+vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
+vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
+vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
 now(function()
   add({
