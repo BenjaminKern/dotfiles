@@ -513,28 +513,39 @@ later(function()
       command = 'lldb-dap',
       name = 'lldb',
     }
-    dap.configurations.cpp = {
-      {
-        name = 'Launch file',
-        type = 'lldb',
-        request = 'launch',
-        program = function()
-          return coroutine.create(function(dap_run_co)
-            vim.ui.input(
-              { prompt = 'Path to executable: ', default = vim.fn.getcwd() .. '/', completion = 'file' },
-              function(input)
-                coroutine.resume(dap_run_co, input)
-              end
-            )
-          end)
-        end,
-        cwd = '${workspaceFolder}',
-        stopOnEntry = false,
-        runInTerminal = false,
-      },
-    }
-    dap.configurations.c = dap.configurations.cpp
   end
+
+  if vim.fn.executable('OpenDebugAD7') == 1 then
+    dap.adapters.cppdbg = {
+      id = 'cppdbg',
+      type = 'executable',
+      command = 'OpenDebugAD7',
+      MIMode = 'gdb',
+      MIDebuggerPath = 'gdb',
+    }
+  end
+
+  dap.configurations.cpp = {
+    {
+      name = 'Launch file',
+      type = 'lldb',
+      request = 'launch',
+      program = function()
+        return coroutine.create(function(dap_run_co)
+          vim.ui.input(
+            { prompt = 'Path to executable: ', default = vim.fn.getcwd() .. '/', completion = 'file' },
+            function(input)
+              coroutine.resume(dap_run_co, input)
+            end
+          )
+        end)
+      end,
+      cwd = '${workspaceFolder}',
+      stopOnEntry = true,
+      runInTerminal = false,
+    },
+  }
+  dap.configurations.c = dap.configurations.cpp
 
   vim.keymap.set('n', '<F5>', function()
     dap.continue()
