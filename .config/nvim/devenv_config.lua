@@ -77,6 +77,7 @@ now(function()
   require('mini.pick').setup()
   vim.ui.select = MiniPick.ui_select
 end)
+
 later(function()
   add({
     source = 'akinsho/toggleterm.nvim',
@@ -157,6 +158,38 @@ later(function()
       'comment',
     },
     highlight = { enable = true },
+  })
+end)
+
+later(function()
+  add({
+    source = 'MeanderingProgrammer/render-markdown.nvim',
+    depends = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+  })
+  require('render-markdown').setup({
+    file_types = { 'markdown', 'codecompanion' },
+  })
+end)
+
+later(function()
+  add({
+    source = 'olimorris/codecompanion.nvim',
+    depends = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+      'MeanderingProgrammer/render-markdown.nvim',
+    },
+  })
+  require('codecompanion').setup({
+    strategies = {
+      chat = {
+        adapter = 'ollama',
+        render_headers = false,
+      },
+      inline = {
+        adapter = 'ollama',
+      },
+    },
   })
 end)
 
