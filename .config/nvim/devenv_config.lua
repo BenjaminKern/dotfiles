@@ -83,7 +83,6 @@ later(function()
     source = 'akinsho/toggleterm.nvim',
   })
   require('toggleterm').setup({
-    shell = vim.fn.has('unix') == 1 and '/usr/bin/env bash' or 'cmd.exe',
     direction = 'horizontal',
     open_mapping = [[<leader>t]],
     size = 30,
