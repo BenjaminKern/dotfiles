@@ -45,7 +45,7 @@ vim.opt.completeopt:append('fuzzy')
 vim.o.foldtext = ''
 vim.o.spelllang = 'en,de' -- Define spelling dictionaries
 vim.o.spelloptions = 'camel' -- Treat parts of camelCase words as seprate words
-vim.cmd.colorscheme('xyztokyo')
+-- vim.cmd.colorscheme('xyztokyo')
 
 local path_package = vim.env.VIM .. '/deps'
 
@@ -65,6 +65,13 @@ require('mini.deps').setup({ path = { package = path_package } })
 local add = MiniDeps.add
 local later = MiniDeps.later
 local now = MiniDeps.now
+
+now(function()
+  add({
+    source = 'folke/tokyonight.nvim',
+  })
+  vim.cmd.colorscheme('tokyonight-moon')
+end)
 
 now(function()
   add({
