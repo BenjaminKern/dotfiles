@@ -210,7 +210,7 @@ end)
 later(function()
   add('danymat/neogen')
   require('neogen').setup({
-    snippet_engine = 'nvim',
+    snippet_engine = 'mini',
     languages = {
       python = { template = { annotation_convention = 'numpydoc' } },
       c = { template = { annotation_convention = 'doxygen' } },
@@ -338,6 +338,17 @@ require('mini.trailspace').setup()
 require('mini.align').setup()
 require('mini.surround').setup()
 require('mini.files').setup()
+local gen_loader = require('mini.snippets').gen_loader
+require('mini.snippets').setup({
+  snippets = {
+    -- Load custom file with global snippets first (adjust for Windows)
+    -- gen_loader.from_file('~/.config/nvim/snippets/global.json'),
+
+    -- Load snippets based on current language by reading files from
+    -- "snippets/" subdirectories from 'runtimepath' directories.
+    gen_loader.from_lang(),
+  },
+})
 
 local files_set_cwd = function(path)
   -- Works only if cursor is on the valid file system entry
