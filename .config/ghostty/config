@@ -1,0 +1,18 @@
+# Syntax
+# vim: set filetype=dosini
+
+theme = tokyonight
+shell-integration-features = no-cursor
+cursor-style-blink = false
+cursor-color = #82aaff
+keybind = opt+h=csi:D
+keybind = opt+l=csi:C
+keybind = opt+k=csi:A
+keybind = opt+j=csi:B
+
+macos-option-as-alt = true
+mouse-hide-while-typing = true
+focus-follows-mouse = true
+
+desktop-notifications = true
+shell-integration = zsh
