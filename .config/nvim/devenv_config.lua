@@ -202,7 +202,7 @@ end)
 later(function()
   add({
     source = 'theHamsta/nvim-dap-virtual-text',
-    depends = { 'mfussenegger/nvim-dap', 'nvim-treesitter/nvim-treesitter' },
+    depends = { 'mfussenegger/nvim-dap', 'mfussenegger/nvim-dap-python', 'nvim-treesitter/nvim-treesitter' },
   })
   require('nvim-dap-virtual-text').setup()
 end)
@@ -309,7 +309,7 @@ require('mini.visits').setup()
 require('mini.diff').setup()
 require('mini.extra').setup()
 require('mini.misc').setup()
-MiniMisc.setup_auto_root()
+MiniMisc.setup_auto_root({"MODULE.bazel", "compile_commands.json", ".git"})
 require('mini.bracketed').setup()
 require('mini.comment').setup()
 require('mini.completion').setup({
@@ -555,6 +555,10 @@ later(function()
     { text = '', texthl = 'DapLogPoint', linehl = 'DapLogPoint', numhl = 'DapLogPoint' }
   )
   vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
+
+  if vim.fn.executable('debugpy') == 1 then
+    require('dap-python').setup('python3')
+  end
 
   if vim.fn.executable('lldb-dap') == 1 then
     dap.adapters.lldb = {
