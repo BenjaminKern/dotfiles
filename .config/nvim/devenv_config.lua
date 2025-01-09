@@ -301,7 +301,7 @@ vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find f
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
 
-require('mini.git').setup()
+-- require('mini.git').setup()
 require('mini.icons').setup()
 MiniIcons.tweak_lsp_kind()
 MiniIcons.mock_nvim_web_devicons()
@@ -310,7 +310,6 @@ require('mini.diff').setup()
 require('mini.extra').setup()
 require('mini.misc').setup()
 MiniMisc.setup_auto_root()
-MiniMisc.setup_termbg_sync()
 require('mini.bracketed').setup()
 require('mini.comment').setup()
 require('mini.completion').setup({
