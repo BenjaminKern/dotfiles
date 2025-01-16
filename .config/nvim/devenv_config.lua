@@ -45,7 +45,6 @@ vim.opt.completeopt:append('fuzzy')
 vim.o.foldtext = ''
 vim.o.spelllang = 'en,de' -- Define spelling dictionaries
 vim.o.spelloptions = 'camel' -- Treat parts of camelCase words as seprate words
--- vim.cmd.colorscheme('xyztokyo')
 
 local path_package = vim.env.VIM .. '/deps'
 
@@ -309,7 +308,7 @@ require('mini.visits').setup()
 require('mini.diff').setup()
 require('mini.extra').setup()
 require('mini.misc').setup()
-MiniMisc.setup_auto_root({"MODULE.bazel", "compile_commands.json", ".git"})
+-- MiniMisc.setup_auto_root({"MODULE.bazel", "compile_commands.json", ".git"})
 require('mini.bracketed').setup()
 require('mini.comment').setup()
 require('mini.completion').setup({
@@ -419,81 +418,72 @@ vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id
   vim.notify(method.message, severity[params.type])
 end
 
-local use_lsp_completion = false
-
-local on_attach = function(client, bufnr)
-  if use_lsp_completion then
-    vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
-  else
-    vim.bo[bufnr].omnifunc = 'v:lua.MiniCompletion.completefunc_lsp'
-  end
-
-  vim.keymap.set('n', 'gd', function()
-    vim.lsp.buf.definition()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp Definition' })
-  vim.keymap.set('n', 'gt', function()
-    vim.lsp.buf.type_definition()
-  end, { silent = true, buffer = bufnr, desc = 'Lsp Type Definition' })
-  vim.keymap.set('n', 'ca', function()
-    vim.lsp.buf.code_action()
-  end, { silent = true, buffer = bufnr, desc = 'Show Lsp Code Action' })
-  vim.api.nvim_buf_create_user_command(bufnr, 'Rename', function()
-    vim.lsp.buf.rename()
-  end, { desc = 'Lsp Rename' })
-  if client.supports_method('textDocument/inlayHint') then
-    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-  end
-end
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+    -- vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+    vim.bo[args.buf].omnifunc = 'v:lua.MiniCompletion.completefunc_lsp'
+    if client.supports_method('textDocument/inlayHint') then
+      vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+    end
+    vim.keymap.set('n', 'gd', function()
+      vim.lsp.buf.definition()
+    end, { silent = true, buffer = args.buf, desc = 'Lsp Definition' })
+    vim.keymap.set('n', 'gt', function()
+      vim.lsp.buf.type_definition()
+    end, { silent = true, buffer = args.buf, desc = 'Lsp Type Definition' })
+    vim.keymap.set('n', 'ca', function()
+      vim.lsp.buf.code_action()
+    end, { silent = true, buffer = args.buf, desc = 'Show Lsp Code Action' })
+    vim.api.nvim_buf_create_user_command(args.buf, 'Rename', function()
+      vim.lsp.buf.rename()
+    end, { desc = 'Lsp Rename' })
+  end,
+})
 
 vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
 vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
 vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
 vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
-now(function()
-  add({
-    source = 'neovim/nvim-lspconfig',
-  })
-  if vim.fn.executable('clangd') == 1 then
-    require('lspconfig').clangd.setup({
-      on_attach = on_attach,
-      cmd = {
-        'clangd',
-        '--background-index',
-        '--enable-config',
-        '--header-insertion=iwyu',
-        '--clang-tidy',
-        '--completion-style=bundled',
-        '--function-arg-placeholders',
-        '--header-insertion-decorators',
-      },
-    })
-  end
+vim.lsp.config('clangd', {
+  cmd = {
+    'clangd',
+    '--clang-tidy',
+    '--background-index',
+    '--offset-encoding=utf-8',
+    '--enable-config',
+    '--header-insertion=iwyu',
+    '--function-arg-placeholders',
+    '--header-insertion-decorators',
+    '--completion-style=bundled',
+  },
+  root_markers = { '.clangd', 'compile_commands.json', 'MODULE.bazel' },
+  filetypes = { 'c', 'cpp' },
+})
 
-  if vim.fn.executable('pylsp') == 1 then
-    require('lspconfig').pylsp.setup({
-      on_attach = on_attach,
-    })
-  end
+if vim.fn.executable('clangd') == 1 then
+  vim.lsp.enable('clangd')
+end
 
-  if vim.fn.executable('gopls') == 1 then
-    require('lspconfig').gopls.setup({
-      on_attach = on_attach,
-    })
-  end
+vim.lsp.config('ruff', {
+  cmd = {
+    'ruff',
+    '--clang-tidy',
+  },
+  root_markers = {
+    'pyproject.toml',
+    'setup.py',
+    'setup.cfg',
+    'requirements.txt',
+  },
+  filetypes = { 'python' },
+})
 
-  if vim.fn.executable('starlark') == 1 then
-    require('lspconfig').starlark_rust.setup({
-      on_attach = on_attach,
-    })
-  end
+if vim.fn.executable('ruff') == 1 then
+  vim.lsp.enable('ruff')
+end
 
-  if vim.fn.executable('deno') == 1 then
-    require('lspconfig').denols.setup({
-      on_attach = on_attach,
-    })
-  end
-end)
 later(function()
   add({
     source = 'rcarriga/nvim-dap-ui',
