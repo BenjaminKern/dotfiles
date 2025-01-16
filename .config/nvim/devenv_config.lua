@@ -408,6 +408,7 @@ later(function()
 end)
 
 -- LSP settings
+-- https://github.com/lewis6991/dotfiles/blob/main/config/nvim/lua/lewis6991/lsp.lua
 local severity = {
   'error',
   'warn',
@@ -469,7 +470,7 @@ end
 vim.lsp.config('ruff', {
   cmd = {
     'ruff',
-    '--clang-tidy',
+    'server',
   },
   root_markers = {
     'pyproject.toml',
@@ -482,6 +483,33 @@ vim.lsp.config('ruff', {
 
 if vim.fn.executable('ruff') == 1 then
   vim.lsp.enable('ruff')
+end
+
+local pyright = vim.fn.executable('basedpyright') == 1 and 'basedpyright' or 'pyright'
+
+vim.lsp.config('pyright', {
+  cmd = {
+    'basedpyright-langserver',
+    '--stdio',
+  },
+  root_markers = {
+    'pyproject.toml',
+    'setup.py',
+    'setup.cfg',
+    'requirements.txt',
+  },
+  filetypes = { 'python' },
+  settings = {
+    basedpyright = {
+      analysis = {
+        typeCheckingMode = 'strict',
+      },
+    },
+  },
+})
+
+if vim.fn.executable('basedpyright') == 1 then
+  vim.lsp.enable('pyright')
 end
 
 later(function()
