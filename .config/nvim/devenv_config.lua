@@ -67,6 +67,12 @@ local now = MiniDeps.now
 
 now(function()
   add({
+    source = 'lewis6991/fileline.nvim',
+  })
+end)
+
+now(function()
+  add({
     source = 'folke/tokyonight.nvim',
   })
   vim.cmd.colorscheme('tokyonight-moon')
