@@ -46,183 +46,366 @@ vim.o.foldtext = ''
 vim.o.spelllang = 'en,de' -- Define spelling dictionaries
 vim.o.spelloptions = 'camel' -- Treat parts of camelCase words as seprate words
 
-local path_package = vim.env.VIM .. '/deps'
-
-local mini_path = vim.env.VIM .. '/runtime/pack/dist/opt/mini.deps'
-if not vim.loop.fs_stat(mini_path) then
+local pckr_lockfile = vim.env.VIM .. '/pckr/lockfile.lua'
+local pckr_pack_dir = vim.env.VIM .. '/pckr'
+local pckr_path = vim.env.VIM .. '/pckr/pckr.nvim'
+if not (vim.uv or vim.loop).fs_stat(pckr_path) then
   vim.fn.system({
     'git',
     'clone',
     '--filter=blob:none',
-    'https://github.com/echasnovski/mini.deps',
-    mini_path,
+    'https://github.com/lewis6991/pckr.nvim',
+    pckr_path,
   })
 end
-vim.cmd([[packadd mini.deps]])
-require('mini.deps').setup({ path = { package = path_package } })
+vim.opt.rtp:prepend(pckr_path)
 
-local add = MiniDeps.add
-local later = MiniDeps.later
-local now = MiniDeps.now
+require('pckr').setup({
+  pack_dir = pckr_pack_dir,
+  autoremove = true,
+  lockfile = {
+    path = pckr_lockfile,
+  },
+})
 
-now(function()
-  add({
-    source = 'lewis6991/fileline.nvim',
-  })
-end)
+require('pckr').add({
+  'lewis6991/fileline.nvim',
+  {
+    'folke/tokyonight.nvim',
+    config = function()
+      vim.cmd.colorscheme('tokyonight-moon')
+    end,
+  },
+  {
+    'stevearc/dressing.nvim',
+    config = function()
+      require('dressing').setup({
+        select = {
+          enabled = false,
+        },
+      })
+    end,
+  },
+  {
+    'stevearc/conform.nvim',
+    config = function()
+      require('conform').setup({
+        formatters_by_ft = {
+          lua = { 'stylua' },
+          python = { 'black' },
+          json = { 'deno_fmt' },
+          markdown = { 'deno_fmt' },
+          bazel = { 'buildifier' },
+        },
+      })
+    end,
+  },
+  {
+    'echasnovski/mini.nvim',
+    config = function()
+      require('mini.notify').setup({
+        window = { config = { border = 'double' } },
+      })
+      vim.notify = MiniNotify.make_notify()
+      require('mini.pick').setup()
+      vim.ui.select = MiniPick.ui_select
+      -- require('mini.git').setup()
+      require('mini.icons').setup()
+      MiniIcons.tweak_lsp_kind()
+      MiniIcons.mock_nvim_web_devicons()
+      require('mini.visits').setup()
+      require('mini.diff').setup()
+      require('mini.extra').setup()
+      require('mini.misc').setup()
+      -- MiniMisc.setup_auto_root({"MODULE.bazel", "compile_commands.json", ".git"})
+      require('mini.bracketed').setup()
+      require('mini.comment').setup()
+      require('mini.completion').setup({
+        lsp_completion = {
+          source_func = 'omnifunc',
+          auto_setup = false,
+        },
+      })
+      require('mini.cursorword').setup()
+      require('mini.indentscope').setup()
+      require('mini.starter').setup({
+        header = [[
+██╗  ██╗██╗   ██╗███████╗
+╚██╗██╔╝╚██╗ ██╔╝╚══███╔╝
+ ╚███╔╝  ╚████╔╝   ███╔╝ 
+ ██╔██╗   ╚██╔╝   ███╔╝  
+██╔╝ ██╗   ██║   ███████╗
+╚═╝  ╚═╝   ╚═╝   ╚══════╝]],
+      })
+      require('mini.statusline').setup({
+        set_vim_settings = false,
+      })
+      require('mini.tabline').setup()
+      require('mini.trailspace').setup()
+      require('mini.align').setup()
+      require('mini.surround').setup()
+      require('mini.files').setup()
+      local gen_loader = require('mini.snippets').gen_loader
+      require('mini.snippets').setup({
+        snippets = {
+          -- Load custom file with global snippets first (adjust for Windows)
+          -- gen_loader.from_file('~/.config/nvim/snippets/global.json'),
 
-now(function()
-  add({
-    source = 'folke/tokyonight.nvim',
-  })
-  vim.cmd.colorscheme('tokyonight-moon')
-end)
-
-now(function()
-  add({
-    source = 'echasnovski/mini.nvim',
-  })
-  require('mini.notify').setup({
-    window = { config = { border = 'double' } },
-  })
-  vim.notify = MiniNotify.make_notify()
-  require('mini.pick').setup()
-  vim.ui.select = MiniPick.ui_select
-end)
-
-later(function()
-  add({
-    source = 'akinsho/toggleterm.nvim',
-  })
-  require('toggleterm').setup({
-    direction = 'horizontal',
-    open_mapping = [[<leader>t]],
-    size = 30,
-  })
-end)
-
-now(function()
-  add({
-    source = 'stevearc/dressing.nvim',
-  })
-  require('dressing').setup({
-    select = {
-      enabled = false,
-    },
-  })
-end)
-
-later(function()
-  add({
-    source = 'stevearc/conform.nvim',
-  })
-  require('conform').setup({
-    formatters_by_ft = {
-      lua = { 'stylua' },
-      python = { 'black' },
-      json = { 'deno_fmt' },
-      markdown = { 'deno_fmt' },
-      bazel = { 'buildifier' },
-    },
-  })
-end)
-
-later(function()
-  add({
-    source = 'smoka7/hop.nvim',
-  })
-  require('hop').setup({
-    keys = 'etovxqpdygfblzhckisuran',
-    term_seq_bias = 0.5,
-  })
-end)
-
-later(function()
-  add({
-    source = 'nvim-treesitter/nvim-treesitter',
-    hooks = {
-      post_checkout = function()
-        vim.cmd([[TSUpdate]])
-      end,
-    },
-  })
-  require('nvim-treesitter.configs').setup({
-    ensure_installed = {
-      'vim',
-      'regex',
-      'c',
-      'cpp',
-      'lua',
-      'go',
-      'python',
-      'bash',
-      'cmake',
-      'markdown',
-      'markdown_inline',
-      'json',
-      'yaml',
-      'diff',
-      'dockerfile',
-      'starlark',
-      'typescript',
-      'javascript',
-      'comment',
-    },
-    highlight = { enable = true },
-  })
-end)
-
-later(function()
-  add({
-    source = 'MeanderingProgrammer/render-markdown.nvim',
-    depends = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
-  })
-  require('render-markdown').setup({
-    file_types = { 'markdown', 'codecompanion' },
-  })
-end)
-
-later(function()
-  add({
-    source = 'olimorris/codecompanion.nvim',
-    depends = {
+          -- Load snippets based on current language by reading files from
+          -- "snippets/" subdirectories from 'runtimepath' directories.
+          gen_loader.from_lang(),
+        },
+      })
+      local hipatterns = require('mini.hipatterns')
+      hipatterns.setup({
+        highlighters = {
+          -- Highlight hex color strings (`#rrggbb`) using that color
+          hex_color = hipatterns.gen_highlighter.hex_color(),
+        },
+      })
+      local miniclue = require('mini.clue')
+      miniclue.setup({
+        clues = {
+          miniclue.gen_clues.builtin_completion(),
+          miniclue.gen_clues.g(),
+          miniclue.gen_clues.marks(),
+          miniclue.gen_clues.registers(),
+          miniclue.gen_clues.windows({ submode_resize = true }),
+          miniclue.gen_clues.z(),
+        },
+        triggers = {
+          { mode = 'n', keys = '<Leader>' }, -- Leader triggers
+          { mode = 'x', keys = '<Leader>' },
+          { mode = 'n', keys = '[' }, -- mini.bracketed
+          { mode = 'n', keys = ']' },
+          { mode = 'x', keys = '[' },
+          { mode = 'x', keys = ']' },
+          { mode = 'i', keys = '<C-x>' }, -- Built-in completion
+          { mode = 'n', keys = 'g' }, -- `g` key
+          { mode = 'x', keys = 'g' },
+          { mode = 'n', keys = "'" }, -- Marks
+          { mode = 'n', keys = '`' },
+          { mode = 'x', keys = "'" },
+          { mode = 'x', keys = '`' },
+          { mode = 'n', keys = '"' }, -- Registers
+          { mode = 'x', keys = '"' },
+          { mode = 'i', keys = '<C-r>' },
+          { mode = 'c', keys = '<C-r>' },
+          { mode = 'n', keys = '<C-w>' }, -- Window commands
+          { mode = 'n', keys = 'z' }, -- `z` key
+          { mode = 'x', keys = 'z' },
+        },
+        window = { config = { border = 'double' } },
+      })
+    end,
+  },
+  {
+    'akinsho/toggleterm.nvim',
+    config = function()
+      require('toggleterm').setup({
+        direction = 'horizontal',
+        open_mapping = [[<leader>t]],
+        size = 30,
+      })
+    end,
+  },
+  {
+    'smoka7/hop.nvim',
+    config = function()
+      require('hop').setup({
+        keys = 'etovxqpdygfblzhckisuran',
+        term_seq_bias = 0.5,
+      })
+    end,
+  },
+  {
+    'nvim-treesitter/nvim-treesitter',
+    config = function()
+      require('nvim-treesitter.configs').setup({
+        ensure_installed = {
+          'vim',
+          'regex',
+          'c',
+          'cpp',
+          'lua',
+          'go',
+          'python',
+          'bash',
+          'cmake',
+          'markdown',
+          'markdown_inline',
+          'json',
+          'yaml',
+          'diff',
+          'dockerfile',
+          'starlark',
+          'typescript',
+          'javascript',
+          'comment',
+        },
+        highlight = { enable = true },
+      })
+    end,
+    run = ':TSUpdate',
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    config = function()
+      require('render-markdown').setup({
+        file_types = { 'markdown', 'codecompanion' },
+      })
+    end,
+    requires = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+  },
+  {
+    'olimorris/codecompanion.nvim',
+    config = function()
+      require('codecompanion').setup({
+        strategies = {
+          chat = {
+            adapter = 'ollama',
+            render_headers = false,
+          },
+          inline = {
+            adapter = 'ollama',
+          },
+        },
+      })
+    end,
+    requires = {
       'nvim-lua/plenary.nvim',
       'nvim-treesitter/nvim-treesitter',
       'MeanderingProgrammer/render-markdown.nvim',
     },
-  })
-  require('codecompanion').setup({
-    strategies = {
-      chat = {
-        adapter = 'ollama',
-        render_headers = false,
-      },
-      inline = {
-        adapter = 'ollama',
-      },
-    },
-  })
-end)
+  },
+  {
+    'theHamsta/nvim-dap-virtual-text',
+    requires = { 'mfussenegger/nvim-dap', 'mfussenegger/nvim-dap-python', 'nvim-treesitter/nvim-treesitter' },
+    config = function()
+      require('nvim-dap-virtual-text').setup()
+    end,
+  },
+  {
+    'danymat/neogen',
+    config = function()
+      require('neogen').setup({
+        languages = {
+          python = { template = { annotation_convention = 'numpydoc' } },
+          c = { template = { annotation_convention = 'doxygen' } },
+          cpp = { template = { annotation_convention = 'doxygen' } },
+        },
+      })
+    end,
+  },
+  {
+    'rcarriga/nvim-dap-ui',
+    requires = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' },
+    config = function()
+      local dap = require('dap')
+      local dapui = require('dapui')
+      dapui.setup({
+        layouts = {
+          {
+            elements = {
+              -- Elements can be strings or table with id and size keys.
+              { id = 'repl', size = 0.25 },
+              { id = 'watches', size = 0.25 },
+              { id = 'breakpoints', size = 0.20 },
+              { id = 'stacks', size = 0.30 },
+            },
+            size = 40,
+            position = 'left',
+          },
+          {
+            elements = {
+              { id = 'scopes', size = 0.60 },
+              { id = 'console', size = 0.40 },
+            },
+            size = 0.30,
+            position = 'bottom',
+          },
+        },
+      })
+      dap.listeners.after.event_initialized['dapui_config'] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated['dapui_config'] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited['dapui_config'] = function()
+        dapui.close()
+      end
+      if vim.fn.executable('lldb-dap') == 1 then
+        dap.adapters.lldb = {
+          type = 'executable',
+          command = 'lldb-dap',
+          name = 'lldb',
+        }
+      end
 
-later(function()
-  add({
-    source = 'theHamsta/nvim-dap-virtual-text',
-    depends = { 'mfussenegger/nvim-dap', 'mfussenegger/nvim-dap-python', 'nvim-treesitter/nvim-treesitter' },
-  })
-  require('nvim-dap-virtual-text').setup()
-end)
-
-later(function()
-  add('danymat/neogen')
-  require('neogen').setup({
-    snippet_engine = 'mini',
-    languages = {
-      python = { template = { annotation_convention = 'numpydoc' } },
-      c = { template = { annotation_convention = 'doxygen' } },
-      cpp = { template = { annotation_convention = 'doxygen' } },
-    },
-  })
-end)
+      if vim.fn.executable('OpenDebugAD7') == 1 then
+        dap.adapters.cppdbg = {
+          id = 'cppdbg',
+          type = 'executable',
+          command = 'OpenDebugAD7',
+          MIMode = 'gdb',
+          MIDebuggerPath = 'gdb',
+        }
+      end
+      dap.configurations.cpp = {
+        {
+          name = 'Launch file',
+          type = 'lldb',
+          request = 'launch',
+          program = function()
+            return coroutine.create(function(dap_run_co)
+              vim.ui.input(
+                { prompt = 'Path to executable: ', default = vim.fn.getcwd() .. '/', completion = 'file' },
+                function(input)
+                  coroutine.resume(dap_run_co, input)
+                end
+              )
+            end)
+          end,
+          cwd = '${workspaceFolder}',
+          stopOnEntry = true,
+          runInTerminal = false,
+        },
+      }
+      dap.configurations.c = dap.configurations.cpp
+      vim.keymap.set('n', '<F5>', function()
+        dap.continue()
+      end, { desc = 'Debug: Start/Continue' })
+      vim.keymap.set('n', '<F9>', function()
+        dap.toggle_breakpoint()
+      end, { desc = 'Debug: Toggle Breakpoint' })
+      vim.keymap.set('n', '<F10>', function()
+        dap.step_over()
+      end, { desc = 'Debug: Step Over' })
+      vim.keymap.set('n', '<F11>', function()
+        dap.step_into()
+      end, { desc = 'Debug: Step Into' })
+      vim.keymap.set('n', '<F12>', function()
+        dap.step_out()
+      end, { desc = 'Debug: Step Out' })
+      vim.api.nvim_create_user_command('DebugListBreakpoints', function()
+        dap.list_breakpoints()
+      end, { desc = 'Debug: List Breakpoints' })
+      vim.api.nvim_create_user_command('DebugClearBreakpoints', function()
+        dap.clear_breakpoints()
+      end, { desc = 'Debug: Clear Breakpoints' })
+      vim.api.nvim_create_user_command('DebugSetBreakpoint', function()
+        dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
+      end, { desc = 'Debug: Set Conditional Breakpoint' })
+      vim.api.nvim_create_user_command('DebugSetLogpoint', function()
+        dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))
+      end, { desc = 'Debug: Set Log Point Message' })
+      vim.api.nvim_create_user_command('DebugConsole', function()
+        dap.repl.toggle()
+      end, { desc = 'Debug: Toggle Debug Console' })
+    end,
+  },
+})
 
 vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
@@ -306,54 +489,6 @@ vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find f
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
 
--- require('mini.git').setup()
-require('mini.icons').setup()
-MiniIcons.tweak_lsp_kind()
-MiniIcons.mock_nvim_web_devicons()
-require('mini.visits').setup()
-require('mini.diff').setup()
-require('mini.extra').setup()
-require('mini.misc').setup()
--- MiniMisc.setup_auto_root({"MODULE.bazel", "compile_commands.json", ".git"})
-require('mini.bracketed').setup()
-require('mini.comment').setup()
-require('mini.completion').setup({
-  lsp_completion = {
-    source_func = 'omnifunc',
-    auto_setup = false,
-  },
-})
-require('mini.cursorword').setup()
-require('mini.indentscope').setup()
-require('mini.starter').setup({
-  header = [[
-██╗  ██╗██╗   ██╗███████╗
-╚██╗██╔╝╚██╗ ██╔╝╚══███╔╝
- ╚███╔╝  ╚████╔╝   ███╔╝ 
- ██╔██╗   ╚██╔╝   ███╔╝  
-██╔╝ ██╗   ██║   ███████╗
-╚═╝  ╚═╝   ╚═╝   ╚══════╝]],
-})
-require('mini.statusline').setup({
-  set_vim_settings = false,
-})
-require('mini.tabline').setup()
-require('mini.trailspace').setup()
-require('mini.align').setup()
-require('mini.surround').setup()
-require('mini.files').setup()
-local gen_loader = require('mini.snippets').gen_loader
-require('mini.snippets').setup({
-  snippets = {
-    -- Load custom file with global snippets first (adjust for Windows)
-    -- gen_loader.from_file('~/.config/nvim/snippets/global.json'),
-
-    -- Load snippets based on current language by reading files from
-    -- "snippets/" subdirectories from 'runtimepath' directories.
-    gen_loader.from_lang(),
-  },
-})
-
 local files_set_cwd = function(path)
   -- Works only if cursor is on the valid file system entry
   local cur_entry_path = MiniFiles.get_fs_entry().path
@@ -366,52 +501,6 @@ vim.api.nvim_create_autocmd('User', {
     vim.keymap.set('n', 'g~', files_set_cwd, { buffer = args.data.buf_id })
   end,
 })
-later(function()
-  local hipatterns = require('mini.hipatterns')
-  hipatterns.setup({
-    highlighters = {
-      -- Highlight hex color strings (`#rrggbb`) using that color
-      hex_color = hipatterns.gen_highlighter.hex_color(),
-    },
-  })
-end)
-later(function()
-  local miniclue = require('mini.clue')
-  --stylua: ignore
-  miniclue.setup({
-    clues = {
-      miniclue.gen_clues.builtin_completion(),
-      miniclue.gen_clues.g(),
-      miniclue.gen_clues.marks(),
-      miniclue.gen_clues.registers(),
-      miniclue.gen_clues.windows({ submode_resize = true }),
-      miniclue.gen_clues.z(),
-    },
-    triggers = {
-      { mode = 'n', keys = '<Leader>' }, -- Leader triggers
-      { mode = 'x', keys = '<Leader>' },
-      { mode = 'n', keys = '[' },        -- mini.bracketed
-      { mode = 'n', keys = ']' },
-      { mode = 'x', keys = '[' },
-      { mode = 'x', keys = ']' },
-      { mode = 'i', keys = '<C-x>' },    -- Built-in completion
-      { mode = 'n', keys = 'g' },        -- `g` key
-      { mode = 'x', keys = 'g' },
-      { mode = 'n', keys = "'" },        -- Marks
-      { mode = 'n', keys = '`' },
-      { mode = 'x', keys = "'" },
-      { mode = 'x', keys = '`' },
-      { mode = 'n', keys = '"' },        -- Registers
-      { mode = 'x', keys = '"' },
-      { mode = 'i', keys = '<C-r>' },
-      { mode = 'c', keys = '<C-r>' },
-      { mode = 'n', keys = '<C-w>' },    -- Window commands
-      { mode = 'n', keys = 'z' },        -- `z` key
-      { mode = 'x', keys = 'z' },
-    },
-    window = { config = { border = 'double' } },
-  })
-end)
 
 -- LSP settings
 -- https://github.com/lewis6991/dotfiles/blob/main/config/nvim/lua/lewis6991/lsp.lua
@@ -518,140 +607,28 @@ if vim.fn.executable('basedpyright') == 1 then
   vim.lsp.enable('pyright')
 end
 
-later(function()
-  add({
-    source = 'rcarriga/nvim-dap-ui',
-    depends = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' },
-  })
-  local dap = require('dap')
-  local dapui = require('dapui')
-  dapui.setup({
-    layouts = {
-      {
-        elements = {
-          -- Elements can be strings or table with id and size keys.
-          { id = 'repl', size = 0.25 },
-          { id = 'watches', size = 0.25 },
-          { id = 'breakpoints', size = 0.20 },
-          { id = 'stacks', size = 0.30 },
-        },
-        size = 40,
-        position = 'left',
-      },
-      {
-        elements = {
-          { id = 'scopes', size = 0.60 },
-          { id = 'console', size = 0.40 },
-        },
-        size = 0.30,
-        position = 'bottom',
-      },
-    },
-  })
-  dap.listeners.after.event_initialized['dapui_config'] = function()
-    dapui.open()
-  end
-  dap.listeners.before.event_terminated['dapui_config'] = function()
-    dapui.close()
-  end
-  dap.listeners.before.event_exited['dapui_config'] = function()
-    dapui.close()
-  end
+vim.api.nvim_set_hl(0, 'DapBreakpoint', { fg = '#993939', bg = '#31353f' })
+vim.api.nvim_set_hl(0, 'DapLogPoint', { fg = '#61afef', bg = '#31353f' })
+vim.api.nvim_set_hl(0, 'DapStopped', { fg = '#98c379', bg = '#31353f' })
 
-  vim.api.nvim_set_hl(0, 'DapBreakpoint', { fg = '#993939', bg = '#31353f' })
-  vim.api.nvim_set_hl(0, 'DapLogPoint', { fg = '#61afef', bg = '#31353f' })
-  vim.api.nvim_set_hl(0, 'DapStopped', { fg = '#98c379', bg = '#31353f' })
+vim.fn.sign_define(
+  'DapBreakpoint',
+  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapBreakpointCondition',
+  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapBreakpointRejected',
+  { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
+)
+vim.fn.sign_define(
+  'DapLogPoint',
+  { text = '', texthl = 'DapLogPoint', linehl = 'DapLogPoint', numhl = 'DapLogPoint' }
+)
+vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
 
-  vim.fn.sign_define(
-    'DapBreakpoint',
-    { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
-  )
-  vim.fn.sign_define(
-    'DapBreakpointCondition',
-    { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
-  )
-  vim.fn.sign_define(
-    'DapBreakpointRejected',
-    { text = '', texthl = 'DapBreakpoint', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' }
-  )
-  vim.fn.sign_define(
-    'DapLogPoint',
-    { text = '', texthl = 'DapLogPoint', linehl = 'DapLogPoint', numhl = 'DapLogPoint' }
-  )
-  vim.fn.sign_define('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
-
-  if vim.fn.executable('debugpy') == 1 then
-    require('dap-python').setup('python3')
-  end
-
-  if vim.fn.executable('lldb-dap') == 1 then
-    dap.adapters.lldb = {
-      type = 'executable',
-      command = 'lldb-dap',
-      name = 'lldb',
-    }
-  end
-
-  if vim.fn.executable('OpenDebugAD7') == 1 then
-    dap.adapters.cppdbg = {
-      id = 'cppdbg',
-      type = 'executable',
-      command = 'OpenDebugAD7',
-      MIMode = 'gdb',
-      MIDebuggerPath = 'gdb',
-    }
-  end
-
-  dap.configurations.cpp = {
-    {
-      name = 'Launch file',
-      type = 'lldb',
-      request = 'launch',
-      program = function()
-        return coroutine.create(function(dap_run_co)
-          vim.ui.input(
-            { prompt = 'Path to executable: ', default = vim.fn.getcwd() .. '/', completion = 'file' },
-            function(input)
-              coroutine.resume(dap_run_co, input)
-            end
-          )
-        end)
-      end,
-      cwd = '${workspaceFolder}',
-      stopOnEntry = true,
-      runInTerminal = false,
-    },
-  }
-  dap.configurations.c = dap.configurations.cpp
-
-  vim.keymap.set('n', '<F5>', function()
-    dap.continue()
-  end, { desc = 'Debug: Start/Continue' })
-  vim.keymap.set('n', '<F9>', function()
-    dap.toggle_breakpoint()
-  end, { desc = 'Debug: Toggle Breakpoint' })
-  vim.keymap.set('n', '<F10>', function()
-    dap.step_over()
-  end, { desc = 'Debug: Step Over' })
-  vim.keymap.set('n', '<F11>', function()
-    dap.step_into()
-  end, { desc = 'Debug: Step Into' })
-  vim.keymap.set('n', '<F12>', function()
-    dap.step_out()
-  end, { desc = 'Debug: Step Out' })
-  vim.api.nvim_create_user_command('DebugListBreakpoints', function()
-    dap.list_breakpoints()
-  end, { desc = 'Debug: List Breakpoints' })
-  vim.api.nvim_create_user_command('DebugClearBreakpoints', function()
-    dap.clear_breakpoints()
-  end, { desc = 'Debug: Clear Breakpoints' })
-  vim.api.nvim_create_user_command('DebugSetBreakpoint', function()
-    dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
-  end, { desc = 'Debug: Set Conditional Breakpoint' })
-  vim.api.nvim_create_user_command('DebugSetLogpoint', function()
-    dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))
-  end, { desc = 'Debug: Set Log Point Message' })
-  vim.api.nvim_create_user_command('DebugConsole', function()
-    dap.repl.toggle()
-  end, { desc = 'Debug: Toggle Debug Console' })
-end)
+if vim.fn.executable('debugpy') == 1 then
+  require('dap-python').setup('python3')
+end
