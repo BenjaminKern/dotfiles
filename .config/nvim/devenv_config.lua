@@ -46,6 +46,17 @@ vim.o.foldtext = ''
 vim.o.spelllang = 'en,de' -- Define spelling dictionaries
 vim.o.spelloptions = 'camel' -- Treat parts of camelCase words as seprate words
 
+vim.filetype.add({
+  extension = {
+    zsh = 'sh',
+    sh = 'sh', -- force sh-files with zsh-shebang to still get sh as filetype
+  },
+  filename = {
+    ['.zshrc'] = 'sh',
+    ['.zshenv'] = 'sh',
+  },
+})
+
 local pckr_lockfile = vim.env.VIM .. '/pckr/lockfile.lua'
 local pckr_pack_dir = vim.env.VIM .. '/pckr'
 local pckr_path = vim.env.VIM .. '/pckr/pckr.nvim'
@@ -264,7 +275,7 @@ require('pckr').add({
         strategies = {
           chat = {
             adapter = 'ollama',
-            render_headers = false,
+            render_headers = true,
           },
           inline = {
             adapter = 'ollama',
