@@ -2,7 +2,7 @@ format = """
 [](#a3aed2)\
 $container\
 $os\
-$localip\
+$hostname\
 [](bg:#769ff0 fg:#a3aed2)\
 $directory\
 [](fg:#769ff0 bg:#394260)\
@@ -75,7 +75,7 @@ style = 'fg:#9c454e bg:#212736'
 symbol = ' '
 disabled = false
 
-[localip]
-format = '[ $localipv4 ](fg:#090c0c bold bg:#a3aed2)'
+[hostname]
+format = '[ $ssh_symbol ](fg:#090c0c bold bg:#a3aed2)'
 ssh_only = true
 disabled = false
