@@ -112,6 +112,27 @@ require('pckr').add({
     end,
   },
   {
+    'saghen/blink.cmp',
+    config = function()
+      require('blink.cmp').setup({
+        signature = {
+          enabled = true,
+        },
+        keymap = {
+          preset = 'super-tab',
+        },
+        fuzzy = { implementation = 'lua' },
+        completion = {
+          menu = {
+            draw = {
+              columns = { { 'label', 'label_description', gap = 1 }, { 'kind_icon', 'kind' } },
+            },
+          },
+        },
+      })
+    end,
+  },
+  {
     'echasnovski/mini.nvim',
     config = function()
       require('mini.notify').setup({
@@ -128,15 +149,9 @@ require('pckr').add({
       require('mini.diff').setup()
       require('mini.extra').setup()
       require('mini.misc').setup()
-      -- MiniMisc.setup_auto_root({"MODULE.bazel", "compile_commands.json", ".git"})
+      MiniMisc.setup_auto_root({ 'MODULE.bazel', 'compile_commands.json', '.git' })
       require('mini.bracketed').setup()
       require('mini.comment').setup()
-      require('mini.completion').setup({
-        lsp_completion = {
-          source_func = 'omnifunc',
-          auto_setup = false,
-        },
-      })
       require('mini.cursorword').setup()
       require('mini.indentscope').setup()
       require('mini.starter').setup({
@@ -156,17 +171,17 @@ require('pckr').add({
       require('mini.align').setup()
       require('mini.surround').setup()
       require('mini.files').setup()
-      local gen_loader = require('mini.snippets').gen_loader
-      require('mini.snippets').setup({
-        snippets = {
-          -- Load custom file with global snippets first (adjust for Windows)
-          -- gen_loader.from_file('~/.config/nvim/snippets/global.json'),
-
-          -- Load snippets based on current language by reading files from
-          -- "snippets/" subdirectories from 'runtimepath' directories.
-          gen_loader.from_lang(),
-        },
-      })
+      -- local gen_loader = require('mini.snippets').gen_loader
+      -- require('mini.snippets').setup({
+      --   snippets = {
+      --     -- Load custom file with global snippets first (adjust for Windows)
+      --     -- gen_loader.from_file('~/.config/nvim/snippets/global.json'),
+      --
+      --     -- Load snippets based on current language by reading files from
+      --     -- "snippets/" subdirectories from 'runtimepath' directories.
+      --     gen_loader.from_lang(),
+      --   },
+      -- })
       local hipatterns = require('mini.hipatterns')
       hipatterns.setup({
         highlighters = {
@@ -462,40 +477,6 @@ end, { desc = 'Toggle file tree' })
 
 vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], { desc = 'Escape from terminal' })
 
-local keys = {
-  ['cr'] = vim.api.nvim_replace_termcodes('<CR>', true, true, true),
-  ['ctrl-y'] = vim.api.nvim_replace_termcodes('<C-y>', true, true, true),
-  ['ctrl-y_cr'] = vim.api.nvim_replace_termcodes('<C-y><CR>', true, true, true),
-  ['ctrl-n'] = vim.api.nvim_replace_termcodes('<C-n>', true, true, true),
-  ['ctrl-p'] = vim.api.nvim_replace_termcodes('<C-p>', true, true, true),
-  ['tab'] = vim.api.nvim_replace_termcodes('<Tab>', true, true, true),
-  ['s-tab'] = vim.api.nvim_replace_termcodes('<S-Tab>', true, true, true),
-}
-_G.cr_action = function()
-  if vim.fn.pumvisible() ~= 0 then
-    -- If popup is visible, confirm selected item or add new line
-    local item_selected = vim.fn.complete_info()['selected'] ~= -1
-    return item_selected and keys['ctrl-y'] or keys['ctrl-y_cr']
-  else
-    -- If popup is not visible, use plain `<CR>`
-    return keys['cr']
-  end
-end
-
-_G.tab_comple_action = function()
-  if vim.fn.pumvisible() == 1 then
-    return keys['ctrl-n']
-  -- elseif vim.snippet.active({ direction = -1 }) then
-  --   return '<Cmd>lua vim.snippet.jump(-1)<CR>'
-  else
-    return keys['tab']
-  end
-end
-
-vim.keymap.set('i', '<CR>', 'v:lua._G.cr_action()', { expr = true })
-vim.keymap.set('i', '<Tab>', 'v:lua._G.tab_comple_action()', { expr = true })
--- vim.keymap.set('i', [[<S-Tab>]], [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
-
 vim.keymap.set('n', '<leader>ff', [[<Cmd>Pick files<CR>]], { desc = 'Pick find files' })
 vim.keymap.set('n', '<leader>fg', [[<Cmd>Pick grep_live<CR>]], { desc = 'Pick grep live' })
 vim.keymap.set('n', '<leader>fG', [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = 'Pick grep string under cursor' })
@@ -528,8 +509,6 @@ end
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-    -- vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
-    vim.bo[args.buf].omnifunc = 'v:lua.MiniCompletion.completefunc_lsp'
     if client.supports_method('textDocument/inlayHint') then
       vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
     end
