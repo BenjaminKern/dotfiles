@@ -129,6 +129,7 @@ require('pckr').add({
             },
           },
         },
+        snippets = { preset = 'mini_snippets' },
       })
     end,
   },
@@ -171,17 +172,13 @@ require('pckr').add({
       require('mini.align').setup()
       require('mini.surround').setup()
       require('mini.files').setup()
-      -- local gen_loader = require('mini.snippets').gen_loader
-      -- require('mini.snippets').setup({
-      --   snippets = {
-      --     -- Load custom file with global snippets first (adjust for Windows)
-      --     -- gen_loader.from_file('~/.config/nvim/snippets/global.json'),
-      --
-      --     -- Load snippets based on current language by reading files from
-      --     -- "snippets/" subdirectories from 'runtimepath' directories.
-      --     gen_loader.from_lang(),
-      --   },
-      -- })
+      local gen_loader = require('mini.snippets').gen_loader
+      require('mini.snippets').setup({
+        snippets = {
+          gen_loader.from_file(vim.env.VIM .. 'runtime/snippets/all.json'),
+          gen_loader.from_lang(),
+        },
+      })
       local hipatterns = require('mini.hipatterns')
       hipatterns.setup({
         highlighters = {
