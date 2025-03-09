@@ -238,5 +238,20 @@
     ],
     "description": "Class",
     "prefix": "cls"
+  },
+  "struct template": {
+    "body": [
+      "/// @struct ${1:$TM_FILENAME_BASE}",
+      "/// @brief ${4:Brief struct description}",
+      "///",
+      "///  ${5:Detailed description}",
+      "///",
+      "struct ${1} {",
+      "  ${2:int} ${3:x} /*!< ${6:Description} */",
+      "};",
+      "${0}"
+    ],
+    "description": "struct template",
+    "prefix": "sct"
   }
 }
