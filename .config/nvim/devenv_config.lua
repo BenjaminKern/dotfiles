@@ -130,6 +130,15 @@ require('pckr').add({
           },
         },
         snippets = { preset = 'mini_snippets' },
+        sources = {
+          default = { 'lsp', 'buffer', 'snippets', 'path', 'codecompanion' },
+          providers = {
+            codecompanion = {
+              name = 'CodeCompanion',
+              module = 'codecompanion.providers.completion.blink',
+            },
+          },
+        },
       })
     end,
   },
