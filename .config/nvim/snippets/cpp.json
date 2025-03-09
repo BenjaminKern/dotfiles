@@ -118,7 +118,7 @@
       "}"
     ],
     "description": "pimpl class",
-    "prefix": "pcls"
+    "prefix": "clsp"
   },
   "type erased class template": {
     "body": [
@@ -175,6 +175,68 @@
       "${0}"
     ],
     "description": "Type Erased class",
-    "prefix": "tcls"
+    "prefix": "clst"
+  },
+  "Class Template": {
+    "body": [
+      "#include <functional>",
+      "namespace ${1:foo} {",
+      "/// @class ${2:$TM_FILENAME_BASE}",
+      "/// @brief ${13:Brief class description}",
+      "///",
+      "///  ${14:Detailed description}",
+      "///",
+      "class ${2} {",
+      "public:",
+      "  explicit ${2}(${3:int} ${4:x});",
+      "  ${2}() = delete;",
+      "  ${2}(${2} const&) = default;",
+      "  ${2}(${2}&&) = default;",
+      "  ${2} &operator=(${2} other) {",
+      "    swap(*this, other);",
+      "    return *this;",
+      "  }",
+      "  ~${2}() = default;",
+      "  friend void swap(${2}& first, ${2}& second) {",
+      "    using std::swap;",
+      "    swap(first.m_${4}, second.m_${4});",
+      "  }",
+      "  friend bool operator==(${2} const& lhs, ${2} const& rhs) {",
+      "    return lhs.m_${4} == rhs.m_${4};",
+      "  }",
+      "  inline std::size_t hash() const {",
+      "    std::size_t ret = 17;",
+      "    ret = ret*31 + std::hash<${3}>{}(m_${4});",
+      "    return ret;",
+      "  }",
+      "  /// @brief ${9:Brief method description}",
+      "  ///",
+      "  /// ${10:Detailed method description}",
+      "  ///",
+      "  /// @param ${8:x} ${11:Parameter description}",
+      "  /// @return ${12:Return parameter description}",
+      "  ///",
+      "  ${5:int} ${6:doFoo}(${7:int} ${8});",
+      "private:",
+      "  ${3} m_${4};",
+      "};",
+      "} // namespace ${1}",
+      "namespace std {",
+      "template <>",
+      "  struct hash<${1}::${2}> {",
+      "    size_t operator()(${1}::${2} const& k) const {",
+      "      return k.hash();",
+      "    }",
+      "  };",
+      "} // namespace std",
+      "${0}",
+      "using namespace ${1};",
+      "${1}::${2}::${2}(${3} ${4}) : m_${4}{${4}} {}",
+      "${5} ${1}::${2}::${6}(${7} ${8}) {",
+      "    return {};",
+      "}"
+    ],
+    "description": "Class",
+    "prefix": "cls"
   }
 }
