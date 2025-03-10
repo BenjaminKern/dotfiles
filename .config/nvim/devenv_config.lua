@@ -74,12 +74,12 @@ vim.opt.rtp:prepend(pckr_path)
 vim.diagnostic.config({
   virtual_text = true,
   signs = {
-      text = {
-          [vim.diagnostic.severity.ERROR] = '',
-          [vim.diagnostic.severity.WARN] = '',
-          [vim.diagnostic.severity.INFO] = '',
-          [vim.diagnostic.severity.HINT] = '',
-      },
+    text = {
+      [vim.diagnostic.severity.ERROR] = '',
+      [vim.diagnostic.severity.WARN] = '',
+      [vim.diagnostic.severity.INFO] = '',
+      [vim.diagnostic.severity.HINT] = '',
+    },
   },
 })
 
@@ -115,7 +115,7 @@ require('pckr').add({
       require('conform').setup({
         formatters_by_ft = {
           lua = { 'stylua' },
-          python = { 'black' },
+          python = { 'ruff_format' },
           json = { 'deno_fmt' },
           markdown = { 'deno_fmt' },
           bazel = { 'buildifier' },
@@ -449,9 +449,17 @@ vim.keymap.set('n', 'ww', function()
   require('hop').hint_words()
 end, { desc = 'Use hop' })
 
-vim.api.nvim_create_user_command('Format', function()
-  require('conform').format({ lsp_fallback = true })
-end, { desc = 'Format' })
+vim.api.nvim_create_user_command('Format', function(args)
+  local range = nil
+  if args.count ~= -1 then
+    local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+    range = {
+      start = { args.line1, 0 },
+      ['end'] = { args.line2, end_line:len() },
+    }
+  end
+  require('conform').format({ async = true, lsp_format = 'fallback', range = range })
+end, { range = true })
 
 vim.keymap.set('n', '<C-Z>', '<NOP>')
 
