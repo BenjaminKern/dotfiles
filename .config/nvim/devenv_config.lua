@@ -71,6 +71,18 @@ if not (vim.uv or vim.loop).fs_stat(pckr_path) then
 end
 vim.opt.rtp:prepend(pckr_path)
 
+vim.diagnostic.config({
+  virtual_text = true,
+  signs = {
+      text = {
+          [vim.diagnostic.severity.ERROR] = '',
+          [vim.diagnostic.severity.WARN] = '',
+          [vim.diagnostic.severity.INFO] = '',
+          [vim.diagnostic.severity.HINT] = '',
+      },
+  },
+})
+
 require('pckr').setup({
   pack_dir = pckr_pack_dir,
   autoremove = true,
@@ -500,7 +512,7 @@ local severity = {
   'error',
   'warn',
   'info',
-  'info',
+  'hint',
 }
 vim.lsp.handlers['window/showMessage'] = function(err, method, params, client_id)
   vim.notify(method.message, severity[params.type])
@@ -509,7 +521,7 @@ end
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-    if client.supports_method('textDocument/inlayHint') then
+    if client:supports_method('textDocument/inlayHint') then
       vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
     end
     vim.keymap.set('n', 'gd', function()
@@ -526,11 +538,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end, { desc = 'Lsp Rename' })
   end,
 })
-
-vim.fn.sign_define('DiagnosticSignError', { text = '', texthl = 'DiagnosticSignError' })
-vim.fn.sign_define('DiagnosticSignWarn', { text = '', texthl = 'DiagnosticSignWarn' })
-vim.fn.sign_define('DiagnosticSignInfo', { text = '', texthl = 'DiagnosticSignInfo' })
-vim.fn.sign_define('DiagnosticSignHint', { text = '', texthl = 'DiagnosticSignHint' })
 
 vim.lsp.config('clangd', {
   cmd = {
