@@ -119,6 +119,7 @@ require("pckr").add({
           json = { "deno_fmt" },
           markdown = { "deno_fmt" },
           bzl = { "buildifier" },
+          sh = { "shfmt" },
         },
         formatters = {
           ruff_format = {
