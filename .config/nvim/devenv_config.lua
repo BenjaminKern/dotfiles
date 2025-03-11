@@ -16,7 +16,7 @@ vim.opt.signcolumn = "yes" -- Always show sign column (otherwise it will shift t
 vim.opt.fillchars = "eob: ,vert:┃,horiz:━,horizdown:┳,horizup:┻,verthoriz:╋,vertleft:┫,vertright:┣"
 vim.opt.pumblend = 10 -- Make builtin completion menus slightly transparent
 vim.opt.pumheight = 10 -- Make popup menu smaller
-vim.opt.winblend = 10 -- Make floating windows slightl transparent
+vim.opt.winblend = 10 -- Make floating windows slightly transparent
 vim.opt.listchars = "tab: ,extends:…,precedes:…,nbsp:␣,eol:" -- Define which helper symbols to show
 vim.opt.list = true
 vim.opt.ignorecase = true -- Ignore case when searching (use `\C` to force not doing that)
@@ -44,7 +44,7 @@ vim.opt.background = "dark"
 vim.opt.completeopt:append("fuzzy")
 vim.o.foldtext = ""
 vim.o.spelllang = "en,de" -- Define spelling dictionaries
-vim.o.spelloptions = "camel" -- Treat parts of camelCase words as seprate words
+vim.o.spelloptions = "camel" -- Treat parts of camelCase words as separate words
 
 vim.filetype.add({
   extension = {
@@ -120,6 +120,7 @@ require("pckr").add({
           markdown = { "deno_fmt" },
           bzl = { "buildifier" },
           sh = { "shfmt" },
+          ["*"] = { "typos" },
         },
         formatters = {
           ruff_format = {
