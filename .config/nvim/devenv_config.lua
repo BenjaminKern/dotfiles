@@ -118,7 +118,7 @@ require("pckr").add({
           python = { "ruff_format" },
           json = { "deno_fmt" },
           markdown = { "deno_fmt" },
-          bazel = { "buildifier" },
+          bzl = { "buildifier" },
         },
         formatters = {
           ruff_format = {
