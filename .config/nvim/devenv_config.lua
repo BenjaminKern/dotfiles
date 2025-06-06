@@ -114,6 +114,7 @@ require("pckr").add({
       require("conform").setup({
         formatters_by_ft = {
           lua = { "stylua" },
+          cpp = { "clang-format" },
           python = { "ruff_format" },
           json = { "deno_fmt" },
           markdown = { "deno_fmt" },
