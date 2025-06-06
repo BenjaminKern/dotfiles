@@ -120,6 +120,7 @@ require("pckr").add({
           markdown = { "deno_fmt" },
           bzl = { "buildifier" },
           sh = { "shfmt" },
+          yaml = { "yq" },
           ["*"] = { "typos" },
         },
         formatters = {
