@@ -85,6 +85,7 @@ vim.diagnostic.config({
 
 require("pckr").setup({
   pack_dir = pckr_pack_dir,
+  max_jobs = 3,
   autoremove = true,
   lockfile = {
     path = pckr_lockfile,
