@@ -115,7 +115,7 @@ require("pckr").add({
         formatters_by_ft = {
           lua = { "stylua" },
           cpp = { "clang-format" },
-          python = { "ruff_format" },
+          python = { "ruff_format", "ruff_fix", "ruff_organize_imports" },
           json = { "deno_fmt" },
           markdown = { "deno_fmt" },
           bzl = { "buildifier" },
@@ -298,6 +298,7 @@ require("pckr").add({
         ensure_installed = {
           "vim",
           "regex",
+          "html",
           "c",
           "cpp",
           "lua",
