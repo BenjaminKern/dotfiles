@@ -291,7 +291,6 @@ require("pckr").add({
   {
     "nvim-treesitter/nvim-treesitter",
     config = function()
-      require("nvim-treesitter.install").prefer_git = false
       -- Add zig as preferred compiler, since it has better interoperability with windows
       require("nvim-treesitter.install").compilers = { "zig", "gcc", "clang" }
       require("nvim-treesitter.configs").setup({
