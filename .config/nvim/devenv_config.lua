@@ -42,9 +42,16 @@ vim.opt.shortmess:append("WcC")
 vim.opt.splitkeep = "screen"
 vim.opt.background = "dark"
 vim.opt.completeopt:append("fuzzy")
-vim.o.foldtext = ""
-vim.o.spelllang = "en,de" -- Define spelling dictionaries
-vim.o.spelloptions = "camel" -- Treat parts of camelCase words as separate words
+vim.opt.foldtext = ""
+vim.opt.spelllang = "en,de" -- Define spelling dictionaries
+vim.opt.spelloptions = "camel" -- Treat parts of camelCase words as separate words
+vim.schedule(function()
+  vim.opt.clipboard = "unnamedplus" -- Schedule the setting after `UiEnter` because it can increase startup-time.
+end)
+vim.opt.updatetime = 250 -- Decrease update time
+vim.opt.timeoutlen = 300 -- Decrease mapped sequence wait time
+
+vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" }) -- Diagnostic keymaps
 
 vim.filetype.add({
   extension = {
@@ -61,6 +68,7 @@ local pckr_lockfile = vim.env.VIM .. "/pckr/lockfile.lua"
 local pckr_pack_dir = vim.env.VIM .. "/pckr"
 local pckr_path = vim.env.VIM .. "/pckr/pckr.nvim"
 if not (vim.uv or vim.loop).fs_stat(pckr_path) then
+  local out
   vim.fn.system({
     "git",
     "clone",
@@ -68,6 +76,9 @@ if not (vim.uv or vim.loop).fs_stat(pckr_path) then
     "https://github.com/lewis6991/pckr.nvim",
     pckr_path,
   })
+  if vim.v.shell_error ~= 0 then
+    error("Error cloning lazy.nvim:\n" .. out)
+  end
 end
 vim.opt.rtp:prepend(pckr_path)
 
@@ -142,6 +153,9 @@ require("pckr").add({
             },
           },
         },
+        vim.api.nvim_create_user_command("Format", function(args)
+          require("conform").format({ async = true, lsp_format = "fallback" })
+        end, { range = true }),
       })
     end,
   },
@@ -165,8 +179,12 @@ require("pckr").add({
         },
         snippets = { preset = "mini_snippets" },
         sources = {
-          default = { "lsp", "buffer", "snippets", "path", "codecompanion" },
+          default = { "lsp", "path", "buffer", "snippets", "codecompanion" },
         },
+      })
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
+      vim.lsp.config("*", {
+        capabilities = capabilities,
       })
     end,
   },
@@ -203,10 +221,16 @@ require("pckr").add({
       })
       require("mini.statusline").setup({
         set_vim_settings = false,
+        use_icons = true,
       })
       require("mini.tabline").setup()
       require("mini.trailspace").setup()
       require("mini.align").setup()
+      -- Add/delete/replace surroundings (brackets, quotes, etc.)
+      --
+      -- - saiw) - [S]urround [A]dd [I]inner [W]ord [)]Paren
+      -- - sd'   - [S]urround [D]elete [']quotes
+      -- - sr)'  - [S]urround [R]eplace [)] [']
       require("mini.surround").setup()
       require("mini.files").setup()
       local gen_loader = require("mini.snippets").gen_loader
@@ -307,6 +331,7 @@ require("pckr").add({
           "comment",
         },
         highlight = { enable = true },
+        indent = { enable = true },
       })
     end,
   },
@@ -474,23 +499,12 @@ vim.keymap.set("n", "ww", function()
   require("hop").hint_words()
 end, { desc = "Use hop" })
 
-vim.api.nvim_create_user_command("Format", function(args)
-  local range = nil
-  if args.count ~= -1 then
-    local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
-    range = {
-      start = { args.line1, 0 },
-      ["end"] = { args.line2, end_line:len() },
-    }
-  end
-  require("conform").format({ async = true, lsp_format = "fallback", range = range })
-end, { range = true })
-
 vim.keymap.set("n", "<C-Z>", "<NOP>")
 
 vim.api.nvim_create_autocmd("TextYankPost", {
-  pattern = "*",
-  callback = function(args)
+  desc = "Highlight when yanking (copying) text",
+  group = vim.api.nvim_create_augroup("xyz-highlight-yank", { clear = true }),
+  callback = function()
     vim.highlight.on_yank()
   end,
 })
@@ -551,20 +565,18 @@ vim.lsp.handlers["window/showMessage"] = function(err, method, params, client_id
   vim.notify(method.message, severity[params.type])
 end
 
-vim.g.have_nerd_font = true
-
 vim.diagnostic.config({
   severity_sort = true,
   float = { border = "rounded", source = "if_many" },
   underline = { severity = vim.diagnostic.severity.ERROR },
-  signs = vim.g.have_nerd_font and {
+  signs = {
     text = {
       [vim.diagnostic.severity.ERROR] = "󰅚 ",
       [vim.diagnostic.severity.WARN] = "󰀪 ",
       [vim.diagnostic.severity.INFO] = "󰋽 ",
       [vim.diagnostic.severity.HINT] = "󰌶 ",
     },
-  } or {},
+  },
   virtual_text = {
     source = "if_many",
     spacing = 2,
@@ -583,11 +595,13 @@ vim.diagnostic.config({
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     group = vim.api.nvim_create_augroup("xys-lsp-attach", { clear = true })
-    local function client_supports_method(client, method, bufnr)
-      return client:supports_method(method, bufnr)
+    local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+      vim.keymap.set("n", "<leader>h", function()
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = args.buf }))
+      end, { silent = true, buffer = args.buf, desc = "Toggle Inlay [H]ints" })
     end
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, args.buf) then
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
       local highlight_augroup = vim.api.nvim_create_augroup("xys-lsp-highlight", { clear = false })
       vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
         buffer = args.buf,
@@ -610,22 +624,21 @@ vim.api.nvim_create_autocmd("LspAttach", {
       })
     end
 
-    local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-    if client:supports_method("textDocument/inlayHint") then
-      vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
-    end
+    vim.keymap.set("n", "gD", function()
+      vim.lsp.buf.declaration()
+    end, { silent = true, buffer = args.buf, desc = "[g]oto [D]eclaration" })
     vim.keymap.set("n", "gd", function()
       vim.lsp.buf.definition()
-    end, { silent = true, buffer = args.buf, desc = "Lsp Definition" })
+    end, { silent = true, buffer = args.buf, desc = "[g]oto [d]efinition" })
     vim.keymap.set("n", "gt", function()
       vim.lsp.buf.type_definition()
-    end, { silent = true, buffer = args.buf, desc = "Lsp Type Definition" })
+    end, { silent = true, buffer = args.buf, desc = "[g]oto [t]ype Definition" })
     vim.keymap.set("n", "ca", function()
       vim.lsp.buf.code_action()
-    end, { silent = true, buffer = args.buf, desc = "Show Lsp Code Action" })
+    end, { silent = true, buffer = args.buf, desc = "[c]ode [a]ction" })
     vim.api.nvim_buf_create_user_command(args.buf, "Rename", function()
       vim.lsp.buf.rename()
-    end, { desc = "Lsp Rename" })
+    end, { desc = "Rename" })
   end,
 })
 
