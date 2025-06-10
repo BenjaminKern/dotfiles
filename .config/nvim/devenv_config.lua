@@ -165,7 +165,7 @@ require("pckr").add({
           enabled = true,
         },
         keymap = {
-          preset = "enter",
+          preset = "super-tab",
         },
         fuzzy = { implementation = "lua" },
         completion = {
@@ -563,8 +563,6 @@ vim.lsp.handlers["window/showMessage"] = function(err, method, params, client_id
   vim.notify(method.message, severity[params.type])
 end
 
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" }) -- Diagnostic keymaps
-
 vim.diagnostic.config({
   severity_sort = true,
   float = { border = "rounded", source = "if_many" },
@@ -577,28 +575,19 @@ vim.diagnostic.config({
       [vim.diagnostic.severity.HINT] = "󰌶 ",
     },
   },
-  virtual_text = {
-    source = "if_many",
-    spacing = 2,
-    format = function(diagnostic)
-      local diagnostic_message = {
-        [vim.diagnostic.severity.ERROR] = diagnostic.message,
-        [vim.diagnostic.severity.WARN] = diagnostic.message,
-        [vim.diagnostic.severity.INFO] = diagnostic.message,
-        [vim.diagnostic.severity.HINT] = diagnostic.message,
-      }
-      return diagnostic_message[diagnostic.severity]
-    end,
-  },
+  virtual_text = false,
 })
 
+vim.keymap.set("n", "<leader>q", vim.diagnostic.setqflist, { desc = "Open diagnostic [Q]uickfix list" }) -- Diagnostic keymaps
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic location" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic location" })
 vim.keymap.set("n", "<leader>l", function()
-  vim.diagnostic.config({ virtual_lines = { current_line = true }, virtual_text = false })
+  vim.diagnostic.config({ virtual_lines = { current_line = true } })
 
   vim.api.nvim_create_autocmd("CursorMoved", {
     group = vim.api.nvim_create_augroup("xyz-line-diagnostics", { clear = true }),
     callback = function()
-      vim.diagnostic.config({ virtual_lines = false, virtual_text = true })
+      vim.diagnostic.config({ virtual_lines = false })
       return true
     end,
   })
