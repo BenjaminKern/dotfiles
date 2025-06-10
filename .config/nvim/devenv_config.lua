@@ -153,7 +153,7 @@ require("pckr").add({
           enabled = true,
         },
         keymap = {
-          preset = "super-tab",
+          preset = "enter",
         },
         fuzzy = { implementation = "lua" },
         completion = {
