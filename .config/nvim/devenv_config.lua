@@ -89,16 +89,6 @@ require("pckr").add({
     end,
   },
   {
-    "Bekaboo/dropbar.nvim",
-    config = function()
-      local dropbar_api = require("dropbar.api")
-      vim.keymap.set("n", "<Leader>s", dropbar_api.pick, { desc = "Pick symbols in winbar" })
-      vim.keymap.set("n", "[;", dropbar_api.goto_context_start, { desc = "Go to start of current context" })
-      vim.keymap.set("n", "];", dropbar_api.select_next_context, { desc = "Select next context" })
-      -- vim.ui.select = require('dropbar.utils.menu').select
-    end,
-  },
-  {
     "stevearc/dressing.nvim",
     config = function()
       require("dressing").setup({
@@ -321,15 +311,6 @@ require("pckr").add({
     end,
   },
   {
-    "MeanderingProgrammer/render-markdown.nvim",
-    config = function()
-      require("render-markdown").setup({
-        file_types = { "markdown", "codecompanion" },
-      })
-    end,
-    requires = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.nvim" },
-  },
-  {
     "olimorris/codecompanion.nvim",
     config = function()
       require("codecompanion").setup({
@@ -358,7 +339,6 @@ require("pckr").add({
     requires = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
-      "MeanderingProgrammer/render-markdown.nvim",
     },
   },
   {
@@ -602,18 +582,13 @@ vim.diagnostic.config({
 
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
-    group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true })
+    group = vim.api.nvim_create_augroup("xys-lsp-attach", { clear = true })
     local function client_supports_method(client, method, bufnr)
       return client:supports_method(method, bufnr)
     end
-    -- The following two autocommands are used to highlight references of the
-    -- word under your cursor when your cursor rests there for a little while.
-    --    See `:help CursorHold` for information about when this is executed
-    --
-    -- When you move your cursor, the highlights will be cleared (the second autocommand).
     local client = vim.lsp.get_client_by_id(args.data.client_id)
     if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, args.buf) then
-      local highlight_augroup = vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
+      local highlight_augroup = vim.api.nvim_create_augroup("xys-lsp-highlight", { clear = false })
       vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
         buffer = args.buf,
         group = highlight_augroup,
@@ -627,10 +602,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
       })
 
       vim.api.nvim_create_autocmd("LspDetach", {
-        group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+        group = vim.api.nvim_create_augroup("xys-lsp-detach", { clear = true }),
         callback = function(event)
           vim.lsp.buf.clear_references()
-          vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event.buf })
+          vim.api.nvim_clear_autocmds({ group = "xys-lsp-highlight", buffer = event.buf })
         end,
       })
     end
