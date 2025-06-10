@@ -51,8 +51,6 @@ end)
 vim.opt.updatetime = 250 -- Decrease update time
 vim.opt.timeoutlen = 300 -- Decrease mapped sequence wait time
 
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" }) -- Diagnostic keymaps
-
 vim.filetype.add({
   extension = {
     zsh = "sh",
@@ -565,6 +563,8 @@ vim.lsp.handlers["window/showMessage"] = function(err, method, params, client_id
   vim.notify(method.message, severity[params.type])
 end
 
+vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" }) -- Diagnostic keymaps
+
 vim.diagnostic.config({
   severity_sort = true,
   float = { border = "rounded", source = "if_many" },
@@ -591,6 +591,18 @@ vim.diagnostic.config({
     end,
   },
 })
+
+vim.keymap.set("n", "<leader>l", function()
+  vim.diagnostic.config({ virtual_lines = { current_line = true }, virtual_text = false })
+
+  vim.api.nvim_create_autocmd("CursorMoved", {
+    group = vim.api.nvim_create_augroup("xyz-line-diagnostics", { clear = true }),
+    callback = function()
+      vim.diagnostic.config({ virtual_lines = false, virtual_text = true })
+      return true
+    end,
+  })
+end, { desc = "Show line diagnostics" })
 
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
