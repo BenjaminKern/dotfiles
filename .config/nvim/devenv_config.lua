@@ -216,7 +216,7 @@ require("pckr").add({
       vim.notify = MiniNotify.make_notify()
       require("mini.pick").setup()
       vim.ui.select = MiniPick.ui_select
-      -- require('mini.git').setup()
+      require('mini.git').setup()
       require("mini.icons").setup()
       MiniIcons.tweak_lsp_kind()
       MiniIcons.mock_nvim_web_devicons()
