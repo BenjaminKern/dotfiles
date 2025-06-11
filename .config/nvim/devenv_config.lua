@@ -91,6 +91,7 @@ require("pckr").setup({
 
 require("pckr").add({
   "lewis6991/fileline.nvim",
+  "kevinhwang91/nvim-bqf",
   {
     "folke/tokyonight.nvim",
     config = function()
@@ -369,6 +370,9 @@ require("pckr").add({
     requires = { "mfussenegger/nvim-dap", "mfussenegger/nvim-dap-python", "nvim-treesitter/nvim-treesitter" },
     config = function()
       require("nvim-dap-virtual-text").setup()
+      if vim.fn.executable("debugpy") == 1 then
+        require("dap-python").setup("python3")
+      end
     end,
   },
   {
@@ -445,12 +449,13 @@ require("pckr").add({
           request = "launch",
           program = function()
             return coroutine.create(function(dap_run_co)
-              vim.ui.input(
-                { prompt = "Path to executable: ", default = vim.fn.getcwd() .. "/", completion = "file" },
-                function(input)
-                  coroutine.resume(dap_run_co, input)
-                end
-              )
+              vim.ui.input({
+                prompt = "Path to executable: ",
+                default = vim.fn.getcwd() .. "/",
+                completion = "file",
+              }, function(input)
+                coroutine.resume(dap_run_co, input)
+              end)
             end)
           end,
           cwd = "${workspaceFolder}",
@@ -537,19 +542,6 @@ vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], { desc = "Escape from terminal" })
 vim.keymap.set("n", "<leader>ff", [[<Cmd>Pick files<CR>]], { desc = "Pick find files" })
 vim.keymap.set("n", "<leader>fg", [[<Cmd>Pick grep_live<CR>]], { desc = "Pick grep live" })
 vim.keymap.set("n", "<leader>fG", [[<Cmd>Pick grep pattern='<cword>'<CR>]], { desc = "Pick grep string under cursor" })
-
-local files_set_cwd = function(path)
-  -- Works only if cursor is on the valid file system entry
-  local cur_entry_path = MiniFiles.get_fs_entry().path
-  local cur_directory = vim.fs.dirname(cur_entry_path)
-  vim.fn.chdir(cur_directory)
-end
-vim.api.nvim_create_autocmd("User", {
-  pattern = "MiniFilesBufferCreate",
-  callback = function(args)
-    vim.keymap.set("n", "g~", files_set_cwd, { buffer = args.data.buf_id })
-  end,
-})
 
 -- LSP settings
 -- https://github.com/lewis6991/dotfiles/blob/main/config/nvim/lua/lewis6991/lsp.lua
@@ -729,7 +721,3 @@ vim.fn.sign_define(
   { text = "", texthl = "DapLogPoint", linehl = "DapLogPoint", numhl = "DapLogPoint" }
 )
 vim.fn.sign_define("DapStopped", { text = "", texthl = "DapStopped", linehl = "DapStopped", numhl = "DapStopped" })
-
-if vim.fn.executable("debugpy") == 1 then
-  require("dap-python").setup("python3")
-end
