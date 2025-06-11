@@ -180,6 +180,13 @@ require("pckr").add({
         sources = {
           default = { "lsp", "path", "buffer", "snippets", "codecompanion" },
         },
+        cmdline = {
+          keymap = {
+            preset = "inherit",
+            ['<CR>'] = { 'accept_and_enter', 'fallback' },
+          },
+          completion = { menu = { auto_show = true } },
+        },
       })
       local capabilities = require("blink.cmp").get_lsp_capabilities()
       vim.lsp.config("*", {
