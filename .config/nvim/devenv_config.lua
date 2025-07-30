@@ -216,12 +216,15 @@ require("pckr").add({
       vim.notify = MiniNotify.make_notify()
       require("mini.pick").setup()
       vim.ui.select = MiniPick.ui_select
-      require('mini.git').setup()
+      require("mini.git").setup()
       require("mini.icons").setup()
       MiniIcons.tweak_lsp_kind()
       MiniIcons.mock_nvim_web_devicons()
       require("mini.visits").setup()
-      require("mini.diff").setup()
+      local diff = require("mini.diff")
+      diff.setup({
+        source = diff.gen_source.none(),
+      })
       require("mini.extra").setup()
       require("mini.misc").setup()
       MiniMisc.setup_auto_root({ "MODULE.bazel", "compile_commands.json", ".git" })
@@ -355,6 +358,15 @@ require("pckr").add({
     end,
   },
   {
+    "MeanderingProgrammer/render-markdown.nvim",
+    config = function()
+      require("render-markdown").setup({
+        file_types = { "markdown", "codecompanion" },
+      })
+    end,
+    requires = { "echasnovski/mini.nvim" }, -- if you use the mini.nvim suite
+  },
+  {
     "olimorris/codecompanion.nvim",
     config = function()
       require("codecompanion").setup({
@@ -362,27 +374,43 @@ require("pckr").add({
           llama_cpp = function()
             return require("codecompanion.adapters").extend("openai_compatible", {
               env = {
-                url = "http://127.0.0.1:8080", -- llama-server -hf Qwen/Qwen2.5-Coder-14B-Instruct-GGUF
+                url = "http://127.0.0.1:8080",
                 chat_url = "/v1/chat/completions",
                 models_endpoint = "/v1/models",
+              },
+            })
+          end,
+          copilot = function()
+            return require("codecompanion.adapters").extend("copilot", {
+              schema = {
+                model = {
+                  default = function()
+                    return vim.env.COPILOT_MODEL or "gpt-4.1"
+                  end,
+                },
               },
             })
           end,
         },
         strategies = {
           chat = {
-            adapter = "llama_cpp",
-            render_headers = true,
+            adapter = "llama_cpp", -- llama-server -hf Qwen/Qwen2.5-Coder-14B-Instruct-GGUF
           },
           inline = {
             adapter = "llama_cpp",
           },
         },
       })
+      vim.keymap.set({ "n", "v" }, "<C-a>", "<cmd>CodeCompanionActions<cr>", { noremap = true, silent = true })
+      vim.keymap.set({ "n", "v" }, "<leader>a", "<cmd>CodeCompanionChat Toggle<cr>", { noremap = true, silent = true })
+      vim.keymap.set("v", "ga", "<cmd>CodeCompanionChat Add<cr>", { noremap = true, silent = true })
+      -- Expand 'cc' into 'CodeCompanion' in the command line
+      vim.cmd([[cab cc CodeCompanion]])
     end,
     requires = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
+      "MeanderingProgrammer/render-markdown.nvim",
     },
   },
   {
