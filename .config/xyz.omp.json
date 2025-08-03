@@ -18,6 +18,17 @@
         },
         {
           "properties": {
+            "cache_duration": "none"
+          },
+          "template": " 🐋 {{ .Context }} ",
+          "foreground": "#2E3440",
+          "powerline_symbol": "\ue0b0",
+          "background": "#88C0D0",
+          "type": "docker",
+          "style": "powerline"
+        },
+        {
+          "properties": {
             "cache_duration": "none",
             "style": "folder"
           },
