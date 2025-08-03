@@ -274,9 +274,6 @@ require("pckr").add({
             },
           },
         },
-        snippets = {
-          preset = "mini_snippets", -- Use mini.snippets for snippet engine
-        },
         sources = {
           default = { "lsp", "path", "buffer", "snippets", "codecompanion" },
         },
@@ -395,13 +392,13 @@ require("pckr").add({
       require("mini.files").setup()
 
       -- Snippet engine
-      local gen_loader = require("mini.snippets").gen_loader
-      require("mini.snippets").setup({
-        snippets = {
-          gen_loader.from_file(vim.env.VIM .. "runtime/snippets/all.json"),
-          gen_loader.from_lang(), -- Language-specific snippets
-        },
-      })
+      -- local gen_loader = require("mini.snippets").gen_loader
+      -- require("mini.snippets").setup({
+      --   snippets = {
+      --     gen_loader.from_file(vim.env.VIM .. "runtime/snippets/all.json"),
+      --     gen_loader.from_lang(), -- Language-specific snippets
+      --   },
+      -- })
 
       -- Highlight patterns (like hex colors)
       local hipatterns = require("mini.hipatterns")
