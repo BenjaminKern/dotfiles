@@ -275,7 +275,7 @@ require("pckr").add({
           },
         },
         sources = {
-          default = { "lsp", "path", "buffer", "snippets", "codecompanion" },
+          default = { "lsp", "path", "buffer", "snippets" },
         },
         -- Command line completion
         cmdline = {
@@ -531,88 +531,42 @@ require("pckr").add({
   },
 
   -- ============================================================================
-  -- MARKDOWN RENDERING
-  -- ============================================================================
-
-  {
-    "MeanderingProgrammer/render-markdown.nvim", -- Beautiful markdown rendering
-    config = function()
-      require("render-markdown").setup({
-        file_types = { "markdown", "codecompanion" }, -- Also render in AI chat
-      })
-    end,
-    requires = { "echasnovski/mini.nvim" },
-  },
-
-  -- ============================================================================
   -- AI ASSISTANT INTEGRATION
   -- ============================================================================
 
   {
-    "olimorris/codecompanion.nvim", -- AI coding assistant
+    "NickvanDyke/opencode.nvim", -- AI coding assistant via Claude CLI
     config = function()
-      require("codecompanion").setup({
-        adapters = {
-          -- Local llama.cpp server integration
-          llama_cpp = function()
-            return require("codecompanion.adapters").extend("openai_compatible", {
-              env = {
-                url = "http://127.0.0.1:8080",
-                chat_url = "/v1/chat/completions",
-                models_endpoint = "/v1/models",
-              },
-            })
-          end,
-          -- GitHub Copilot integration
-          copilot = function()
-            return require("codecompanion.adapters").extend("copilot", {
-              schema = {
-                model = {
-                  default = function()
-                    return vim.env.COPILOT_MODEL or "gpt-4.1"
-                  end,
-                },
-              },
-            })
-          end,
-        },
-        strategies = {
-          chat = {
-            adapter = "llama_cpp", -- Use local llama-server with Qwen/Qwen2.5-Coder-14B-Instruct-GGUF
-          },
-          inline = {
-            adapter = "llama_cpp",
-          },
-        },
-      })
+      require("opencode").setup()
 
-      -- Key mappings for AI assistant
+      -- Key mappings for opencode
       vim.keymap.set(
-        { "n", "v" },
-        "<C-a>",
-        "<cmd>CodeCompanionActions<cr>",
-        { noremap = true, silent = true, desc = "CodeCompanion Actions" }
-      )
-      vim.keymap.set(
-        { "n", "v" },
-        "<leader>a",
-        "<cmd>CodeCompanionChat Toggle<cr>",
-        { noremap = true, silent = true, desc = "Toggle AI Chat" }
+        "n",
+        "<leader>oa",
+        function() require('opencode').ask('@cursor: ') end,
+        { noremap = true, silent = true, desc = "Ask OpenCode" }
       )
       vim.keymap.set(
         "v",
-        "ga",
-        "<cmd>CodeCompanionChat Add<cr>",
-        { noremap = true, silent = true, desc = "Add to AI Chat" }
+        "<leader>oa",
+        function() require('opencode').ask('@selection: ') end,
+        { noremap = true, silent = true, desc = "Ask OpenCode about selection" }
       )
-
-      -- Command abbreviation
-      vim.cmd([[cab cc CodeCompanion]])
+      vim.keymap.set(
+        { "n", "v" },
+        "<leader>ot",
+        function() require('opencode').toggle() end,
+        { noremap = true, silent = true, desc = "Toggle OpenCode Terminal" }
+      )
+      vim.keymap.set(
+        { "n", "v" },
+        "<leader>op",
+        function() require('opencode').select_prompt() end,
+        { noremap = true, silent = true, desc = "OpenCode Prompt Menu" }
+      )
     end,
     requires = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "MeanderingProgrammer/render-markdown.nvim",
+      "folke/snacks.nvim", -- Required for input and terminal functionality
     },
   },
 
