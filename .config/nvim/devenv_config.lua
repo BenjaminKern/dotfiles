@@ -540,30 +540,18 @@ require("pckr").add({
       require("opencode").setup()
 
       -- Key mappings for opencode
-      vim.keymap.set(
-        "n",
-        "<leader>oa",
-        function() require('opencode').ask('@cursor: ') end,
-        { noremap = true, silent = true, desc = "Ask OpenCode" }
-      )
-      vim.keymap.set(
-        "v",
-        "<leader>oa",
-        function() require('opencode').ask('@selection: ') end,
-        { noremap = true, silent = true, desc = "Ask OpenCode about selection" }
-      )
-      vim.keymap.set(
-        { "n", "v" },
-        "<leader>ot",
-        function() require('opencode').toggle() end,
-        { noremap = true, silent = true, desc = "Toggle OpenCode Terminal" }
-      )
-      vim.keymap.set(
-        { "n", "v" },
-        "<leader>op",
-        function() require('opencode').select_prompt() end,
-        { noremap = true, silent = true, desc = "OpenCode Prompt Menu" }
-      )
+      vim.keymap.set("n", "<leader>oa", function()
+        require("opencode").ask("@cursor: ")
+      end, { noremap = true, silent = true, desc = "Ask OpenCode" })
+      vim.keymap.set("v", "<leader>oa", function()
+        require("opencode").ask("@selection: ")
+      end, { noremap = true, silent = true, desc = "Ask OpenCode about selection" })
+      vim.keymap.set({ "n", "v" }, "<leader>ot", function()
+        require("opencode").toggle()
+      end, { noremap = true, silent = true, desc = "Toggle OpenCode Terminal" })
+      vim.keymap.set({ "n", "v" }, "<leader>op", function()
+        require("opencode").select_prompt()
+      end, { noremap = true, silent = true, desc = "OpenCode Prompt Menu" })
     end,
     requires = {
       "folke/snacks.nvim", -- Required for input and terminal functionality
@@ -851,7 +839,14 @@ vim.diagnostic.config({
 })
 
 -- Diagnostic navigation keymaps
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setqflist, { desc = "Open diagnostic [Q]uickfix list" })
+vim.keymap.set("n", "<leader>q", function()
+  local qf_winid = vim.fn.getqflist({ winid = 0 }).winid
+  if qf_winid ~= 0 then
+    vim.cmd("cclose")
+  else
+    vim.diagnostic.setqflist()
+  end
+end, { desc = "Toggle diagnostic [Q]uickfix list" })
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic location" })
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic location" })
 
