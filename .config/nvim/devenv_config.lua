@@ -275,7 +275,7 @@ require("pckr").add({
           },
         },
         sources = {
-          default = { "lsp", "path", "buffer", "snippets" },
+          default = { "lsp", "path", "buffer", "snippets", "codecompanion" },
         },
         -- Command line completion
         cmdline = {
@@ -462,6 +462,59 @@ require("pckr").add({
   },
 
   -- ============================================================================
+  -- MARKDOWN RENDERING
+  -- ============================================================================
+
+  {
+    "MeanderingProgrammer/render-markdown.nvim", -- Beautiful markdown rendering
+    config = function()
+      require("render-markdown").setup({
+        file_types = { "markdown", "codecompanion" }, -- Also render in AI chat
+      })
+    end,
+    requires = { "echasnovski/mini.nvim" },
+  },
+
+  -- ============================================================================
+  -- AI ASSISTANT INTEGRATION
+  -- ============================================================================
+
+  {
+    "olimorris/codecompanion.nvim", -- AI coding assistant
+    config = function()
+      require("codecompanion").setup()
+
+      -- Key mappings for AI assistant
+      vim.keymap.set(
+        { "n", "v" },
+        "<C-a>",
+        "<cmd>CodeCompanionActions<cr>",
+        { noremap = true, silent = true, desc = "CodeCompanion Actions" }
+      )
+      vim.keymap.set(
+        { "n", "v" },
+        "<leader>a",
+        "<cmd>CodeCompanionChat Toggle<cr>",
+        { noremap = true, silent = true, desc = "Toggle AI Chat" }
+      )
+      vim.keymap.set(
+        "v",
+        "ga",
+        "<cmd>CodeCompanionChat Add<cr>",
+        { noremap = true, silent = true, desc = "Add to AI Chat" }
+      )
+
+      -- Command abbreviation
+      vim.cmd([[cab cc CodeCompanion]])
+    end,
+    requires = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "MeanderingProgrammer/render-markdown.nvim",
+    },
+  },
+
+  -- ============================================================================
   -- TERMINAL INTEGRATION
   -- ============================================================================
 
@@ -528,34 +581,6 @@ require("pckr").add({
         indent = { enable = true }, -- Enable treesitter-based indentation
       })
     end,
-  },
-
-  -- ============================================================================
-  -- AI ASSISTANT INTEGRATION
-  -- ============================================================================
-
-  {
-    "NickvanDyke/opencode.nvim", -- AI coding assistant via Claude CLI
-    config = function()
-      require("opencode").setup()
-
-      -- Key mappings for opencode
-      vim.keymap.set("n", "<leader>oa", function()
-        require("opencode").ask("@cursor: ")
-      end, { noremap = true, silent = true, desc = "Ask OpenCode" })
-      vim.keymap.set("v", "<leader>oa", function()
-        require("opencode").ask("@selection: ")
-      end, { noremap = true, silent = true, desc = "Ask OpenCode about selection" })
-      vim.keymap.set({ "n", "v" }, "<leader>ot", function()
-        require("opencode").toggle()
-      end, { noremap = true, silent = true, desc = "Toggle OpenCode Terminal" })
-      vim.keymap.set({ "n", "v" }, "<leader>op", function()
-        require("opencode").select_prompt()
-      end, { noremap = true, silent = true, desc = "OpenCode Prompt Menu" })
-    end,
-    requires = {
-      "folke/snacks.nvim", -- Required for input and terminal functionality
-    },
   },
 
   -- ============================================================================
@@ -914,7 +939,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     vim.keymap.set("n", "gd", function()
       vim.lsp.buf.definition()
-    end, { silent = true, buffer = args.buf, desc = "[g]oto [d]efinition" })
+    end, { silent = true, buffer = args.buf, desc = "[g]oto [d]definition" })
 
     vim.keymap.set("n", "gt", function()
       vim.lsp.buf.type_definition()
