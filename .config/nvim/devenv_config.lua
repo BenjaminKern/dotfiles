@@ -482,7 +482,16 @@ require("pckr").add({
   {
     "olimorris/codecompanion.nvim", -- AI coding assistant
     config = function()
-      require("codecompanion").setup()
+      require("codecompanion").setup({
+        strategies = {
+          chat = {
+            adapter = {
+              name = "copilot",
+              model = "gpt-4.1", -- claude-sonnet-4, gpt-5
+            },
+          },
+        },
+      })
 
       -- Key mappings for AI assistant
       vim.keymap.set(
