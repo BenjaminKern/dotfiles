@@ -478,16 +478,126 @@ require("pckr").add({
   -- ============================================================================
   -- AI ASSISTANT INTEGRATION
   -- ============================================================================
-
   {
     "olimorris/codecompanion.nvim", -- AI coding assistant
     config = function()
       require("codecompanion").setup({
+        adapters = {
+          http = {
+            llama_cpp = function()
+              return require("codecompanion.adapters").extend("openai_compatible", {
+                env = {
+                  url = "http://127.0.0.1:8080",
+                  chat_url = "/v1/chat/completions",
+                  models_endpoint = "/v1/models",
+                  api_key = "1234",
+                },
+              })
+            end,
+            copilot = function()
+              return require("codecompanion.adapters").extend("copilot", {
+                schema = {
+                  model = {
+                    default = "gpt-4.1", -- claude-sonnet-4, claude-sonnet-4.5, gpt-5
+                  },
+                },
+              })
+            end,
+          },
+        },
         strategies = {
           chat = {
-            adapter = {
-              name = "copilot",
-              model = "gpt-4.1", -- claude-sonnet-4, gpt-5
+            adapter = "llama_cpp",
+          },
+          inline = {
+            adapter = "llama_cpp",
+          },
+          cmd = {
+            adapter = "llama_cpp",
+          },
+        },
+        -- Configure prompt library
+        prompt_library = {
+          ["Code Review"] = {
+            strategy = "chat",
+            description = "Get code review feedback",
+            opts = {
+              index = 1,
+              short_name = "cr",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[Please review the following code for best practices, potential bugs, and improvements:
+                  {buffer}]],
+              },
+            },
+          },
+          ["Explain Code"] = {
+            strategy = "chat",
+            description = "Explain selected code",
+            opts = {
+              index = 2,
+              short_name = "ec",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[Please explain what the following code does:
+                  {buffer}]],
+              },
+            },
+          },
+        },
+        -- Configure workflows
+        workflows = {
+          ["Code Generation"] = {
+            strategy = "workflow",
+            description = "Generate and refine code with feedback",
+            opts = {
+              index = 1,
+              short_name = "cg",
+            },
+            prompts = {
+              {
+                {
+                  role = "system",
+                  content = function(context)
+                    return string.format(
+                      "You are an expert software engineer for the %s language. Provide accurate, thoughtful code solutions.",
+                      context.filetype
+                    )
+                  end,
+                  opts = {
+                    visible = false,
+                  },
+                },
+                {
+                  role = "user",
+                  content = "I want you to generate code for: ",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Great. Now let's review the generated code for correctness, style, and efficiency.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Thanks. Please revise the code based on feedback without additional explanations.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
             },
           },
         },
