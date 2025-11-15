@@ -516,8 +516,9 @@ require("pckr").add({
             adapter = "llama_cpp",
           },
         },
-        -- Configure prompt library
+        -- Enhanced prompt library
         prompt_library = {
+          -- ===== CODE QUALITY =====
           ["Code Review"] = {
             strategy = "chat",
             description = "Get code review feedback",
@@ -528,8 +529,26 @@ require("pckr").add({
             prompts = {
               {
                 role = "user",
-                content = [[Please review the following code for best practices, potential bugs, and improvements:
-                  {buffer}]],
+                content = function(context)
+                  local lang_specific = {
+                    cpp = "\n- Check for memory safety (RAII, smart pointers)\n- Verify const correctness\n- Review exception safety guarantees\n- Check for proper move semantics",
+                    python = "\n- Check type hints completeness\n- Verify PEP 8 compliance\n- Review error handling patterns\n- Check for proper resource cleanup",
+                    bzl = "\n- Verify build rule correctness\n- Check dependency hygiene\n- Review visibility settings",
+                    dockerfile = "\n- Check multi-stage build optimization\n- Verify layer caching efficiency\n- Review security best practices",
+                  }
+                  local extra = lang_specific[context.filetype] or ""
+                  return string.format(
+                    [[Review this %s code for:
+- Best practices and idioms
+- Potential bugs and edge cases
+- Performance implications
+- Security concerns%s
+
+{buffer}]],
+                    context.filetype,
+                    extra
+                  )
+                end,
               },
             },
           },
@@ -543,13 +562,485 @@ require("pckr").add({
             prompts = {
               {
                 role = "user",
-                content = [[Please explain what the following code does:
-                  {buffer}]],
+                content = [[Explain what this code does, including:
+- High-level purpose
+- Key algorithms or patterns used
+- Important edge cases or assumptions
+- Dependencies and their roles
+
+{buffer}]],
+              },
+            },
+          },
+          ["Refactor"] = {
+            strategy = "inline",
+            description = "Suggest refactoring improvements",
+            opts = {
+              index = 3,
+              short_name = "rf",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = function(context)
+                  local refactor_focus = {
+                    cpp = "modern C++17/20 idioms, RAII, const correctness, and move semantics",
+                    python = "Pythonic patterns, type hints, and comprehensions",
+                  }
+                  local focus = refactor_focus[context.filetype] or "clean code principles"
+                  return string.format(
+                    [[Refactor this code focusing on %s. Maintain functionality while improving:
+- Readability and maintainability
+- Performance where applicable
+- Error handling
+- Code organization
+
+{selection}]],
+                    focus
+                  )
+                end,
+              },
+            },
+          },
+          -- ===== DOCUMENTATION =====
+          ["Add Docstring"] = {
+            strategy = "inline",
+            description = "Generate function/class documentation",
+            opts = {
+              index = 4,
+              short_name = "doc",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = function(context)
+                  if context.filetype == "cpp" then
+                    return [[Add Doxygen-style documentation for this function/class:
+- Brief description
+- Detailed description if complex
+- @param for each parameter
+- @return for return value
+- @throw for exceptions
+- @note for important usage notes
+
+{selection}]]
+                  elseif context.filetype == "python" then
+                    return [[Add Google-style docstring for this function/class:
+- One-line summary
+- Detailed description if needed
+- Args: with types
+- Returns: with type
+- Raises: for exceptions
+- Example: if helpful
+
+{selection}]]
+                  else
+                    return "Add clear documentation for:\n{selection}"
+                  end
+                end,
+              },
+            },
+          },
+          -- ===== TESTING =====
+          ["Generate Tests"] = {
+            strategy = "chat",
+            description = "Generate unit tests",
+            opts = {
+              index = 5,
+              short_name = "test",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = function(context)
+                  if context.filetype == "cpp" then
+                    return [[Generate comprehensive unit tests using Google Test for:
+{buffer}
+
+Include:
+- Test fixtures if needed
+- Positive test cases
+- Edge cases and boundary conditions
+- Error cases with EXPECT_THROW
+- Test names following TEST(TestSuiteName, TestName) convention]]
+                  elseif context.filetype == "python" then
+                    return [[Generate comprehensive pytest tests for:
+{buffer}
+
+Include:
+- Fixtures if needed
+- Positive test cases
+- Edge cases and boundary conditions
+- Parametrized tests where applicable
+- Mock external dependencies
+- Clear test function names]]
+                  else
+                    return "Generate unit tests for:\n{buffer}"
+                  end
+                end,
+              },
+            },
+          },
+          ["Fix Test"] = {
+            strategy = "chat",
+            description = "Debug and fix failing test",
+            opts = {
+              index = 6,
+              short_name = "fixtest",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[This test is failing. Analyze why and suggest fixes:
+
+Test code:
+{buffer}
+
+Please:
+1. Identify the root cause
+2. Explain what's wrong
+3. Provide the corrected test
+4. Suggest additional test cases if the original test was incomplete]],
+              },
+            },
+          },
+          -- ===== BUILD & DEVOPS =====
+          ["Bazel Rule"] = {
+            strategy = "chat",
+            description = "Create or fix Bazel build rules",
+            opts = {
+              index = 7,
+              short_name = "bazel",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[I need help with Bazel build configuration. Consider:
+- Proper dependency management
+- Visibility settings
+- Target naming conventions
+- Toolchain configuration
+
+{buffer}
+
+What improvements or fixes do you suggest?]],
+              },
+            },
+          },
+          ["Dockerfile Optimize"] = {
+            strategy = "chat",
+            description = "Optimize Dockerfile",
+            opts = {
+              index = 8,
+              short_name = "docker",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[Optimize this Dockerfile for:
+- Smaller image size (multi-stage builds)
+- Better layer caching
+- Security best practices
+- Build speed
+
+Current Dockerfile:
+{buffer}]],
+              },
+            },
+          },
+          ["GitHub Actions Workflow"] = {
+            strategy = "chat",
+            description = "Create or improve GHA workflow",
+            opts = {
+              index = 9,
+              short_name = "gha",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[Help me create/improve a GitHub Actions workflow for:
+{buffer}
+
+Consider:
+- Efficient caching strategies
+- Parallel job execution
+- Proper secret handling
+- Failure notifications
+- Matrix builds if applicable]],
+              },
+            },
+          },
+          -- ===== DEBUGGING =====
+          ["Debug Issue"] = {
+            strategy = "chat",
+            description = "Analyze and debug code issue",
+            opts = {
+              index = 10,
+              short_name = "debug",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[I'm encountering an issue with this code. Help me debug it:
+
+Code:
+{buffer}
+
+Please:
+1. Identify potential bugs
+2. Explain the likely root cause
+3. Suggest debugging steps
+4. Provide a fix with explanation]],
+              },
+            },
+          },
+          ["Performance Analysis"] = {
+            strategy = "chat",
+            description = "Analyze code for performance issues",
+            opts = {
+              index = 11,
+              short_name = "perf",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = function(context)
+                  if context.filetype == "cpp" then
+                    return [[Analyze this C++ code for performance:
+{buffer}
+
+Focus on:
+- Memory allocation patterns
+- Cache efficiency
+- Unnecessary copies
+- Algorithm complexity
+- Compiler optimization opportunities
+- SIMD/vectorization potential]]
+                  elseif context.filetype == "python" then
+                    return [[Analyze this Python code for performance:
+{buffer}
+
+Focus on:
+- Hot loops and bottlenecks
+- Data structure choices
+- List comprehensions vs loops
+- Generator opportunities
+- Cython/numba candidates]]
+                  else
+                    return "Analyze for performance issues:\n{buffer}"
+                  end
+                end,
+              },
+            },
+          },
+          -- ===== CODE GENERATION =====
+          ["Implement Interface"] = {
+            strategy = "inline",
+            description = "Implement interface/abstract methods",
+            opts = {
+              index = 12,
+              short_name = "impl",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[Implement all methods for this interface/abstract class:
+{selection}
+
+Provide:
+- Complete implementations
+- Proper error handling
+- Documentation for each method
+- Example usage if helpful]],
+              },
+            },
+          },
+          ["Boilerplate"] = {
+            strategy = "inline",
+            description = "Generate common boilerplate code",
+            opts = {
+              index = 13,
+              short_name = "bp",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = function(context)
+                  if context.filetype == "cpp" then
+                    return [[Generate C++ boilerplate for: {selection}
+
+Include:
+- #pragma once
+- Namespace
+- Rule of five if applicable
+- Proper includes]]
+                  elseif context.filetype == "python" then
+                    return [[Generate Python boilerplate for: {selection}
+
+Include:
+- Type hints
+- Docstrings
+- __init__.py if package
+- Common dunder methods if class]]
+                  else
+                    return "Generate appropriate boilerplate for: {selection}"
+                  end
+                end,
+              },
+            },
+          },
+          -- ===== CONVERSION & MIGRATION =====
+          ["Python to C++"] = {
+            strategy = "chat",
+            description = "Convert Python code to C++",
+            opts = {
+              index = 14,
+              short_name = "py2cpp",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[Convert this Python code to modern C++17/20:
+{buffer}
+
+Requirements:
+- Use STL containers and algorithms
+- Apply RAII principles
+- Include proper error handling
+- Add type safety
+- Maintain equivalent functionality
+- Add brief migration notes]],
+              },
+            },
+          },
+          ["Add Type Hints"] = {
+            strategy = "inline",
+            description = "Add Python type hints",
+            opts = {
+              index = 15,
+              short_name = "hints",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = [[Add complete type hints to this Python code:
+{selection}
+
+Include:
+- Function parameter types
+- Return types
+- Variable annotations where helpful
+- Generic types (List, Dict, Optional, etc.)
+- Use typing module appropriately]],
+              },
+            },
+          },
+
+          ["PR Description"] = {
+            strategy = "chat",
+            description = "Generate pull request description",
+            opts = {
+              index = 16,
+              short_name = "pr",
+            },
+            prompts = {
+              {
+                role = "user",
+                content = function()
+                  -- Get current branch name
+                  local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("\n", "")
+
+                  -- Try origin/main first, fall back to origin/master
+                  local base_branch = "origin/main"
+                  local test_base = vim.fn.system(string.format("git rev-parse --verify %s 2>/dev/null", base_branch))
+                  if vim.v.shell_error ~= 0 then
+                    base_branch = "origin/master"
+                    test_base = vim.fn.system(string.format("git rev-parse --verify %s 2>/dev/null", base_branch))
+                    if vim.v.shell_error ~= 0 then
+                      return "Error: Could not find origin/main or origin/master. Please fetch from origin first."
+                    end
+                  end
+
+                  -- Get commits on this branch not in base
+                  local commits = vim.fn.system(string.format("git log %s..HEAD --oneline", base_branch))
+                  if commits == "" then
+                    return string.format(
+                      "No commits found between %s and current branch. Branch may be up to date.",
+                      base_branch
+                    )
+                  end
+
+                  -- Get diff stats
+                  local diff_stat = vim.fn.system(string.format("git diff %s...HEAD --stat", base_branch))
+
+                  -- Get full diff
+                  local diff = vim.fn.system(string.format("git diff %s...HEAD", base_branch))
+
+                  -- Get list of modified files
+                  local files_changed = vim.fn.system(string.format("git diff %s...HEAD --name-only", base_branch))
+
+                  return string.format(
+                    [[Generate a comprehensive pull request description for this branch:
+
+Branch: %s
+Base: %s
+Files changed:
+%s
+
+Commit history:
+%s
+
+Diff summary:
+%s
+
+Full changes:
+```diff
+%s
+```
+
+Include:
+## Summary
+Brief overview of what changed and why (2-3 sentences)
+
+## Changes
+- Bullet points of key changes organized by area/component
+- What was added/modified/removed
+- Highlight important architectural or design decisions
+
+## Testing
+- How these changes were tested
+- Test coverage added
+- Manual testing performed
+
+## Breaking Changes
+- List any breaking changes (or "None" if not applicable)
+
+## Related Issues
+- Reference any related issue numbers (e.g., Fixes #123)
+
+## Deployment Notes
+- Any special deployment considerations
+- Migration steps if needed
+- Configuration changes required
+
+## Checklist
+- [ ] Tests added/updated
+- [ ] Documentation updated
+- [ ] Breaking changes documented
+- [ ] Reviewed my own code]],
+                    branch,
+                    base_branch,
+                    files_changed,
+                    commits,
+                    diff_stat,
+                    diff
+                  )
+                end,
               },
             },
           },
         },
-        -- Configure workflows
+        -- Enhanced workflows
         workflows = {
           ["Code Generation"] = {
             strategy = "workflow",
@@ -563,10 +1054,16 @@ require("pckr").add({
                 {
                   role = "system",
                   content = function(context)
-                    return string.format(
-                      "You are an expert software engineer for the %s language. Provide accurate, thoughtful code solutions.",
-                      context.filetype
-                    )
+                    local expertise = {
+                      cpp = "expert C++ engineer specializing in modern C++17, performance optimization, and systems programming",
+                      python = "expert Python engineer specializing in type safety, async programming, and Pythonic code",
+                      bzl = "expert in Bazel build systems and dependency management",
+                      dockerfile = "expert in Docker containerization and optimization",
+                      yaml = "expert in CI/CD pipelines and GitHub Actions",
+                    }
+                    local role = expertise[context.filetype]
+                      or string.format("expert %s software engineer", context.filetype)
+                    return "You are an " .. role .. ". Provide accurate, production-ready solutions."
                   end,
                   opts = {
                     visible = false,
@@ -583,7 +1080,7 @@ require("pckr").add({
               {
                 {
                   role = "user",
-                  content = "Great. Now let's review the generated code for correctness, style, and efficiency.",
+                  content = "Review this for correctness, efficiency, and best practices.",
                   opts = {
                     auto_submit = false,
                   },
@@ -592,7 +1089,316 @@ require("pckr").add({
               {
                 {
                   role = "user",
-                  content = "Thanks. Please revise the code based on feedback without additional explanations.",
+                  content = "Revise based on feedback. Provide only the improved code.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+            },
+          },
+          ["Comprehensive Review"] = {
+            strategy = "workflow",
+            description = "Multi-stage code review process",
+            opts = {
+              index = 2,
+              short_name = "review",
+            },
+            prompts = {
+              {
+                {
+                  role = "system",
+                  content = "You are a senior software engineer conducting a thorough code review.",
+                  opts = {
+                    visible = false,
+                  },
+                },
+                {
+                  role = "user",
+                  content = [[Review this code for correctness and logic bugs:
+{buffer}]],
+                  opts = {
+                    auto_submit = true,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Now review for performance and efficiency concerns.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Finally, check for security issues and best practices.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Summarize the top 3 most important issues to address.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+            },
+          },
+          ["Test-Driven Development"] = {
+            strategy = "workflow",
+            description = "Generate tests then implementation",
+            opts = {
+              index = 3,
+              short_name = "tdd",
+            },
+            prompts = {
+              {
+                {
+                  role = "system",
+                  content = function(context)
+                    return string.format(
+                      "You are an expert in test-driven development for %s. Follow TDD principles strictly.",
+                      context.filetype
+                    )
+                  end,
+                  opts = {
+                    visible = false,
+                  },
+                },
+                {
+                  role = "user",
+                  content = "I need to implement: ",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "First, write comprehensive tests for this functionality. Include edge cases.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Now provide the minimal implementation that passes these tests.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Suggest any additional tests we should add for better coverage.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+            },
+          },
+          ["Debug Session"] = {
+            strategy = "workflow",
+            description = "Systematic debugging workflow",
+            opts = {
+              index = 4,
+              short_name = "debugflow",
+            },
+            prompts = {
+              {
+                {
+                  role = "system",
+                  content = "You are a debugging expert. Use systematic analysis to identify root causes.",
+                  opts = {
+                    visible = false,
+                  },
+                },
+                {
+                  role = "user",
+                  content = [[I'm seeing this issue:
+{buffer}
+
+Help me understand what's happening.]],
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "What debugging steps should I take to narrow down the cause?",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Based on the symptoms, what are the most likely root causes?",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Provide a fix with explanation of why this solves the issue.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+            },
+          },
+          ["API Design"] = {
+            strategy = "workflow",
+            description = "Design and document an API",
+            opts = {
+              index = 5,
+              short_name = "api",
+            },
+            prompts = {
+              {
+                {
+                  role = "system",
+                  content = "You are an API design expert focusing on usability, maintainability, and performance.",
+                  opts = {
+                    visible = false,
+                  },
+                },
+                {
+                  role = "user",
+                  content = "I need to design an API for: ",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Design the interface/class structure with clear contracts.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Add comprehensive documentation with usage examples.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Suggest test cases that verify the API contract.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+            },
+          },
+          ["Pull Request Review"] = {
+            strategy = "workflow",
+            description = "Complete PR creation workflow",
+            opts = {
+              index = 6,
+              short_name = "prflow",
+            },
+            prompts = {
+              {
+                {
+                  role = "system",
+                  content = "You are a senior engineer helping create a comprehensive pull request.",
+                  opts = {
+                    visible = false,
+                  },
+                },
+                {
+                  role = "user",
+                  content = function()
+                    local branch = vim.fn.system("git rev-parse --abbrev-ref HEAD"):gsub("\n", "")
+
+                    -- Determine base branch
+                    local base_branch = "origin/main"
+                    local test_base = vim.fn.system(string.format("git rev-parse --verify %s 2>/dev/null", base_branch))
+                    if vim.v.shell_error ~= 0 then
+                      base_branch = "origin/master"
+                    end
+
+                    local commits = vim.fn.system(string.format("git log %s..HEAD --oneline", base_branch))
+                    local diff_stat = vim.fn.system(string.format("git diff %s...HEAD --stat", base_branch))
+                    local diff = vim.fn.system(string.format("git diff %s...HEAD", base_branch))
+
+                    return string.format(
+                      [[Analyze these changes and create a detailed PR description:
+
+Branch: %s → %s
+
+Commits:
+%s
+
+File changes:
+%s
+
+Full diff:
+```diff
+%s
+```]],
+                      branch,
+                      base_branch,
+                      commits,
+                      diff_stat,
+                      diff
+                    )
+                  end,
+                  opts = {
+                    auto_submit = true,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Now suggest potential reviewer concerns and how to address them.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "Generate a conventional commit message that summarizes all changes.",
+                  opts = {
+                    auto_submit = false,
+                  },
+                },
+              },
+              {
+                {
+                  role = "user",
+                  content = "List any documentation or tests that should be added before merging.",
                   opts = {
                     auto_submit = false,
                   },
@@ -606,25 +1412,11 @@ require("pckr").add({
       -- Key mappings for AI assistant
       vim.keymap.set(
         { "n", "v" },
-        "<C-a>",
-        "<cmd>CodeCompanionActions<cr>",
-        { noremap = true, silent = true, desc = "CodeCompanion Actions" }
-      )
-      vim.keymap.set(
-        { "n", "v" },
         "<leader>a",
         "<cmd>CodeCompanionChat Toggle<cr>",
         { noremap = true, silent = true, desc = "Toggle AI Chat" }
       )
-      vim.keymap.set(
-        "v",
-        "ga",
-        "<cmd>CodeCompanionChat Add<cr>",
-        { noremap = true, silent = true, desc = "Add to AI Chat" }
-      )
 
-      -- Command abbreviation
-      vim.cmd([[cab cc CodeCompanion]])
     end,
     requires = {
       "nvim-lua/plenary.nvim",
