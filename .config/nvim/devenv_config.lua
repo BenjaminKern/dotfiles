@@ -1416,7 +1416,6 @@ Full diff:
         "<cmd>CodeCompanionChat Toggle<cr>",
         { noremap = true, silent = true, desc = "Toggle AI Chat" }
       )
-
     end,
     requires = {
       "nvim-lua/plenary.nvim",
@@ -1735,6 +1734,52 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_create_user_command("Trim", function()
   MiniTrailspace.trim()
 end, { desc = "Trim trailing whitespace" })
+
+-- Create scratch buffer with git diff output
+vim.api.nvim_create_user_command("Gds", function()
+  -- Create a new scratch buffer
+  local buf = vim.api.nvim_create_buf(false, true)
+
+  -- Get git diff output
+  local output = vim.fn.systemlist("git diff --cached")
+
+  -- Set buffer lines
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
+
+  -- Set buffer options
+  vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
+  vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+  vim.api.nvim_buf_set_option(buf, "swapfile", false)
+  vim.api.nvim_buf_set_option(buf, "modifiable", false)
+  vim.api.nvim_buf_set_option(buf, "filetype", "diff")
+
+  -- Open in current window
+  vim.api.nvim_set_current_buf(buf)
+end, {})
+
+vim.api.nvim_create_user_command("Gdm", function()
+  local buf = vim.api.nvim_create_buf(false, true)
+  local output = vim.fn.systemlist("git diff origin/main")
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
+  vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
+  vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+  vim.api.nvim_buf_set_option(buf, "swapfile", false)
+  vim.api.nvim_buf_set_option(buf, "modifiable", false)
+  vim.api.nvim_buf_set_option(buf, "filetype", "diff")
+  vim.api.nvim_set_current_buf(buf)
+end, {})
+
+vim.api.nvim_create_user_command("Gd", function()
+  local buf = vim.api.nvim_create_buf(false, true)
+  local output = vim.fn.systemlist("git diff")
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
+  vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
+  vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+  vim.api.nvim_buf_set_option(buf, "swapfile", false)
+  vim.api.nvim_buf_set_option(buf, "modifiable", false)
+  vim.api.nvim_buf_set_option(buf, "filetype", "diff")
+  vim.api.nvim_set_current_buf(buf)
+end, {})
 
 -- ============================================================================
 -- LSP (LANGUAGE SERVER PROTOCOL) CONFIGURATION
