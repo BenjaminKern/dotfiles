@@ -600,7 +600,7 @@ require("pckr").add({
     config = function()
       local term = require("floatty").setup()
       local git_log = require("floatty").setup({
-        cmd = [[git lg $@ | \
+        cmd = [[git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit $@ | \
     fzf \
       --ansi --no-sort --reverse --tiebreak=index \
       --preview "f() { set -- \$(echo -- \$@ | grep -o '[a-f0-9]\{7\}'); [ \$# -eq 0 ] || git show --color=always --format=fuller \$1 $filter | delta --line-numbers --syntax-theme=OneHalfDark; }; f {}" \
@@ -692,28 +692,7 @@ require("pckr").add({
     },
     config = function()
       require("nvim-dap-virtual-text").setup()
-
-      -- Setup Python debugging if debugpy is available
-      if vim.fn.executable("debugpy") == 1 then
-        require("dap-python").setup("python3")
-      end
-    end,
-  },
-
-  -- ============================================================================
-  -- DOCUMENTATION GENERATION
-  -- ============================================================================
-
-  {
-    "danymat/neogen", -- Generate function documentation
-    config = function()
-      require("neogen").setup({
-        languages = {
-          python = { template = { annotation_convention = "numpydoc" } },
-          c = { template = { annotation_convention = "doxygen" } },
-          cpp = { template = { annotation_convention = "doxygen" } },
-        },
-      })
+      require("dap-python").setup("uv")
     end,
   },
 
@@ -769,17 +748,6 @@ require("pckr").add({
           type = "executable",
           command = "lldb-dap",
           name = "lldb",
-        }
-      end
-
-      -- Configure cpptools adapter as alternative
-      if vim.fn.executable("OpenDebugAD7") == 1 then
-        dap.adapters.cppdbg = {
-          id = "cppdbg",
-          type = "executable",
-          command = "OpenDebugAD7",
-          MIMode = "gdb",
-          MIDebuggerPath = "gdb",
         }
       end
 
@@ -1087,49 +1055,34 @@ vim.lsp.config("ruff", {
   },
   root_markers = {
     "pyproject.toml",
-    "setup.py",
-    "setup.cfg",
-    "requirements.txt",
+    "ruff.toml",
   },
   filetypes = { "python" },
 })
 
--- Enable ruff if available
 if vim.fn.executable("ruff") == 1 then
   vim.lsp.enable("ruff")
 end
 
 -- ============================================================================
--- PYRIGHT/BASEDPYRIGHT (PYTHON TYPE CHECKER) LANGUAGE SERVER CONFIGURATION
+-- Ty (PYTHON TYPE CHECKER) LANGUAGE SERVER CONFIGURATION
 -- ============================================================================
 
--- Prefer basedpyright over pyright if available
-local pyright = vim.fn.executable("basedpyright") == 1 and "basedpyright" or "pyright"
-
-vim.lsp.config("pyright", {
+vim.lsp.config("ty", {
   cmd = {
-    "basedpyright-langserver",
-    "--stdio",
+    "uvx",
+    "ty",
+    "server",
   },
   root_markers = {
     "pyproject.toml",
-    "setup.py",
-    "setup.cfg",
-    "requirements.txt",
+    "ty.toml",
   },
   filetypes = { "python" },
-  settings = {
-    basedpyright = {
-      analysis = {
-        typeCheckingMode = "strict", -- Enable strict type checking
-      },
-    },
-  },
 })
 
--- Enable basedpyright if available
-if vim.fn.executable("basedpyright") == 1 then
-  vim.lsp.enable("pyright")
+if vim.fn.executable("uvx") == 1 then
+  vim.lsp.enable("ty")
 end
 
 -- ============================================================================
