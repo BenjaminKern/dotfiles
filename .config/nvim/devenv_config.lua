@@ -1016,6 +1016,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.api.nvim_buf_create_user_command(args.buf, "Rename", function()
       vim.lsp.buf.rename()
     end, { desc = "Rename symbol" })
+
+    vim.api.nvim_buf_create_user_command(args.buf, "LspLog", function()
+      vim.cmd(string.format("tabnew %s", vim.lsp.log.get_filename()))
+    end, {
+      desc = "Opens the Nvim LSP client log.",
+    })
   end,
 })
 
