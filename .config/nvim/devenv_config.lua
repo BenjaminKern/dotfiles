@@ -30,7 +30,7 @@ vim.opt.splitkeep = "screen" -- Keep the same relative cursor position when spli
 -- UI enhancements
 vim.opt.pumblend = 10 -- Make completion menus slightly transparent
 vim.opt.pumheight = 10 -- Limit popup menu height
-vim.opt.winblend = 10 -- Make floating windows slightly transparent
+vim.opt.winblend = 0 -- Disable floating windows transparency
 
 -- Define custom fill characters for splits and folds
 vim.opt.fillchars = "eob: ,vert:┃,horiz:━,horizdown:┳,horizup:┻,verthoriz:╋,vertleft:┫,vertright:┣"
