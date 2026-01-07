@@ -649,7 +649,7 @@ require("pckr").add({
       -- Use zig as preferred compiler for better Windows compatibility
       require("nvim-treesitter.install").compilers = { "zig", "gcc", "clang" }
 
-      require("nvim-treesitter.configs").setup({
+      require("nvim-treesitter.config").setup({
         -- Languages to install parsers for
         ensure_installed = {
           "vim",
