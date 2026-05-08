@@ -317,6 +317,7 @@ require("pckr").add({
 
   {
     "saghen/blink.cmp", -- Modern completion engine
+    requires = "saghen/blink.lib",
     config = function()
       require("blink.cmp").setup({
         signature = {
@@ -326,7 +327,7 @@ require("pckr").add({
           preset = "super-tab", -- Use tab for completion navigation
         },
         fuzzy = {
-          implementation = "lua", -- Use Lua implementation for better performance
+          implementation = "lua", -- rust/lua
         },
         completion = {
           menu = {
