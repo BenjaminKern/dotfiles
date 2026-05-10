@@ -2,8 +2,6 @@
 -- NEOVIM CONFIGURATION - devenv_config.lua
 -- ============================================================================
 -- A comprehensive Neovim setup focused on development with C++, Python, and Bazel
--- Author: Your Name
--- Last Modified: $(date)
 -- ============================================================================
 
 -- ============================================================================
@@ -26,10 +24,12 @@ vim.opt.laststatus = 3 -- Global statusline
 vim.opt.splitbelow = true -- Horizontal splits open below current window
 vim.opt.splitright = true -- Vertical splits open to the right of current window
 vim.opt.splitkeep = "screen" -- Keep the same relative cursor position when splitting
+vim.opt.switchbuf = "useopen,uselast" -- LSP jumps reuse open windows (0.13+ buf.definition() honors switchbuf)
 
 -- UI enhancements
 vim.opt.pumblend = 10 -- Make completion menus slightly transparent
 vim.opt.pumheight = 10 -- Limit popup menu height
+vim.opt.pumborder = "rounded" -- Rounded border around the completion popup (matches diagnostic/hover floats)
 vim.opt.winblend = 0 -- Disable floating windows transparency
 
 -- Define custom fill characters for splits and folds
@@ -44,7 +44,6 @@ vim.opt.undofile = false -- Disable persistent undo (see also `:h undodir`)
 vim.opt.backup = false -- Don't create backup files
 vim.opt.writebackup = false -- Don't create backup while overwriting
 vim.opt.swapfile = false -- Disable swap files
-vim.opt.hidden = true -- Allow switching buffers without saving
 
 -- Mouse and input
 vim.opt.mouse = "a" -- Enable mouse for all modes
@@ -54,7 +53,6 @@ vim.opt.updatetime = 250 -- Decrease update time for CursorHold events
 -- Search settings
 vim.opt.ignorecase = true -- Ignore case in search patterns
 vim.opt.smartcase = true -- Override ignorecase if search contains uppercase
-vim.opt.incsearch = true -- Show search results while typing
 vim.opt.hlsearch = false -- Don't highlight search results after search is done
 vim.opt.inccommand = "nosplit" -- Show live preview of substitution commands
 
@@ -62,13 +60,14 @@ vim.opt.inccommand = "nosplit" -- Show live preview of substitution commands
 vim.opt.expandtab = true -- Use spaces instead of tabs
 vim.opt.shiftwidth = 2 -- Number of spaces for each indentation level
 vim.opt.smartindent = true -- Smart autoindenting for new lines
-vim.opt.smarttab = true -- Smart tab behavior
 vim.opt.infercase = true -- Infer letter cases for keyword completion
 vim.opt.formatoptions = "qjl1" -- Control automatic formatting (don't autoformat comments)
 
 -- Completion settings
 vim.opt.completeopt = "menu,menuone,noinsert,noselect" -- Customize completion behavior
 vim.opt.completeopt:append("fuzzy") -- Enable fuzzy matching in completion
+vim.opt.completeopt:append("popup") -- Show completionItem/resolve docs in a popup beside the pmenu
+vim.opt.completeopt:append("preselect") -- Honor LSP "preselect" hints (takes precedence over noselect)
 
 -- Visual mode settings
 vim.opt.virtualedit = "block" -- Allow cursor beyond end of line in visual block mode
@@ -83,9 +82,6 @@ vim.opt.spelloptions = "camel" -- Treat camelCase words as separate words for sp
 -- Misc settings
 vim.opt.shortmess:append("WcC") -- Reduce various messages
 vim.opt.background = "dark" -- Set dark background
-
--- Filetype detection
-vim.g.do_filetype_lua = true -- Use Lua for filetype detection
 
 -- Leader keys
 vim.g.mapleader = "," -- Set leader key to comma
@@ -129,7 +125,7 @@ if not (vim.uv or vim.loop).fs_stat(pckr_path) then
     pckr_path,
   })
   if vim.v.shell_error ~= 0 then
-    error("Error cloning lazy.nvim:\n" .. out)
+    error("Error cloning pckr.nvim:\n" .. out)
   end
 end
 
@@ -240,13 +236,39 @@ require("pckr").add({
   -- ============================================================================
 
   {
-    "stevearc/dressing.nvim", -- Better UI for vim.ui.select and vim.ui.input
+    "lewis6991/hover.nvim", -- Unified context-aware hover (LSP + diagnostics + DAP + man + dict)
     config = function()
-      require("dressing").setup({
-        select = {
-          enabled = false, -- Disable select (using mini.pick instead)
+      require("hover").config({
+        providers = {
+          "hover.providers.diagnostic",
+          "hover.providers.lsp",
+          "hover.providers.dap",
+          "hover.providers.man",
+          "hover.providers.dictionary",
+          "hover.providers.fold_preview",
         },
+        preview_opts = {
+          border = "rounded",
+        },
+        preview_window = false,
+        title = true,
       })
+
+      vim.keymap.set("n", "K", function()
+        require("hover").open()
+      end, { desc = "hover.nvim (open)" })
+
+      vim.keymap.set("n", "gK", function()
+        require("hover").enter()
+      end, { desc = "hover.nvim (enter hover window)" })
+
+      vim.keymap.set("n", "<C-p>", function()
+        require("hover").switch("previous")
+      end, { desc = "hover.nvim (previous source)" })
+
+      vim.keymap.set("n", "<C-n>", function()
+        require("hover").switch("next")
+      end, { desc = "hover.nvim (next source)" })
     end,
   },
 
@@ -309,72 +331,6 @@ require("pckr").add({
   },
 
   -- ============================================================================
-  -- COMPLETION ENGINE
-  -- ============================================================================
-
-  {
-    "saghen/blink.cmp", -- Modern completion engine
-    requires = "saghen/blink.lib",
-    config = function()
-      require("blink.cmp").setup({
-        signature = {
-          enabled = true, -- Show function signatures
-        },
-        keymap = {
-          preset = "super-tab", -- Use tab for completion navigation
-        },
-        fuzzy = {
-          implementation = "lua", -- rust/lua
-        },
-        completion = {
-          menu = {
-            draw = {
-              -- Customize completion menu layout
-              columns = {
-                { "label", "label_description", gap = 1 },
-                { "kind_icon", "kind" },
-              },
-            },
-          },
-        },
-        sources = {
-          default = { "lsp", "path", "buffer", "snippets", "codecompanion" },
-        },
-        -- Command line completion
-        cmdline = {
-          keymap = {
-            preset = "inherit",
-            ["<CR>"] = { "accept_and_enter", "fallback" },
-          },
-          completion = {
-            menu = { auto_show = true },
-          },
-        },
-        -- Source-specific settings
-        sources = {
-          providers = {
-            cmdline = {
-              min_keyword_length = function(ctx)
-                -- Only show cmdline completion after 3 chars when typing commands
-                if ctx.mode == "cmdline" and string.find(ctx.line, " ") == nil then
-                  return 3
-                end
-                return 0
-              end,
-            },
-          },
-        },
-      })
-
-      -- Set up LSP capabilities for completion
-      local capabilities = require("blink.cmp").get_lsp_capabilities()
-      vim.lsp.config("*", {
-        capabilities = capabilities,
-      })
-    end,
-  },
-
-  -- ============================================================================
   -- MINI.NVIM SUITE - COMPREHENSIVE PLUGIN COLLECTION
   -- ============================================================================
 
@@ -398,13 +354,7 @@ require("pckr").add({
 
       -- Additional utilities
       require("mini.extra").setup()
-      require("mini.misc").setup()
 
-      -- Auto-detect project root
-      MiniMisc.setup_auto_root({ ".git", "MODULE.bazel", "compile_commands.json" })
-
-      -- Navigation and editing enhancements
-      require("mini.comment").setup() -- Smart commenting with gc
       require("mini.cursorword").setup() -- Highlight word under cursor
       require("mini.indentscope").setup() -- Visualize indent scope
 
@@ -440,15 +390,6 @@ require("pckr").add({
 
       -- File explorer
       require("mini.files").setup()
-
-      -- Snippet engine
-      -- local gen_loader = require("mini.snippets").gen_loader
-      -- require("mini.snippets").setup({
-      --   snippets = {
-      --     gen_loader.from_file(vim.env.VIM .. "runtime/snippets/all.json"),
-      --     gen_loader.from_lang(), -- Language-specific snippets
-      --   },
-      -- })
 
       -- Highlight patterns (like hex colors)
       local hipatterns = require("mini.hipatterns")
@@ -509,84 +450,6 @@ require("pckr").add({
         window = { config = { border = "double" } },
       })
     end,
-  },
-
-  -- ============================================================================
-  -- MARKDOWN RENDERING
-  -- ============================================================================
-
-  {
-    "MeanderingProgrammer/render-markdown.nvim", -- Beautiful markdown rendering
-    config = function()
-      require("render-markdown").setup({
-        file_types = { "markdown", "codecompanion" }, -- Also render in AI chat
-      })
-    end,
-    requires = { "echasnovski/mini.nvim" },
-  },
-
-  -- ============================================================================
-  -- AI ASSISTANT INTEGRATION
-  -- ============================================================================
-  {
-    "olimorris/codecompanion.nvim", -- AI coding assistant
-    config = function()
-      require("codecompanion").setup({
-        adapters = {
-          http = {
-            llama_cpp = function()
-              return require("codecompanion.adapters").extend("openai_compatible", {
-                env = {
-                  url = "http://127.0.0.1:8080",
-                  chat_url = "/v1/chat/completions",
-                  models_endpoint = "/v1/models",
-                  api_key = "1234",
-                },
-              })
-            end,
-            copilot = function()
-              return require("codecompanion.adapters").extend("copilot", {
-                schema = {
-                  model = {
-                    default = "gpt-4.1", -- claude-sonnet-4, claude-sonnet-4.5, gpt-5
-                  },
-                },
-              })
-            end,
-          },
-        },
-        strategies = {
-          chat = {
-            adapter = "llama_cpp",
-          },
-          inline = {
-            adapter = "llama_cpp",
-          },
-          cmd = {
-            adapter = "llama_cpp",
-          },
-        },
-      })
-
-      -- Key mappings for AI assistant
-      vim.keymap.set(
-        { "n", "v" },
-        "<leader>cc",
-        "<cmd>CodeCompanionChat Toggle<cr>",
-        { noremap = true, silent = true, desc = "Toggle [C]ode [C]ompanion Chat" }
-      )
-      vim.keymap.set(
-        { "n" },
-        "<leader>ca",
-        "<cmd>CodeCompanionActions<cr>",
-        { noremap = true, silent = true, desc = "Start [C]ode Companion [A]ctions" }
-      )
-    end,
-    requires = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "MeanderingProgrammer/render-markdown.nvim",
-    },
   },
 
   -- ============================================================================
@@ -828,11 +691,40 @@ vim.keymap.set("n", "ww", function()
   require("hop").hint_words()
 end, { desc = "Hop to words" })
 
+-- Tab/S-Tab: cycle completion popup, then snippet jump, then literal Tab/S-Tab
+-- CR: accept selected completion item (C-y), or normal newline if nothing selected
+vim.keymap.set({ "i", "s" }, "<Tab>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<C-n>"
+  elseif vim.snippet.active({ direction = 1 }) then
+    return "<Cmd>lua vim.snippet.jump(1)<CR>"
+  end
+  return "<Tab>"
+end, { expr = true, desc = "Completion next / snippet jump / Tab" })
+
+vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+  if vim.fn.pumvisible() == 1 then
+    return "<C-p>"
+  elseif vim.snippet.active({ direction = -1 }) then
+    return "<Cmd>lua vim.snippet.jump(-1)<CR>"
+  end
+  return "<S-Tab>"
+end, { expr = true, desc = "Completion prev / snippet jump / S-Tab" })
+
+vim.keymap.set("i", "<CR>", function()
+  if vim.fn.pumvisible() == 1 then
+    local info = vim.fn.complete_info({ "selected" })
+    if info.selected >= 0 then
+      return "<C-y>"
+    end
+    -- Nothing selected — dismiss popup and insert newline
+    return "<C-e><CR>"
+  end
+  return "<CR>"
+end, { expr = true, desc = "Accept completion or newline" })
+
 -- Disable Ctrl-Z (suspend) in normal mode
 vim.keymap.set("n", "<C-Z>", "<NOP>")
-
--- Yank till end of line (to match D and C behavior)
-vim.keymap.set("n", "Y", "y$", { desc = "Yank till the end of the line" })
 
 -- File operations
 vim.keymap.set("n", "<leader>d", function()
@@ -852,6 +744,21 @@ vim.keymap.set("n", "<leader>fg", [[<Cmd>Pick grep_live<CR>]], { desc = "[F]ind 
 -- AUTOCOMMANDS
 -- ============================================================================
 
+-- Auto-detect project root (replaced mini.misc setup_auto_root)
+vim.api.nvim_create_autocmd("BufEnter", {
+  group = vim.api.nvim_create_augroup("xyz-auto-root", { clear = true }),
+  callback = function(args)
+    if vim.bo[args.buf].buftype ~= "" then
+      return
+    end
+    local root = vim.fs.root(args.buf, { ".git", "MODULE.bazel", "compile_commands.json" })
+    if root and root ~= vim.fn.getcwd() then
+      vim.cmd.cd(root)
+    end
+  end,
+  desc = "Auto-detect project root via vim.fs.root()",
+})
+
 -- Highlight yanked text briefly
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
@@ -866,14 +773,6 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "python", "cpp", "c" },
   callback = function(ev)
     vim.api.nvim_set_option_value("tw", 79, { scope = "local" }) -- 79 character line limit
-  end,
-})
-
--- Set comment string for C++ files
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "cpp" },
-  callback = function(ev)
-    vim.api.nvim_set_option_value("commentstring", "// %s", { scope = "local" })
   end,
 })
 
@@ -933,8 +832,6 @@ vim.keymap.set("n", "<leader>q", function()
     vim.diagnostic.setqflist()
   end
 end, { desc = "Toggle diagnostic [Q]uickfix list" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic location" })
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic location" })
 
 -- Show line diagnostics temporarily
 vim.keymap.set("n", "<leader>l", function()
@@ -958,6 +855,28 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
 
+    -- Native LSP completion — trigger on every keystroke (not just server triggerCharacters)
+    if client:supports_method("textDocument/completion") then
+      local alphanumeric = {}
+      for c = string.byte("a"), string.byte("z") do
+        table.insert(alphanumeric, string.char(c))
+      end
+      for c = string.byte("A"), string.byte("Z") do
+        table.insert(alphanumeric, string.char(c))
+      end
+      for c = string.byte("0"), string.byte("9") do
+        table.insert(alphanumeric, string.char(c))
+      end
+      table.insert(alphanumeric, "_")
+      table.insert(alphanumeric, "#")
+      local existing = vim.tbl_get(
+        client.server_capabilities, "completionProvider", "triggerCharacters"
+      ) or {}
+      local merged = vim.list_extend(vim.list_extend({}, existing), alphanumeric)
+      client.server_capabilities.completionProvider.triggerCharacters = merged
+      vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+    end
+
     -- Enable inlay hints if supported
     if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
       vim.keymap.set("n", "<leader>h", function()
@@ -965,9 +884,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
       end, { silent = true, buffer = args.buf, desc = "Toggle Inlay [H]ints" })
     end
 
+    -- Enable native document_color when the server advertises it (CSS, Tailwind, …)
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentColor) then
+      vim.lsp.document_color.enable(true, args.buf)
+    end
+
     -- Set up document highlighting if supported
     if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-      local highlight_augroup = vim.api.nvim_create_augroup("xys-lsp-highlight", { clear = false })
+      local highlight_augroup = vim.api.nvim_create_augroup("xyz-lsp-highlight", { clear = false })
 
       -- Highlight references under cursor
       vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
@@ -985,10 +909,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
       -- Clean up when LSP detaches
       vim.api.nvim_create_autocmd("LspDetach", {
-        group = vim.api.nvim_create_augroup("xys-lsp-detach", { clear = true }),
+        group = vim.api.nvim_create_augroup("xyz-lsp-detach", { clear = true }),
         callback = function(event)
           vim.lsp.buf.clear_references()
-          vim.api.nvim_clear_autocmds({ group = "xys-lsp-highlight", buffer = event.buf })
+          vim.api.nvim_clear_autocmds({ group = "xyz-lsp-highlight", buffer = event.buf })
         end,
       })
     end
@@ -998,22 +922,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
       vim.lsp.buf.declaration()
     end, { silent = true, buffer = args.buf, desc = "[g]oto [D]eclaration" })
 
+    -- Intentional: gd preferred over CTRL-] (tagfunc)
     vim.keymap.set("n", "gd", function()
       vim.lsp.buf.definition()
-    end, { silent = true, buffer = args.buf, desc = "[g]oto [d]definition" })
-
-    vim.keymap.set("n", "gt", function()
-      vim.lsp.buf.type_definition()
-    end, { silent = true, buffer = args.buf, desc = "[g]oto [t]ype Definition" })
-
-    vim.keymap.set("n", "ca", function()
-      vim.lsp.buf.code_action()
-    end, { silent = true, buffer = args.buf, desc = "[c]ode [a]ction" })
-
-    -- Rename command
-    vim.api.nvim_buf_create_user_command(args.buf, "Rename", function()
-      vim.lsp.buf.rename()
-    end, { desc = "Rename symbol" })
+    end, { silent = true, buffer = args.buf, desc = "[g]oto [d]efinition" })
 
     vim.api.nvim_buf_create_user_command(args.buf, "LspLog", function()
       vim.cmd(string.format("tabnew %s", vim.lsp.log.get_filename()))
@@ -1087,6 +999,57 @@ vim.lsp.config("ty", {
 
 if vim.fn.executable("uvx") == 1 then
   vim.lsp.enable("ty")
+end
+
+-- ============================================================================
+-- LUA_LS (LUA) LANGUAGE SERVER CONFIGURATION
+-- ============================================================================
+
+vim.lsp.config("lua_ls", {
+  cmd = { "lua-language-server" },
+  root_markers = { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml" },
+  filetypes = { "lua" },
+  settings = {
+    Lua = {
+      runtime = { version = "LuaJIT" },
+      workspace = {
+        checkThirdParty = false,
+        library = { vim.env.VIMRUNTIME },
+      },
+    },
+  },
+})
+
+if vim.fn.executable("lua-language-server") == 1 then
+  vim.lsp.enable("lua_ls")
+end
+
+-- ============================================================================
+-- BASHLS (SHELL) LANGUAGE SERVER CONFIGURATION
+-- ============================================================================
+
+vim.lsp.config("bashls", {
+  cmd = { "bash-language-server", "start" },
+  root_markers = { ".git" },
+  filetypes = { "sh", "bash", "zsh" },
+})
+
+if vim.fn.executable("bash-language-server") == 1 then
+  vim.lsp.enable("bashls")
+end
+
+-- ============================================================================
+-- GOPLS (GO) LANGUAGE SERVER CONFIGURATION
+-- ============================================================================
+
+vim.lsp.config("gopls", {
+  cmd = { "gopls" },
+  root_markers = { "go.mod", "go.work" },
+  filetypes = { "go", "gomod", "gowork", "gotmpl" },
+})
+
+if vim.fn.executable("gopls") == 1 then
+  vim.lsp.enable("gopls")
 end
 
 -- ============================================================================
