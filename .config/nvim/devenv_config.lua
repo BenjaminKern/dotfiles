@@ -91,10 +91,7 @@ vim.g.do_filetype_lua = true -- Use Lua for filetype detection
 vim.g.mapleader = "," -- Set leader key to comma
 vim.g.maplocalleader = "," -- Set local leader key to comma
 
--- Schedule clipboard setting after UI loads to improve startup time
-vim.schedule(function()
-  vim.opt.clipboard = "unnamedplus" -- Use system clipboard
-end)
+vim.opt.clipboard:append("unnamedplus") -- Use system clipboard
 
 -- ============================================================================
 -- FILETYPE ASSOCIATIONS
