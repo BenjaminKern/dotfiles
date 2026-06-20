@@ -2,8 +2,6 @@
 -- NEOVIM CONFIGURATION - devenv_config.lua
 -- ============================================================================
 -- A comprehensive Neovim setup focused on development with C++, Python, and Bazel
--- Author: Your Name
--- Last Modified: $(date)
 -- ============================================================================
 
 -- ============================================================================
@@ -26,10 +24,12 @@ vim.opt.laststatus = 3 -- Global statusline
 vim.opt.splitbelow = true -- Horizontal splits open below current window
 vim.opt.splitright = true -- Vertical splits open to the right of current window
 vim.opt.splitkeep = "screen" -- Keep the same relative cursor position when splitting
+vim.opt.switchbuf = "useopen,uselast" -- LSP jumps reuse open windows (0.13+ buf.definition() honors switchbuf)
 
 -- UI enhancements
 vim.opt.pumblend = 10 -- Make completion menus slightly transparent
 vim.opt.pumheight = 10 -- Limit popup menu height
+vim.opt.pumborder = "rounded" -- Rounded border around the completion popup (matches diagnostic/hover floats)
 vim.opt.winblend = 0 -- Disable floating windows transparency
 
 -- Define custom fill characters for splits and folds
@@ -44,7 +44,6 @@ vim.opt.undofile = false -- Disable persistent undo (see also `:h undodir`)
 vim.opt.backup = false -- Don't create backup files
 vim.opt.writebackup = false -- Don't create backup while overwriting
 vim.opt.swapfile = false -- Disable swap files
-vim.opt.hidden = true -- Allow switching buffers without saving
 
 -- Mouse and input
 vim.opt.mouse = "a" -- Enable mouse for all modes
@@ -54,7 +53,7 @@ vim.opt.updatetime = 250 -- Decrease update time for CursorHold events
 -- Search settings
 vim.opt.ignorecase = true -- Ignore case in search patterns
 vim.opt.smartcase = true -- Override ignorecase if search contains uppercase
-vim.opt.incsearch = true -- Show search results while typing
+-- vim.opt.incsearch = true -- Show search results while typing
 vim.opt.hlsearch = false -- Don't highlight search results after search is done
 vim.opt.inccommand = "nosplit" -- Show live preview of substitution commands
 
@@ -69,6 +68,8 @@ vim.opt.formatoptions = "qjl1" -- Control automatic formatting (don't autoformat
 -- Completion settings
 vim.opt.completeopt = "menu,menuone,noinsert,noselect" -- Customize completion behavior
 vim.opt.completeopt:append("fuzzy") -- Enable fuzzy matching in completion
+vim.opt.completeopt:append("popup") -- Show completionItem/resolve docs in a popup beside the pmenu
+vim.opt.completeopt:append("preselect") -- Honor LSP "preselect" hints (takes precedence over noselect)
 
 -- Visual mode settings
 vim.opt.virtualedit = "block" -- Allow cursor beyond end of line in visual block mode
@@ -83,9 +84,6 @@ vim.opt.spelloptions = "camel" -- Treat camelCase words as separate words for sp
 -- Misc settings
 vim.opt.shortmess:append("WcC") -- Reduce various messages
 vim.opt.background = "dark" -- Set dark background
-
--- Filetype detection
-vim.g.do_filetype_lua = true -- Use Lua for filetype detection
 
 -- Leader keys
 vim.g.mapleader = "," -- Set leader key to comma
@@ -129,7 +127,7 @@ if not (vim.uv or vim.loop).fs_stat(pckr_path) then
     pckr_path,
   })
   if vim.v.shell_error ~= 0 then
-    error("Error cloning lazy.nvim:\n" .. out)
+    error("Error cloning pckr.nvim:\n" .. out)
   end
 end
 
@@ -240,13 +238,39 @@ require("pckr").add({
   -- ============================================================================
 
   {
-    "stevearc/dressing.nvim", -- Better UI for vim.ui.select and vim.ui.input
+    "lewis6991/hover.nvim", -- Unified context-aware hover (LSP + diagnostics + DAP + man + dict)
     config = function()
-      require("dressing").setup({
-        select = {
-          enabled = false, -- Disable select (using mini.pick instead)
+      require("hover").config({
+        providers = {
+          "hover.providers.diagnostic",
+          "hover.providers.lsp",
+          "hover.providers.dap",
+          "hover.providers.man",
+          "hover.providers.dictionary",
+          "hover.providers.fold_preview",
         },
+        preview_opts = {
+          border = "rounded",
+        },
+        preview_window = false,
+        title = true,
       })
+
+      vim.keymap.set("n", "K", function()
+        require("hover").open()
+      end, { desc = "hover.nvim (open)" })
+
+      vim.keymap.set("n", "gK", function()
+        require("hover").enter()
+      end, { desc = "hover.nvim (enter hover window)" })
+
+      vim.keymap.set("n", "<C-p>", function()
+        require("hover").switch("previous")
+      end, { desc = "hover.nvim (previous source)" })
+
+      vim.keymap.set("n", "<C-n>", function()
+        require("hover").switch("next")
+      end, { desc = "hover.nvim (next source)" })
     end,
   },
 
@@ -509,84 +533,6 @@ require("pckr").add({
         window = { config = { border = "double" } },
       })
     end,
-  },
-
-  -- ============================================================================
-  -- MARKDOWN RENDERING
-  -- ============================================================================
-
-  {
-    "MeanderingProgrammer/render-markdown.nvim", -- Beautiful markdown rendering
-    config = function()
-      require("render-markdown").setup({
-        file_types = { "markdown", "codecompanion" }, -- Also render in AI chat
-      })
-    end,
-    requires = { "echasnovski/mini.nvim" },
-  },
-
-  -- ============================================================================
-  -- AI ASSISTANT INTEGRATION
-  -- ============================================================================
-  {
-    "olimorris/codecompanion.nvim", -- AI coding assistant
-    config = function()
-      require("codecompanion").setup({
-        adapters = {
-          http = {
-            llama_cpp = function()
-              return require("codecompanion.adapters").extend("openai_compatible", {
-                env = {
-                  url = "http://127.0.0.1:8080",
-                  chat_url = "/v1/chat/completions",
-                  models_endpoint = "/v1/models",
-                  api_key = "1234",
-                },
-              })
-            end,
-            copilot = function()
-              return require("codecompanion.adapters").extend("copilot", {
-                schema = {
-                  model = {
-                    default = "gpt-4.1", -- claude-sonnet-4, claude-sonnet-4.5, gpt-5
-                  },
-                },
-              })
-            end,
-          },
-        },
-        strategies = {
-          chat = {
-            adapter = "llama_cpp",
-          },
-          inline = {
-            adapter = "llama_cpp",
-          },
-          cmd = {
-            adapter = "llama_cpp",
-          },
-        },
-      })
-
-      -- Key mappings for AI assistant
-      vim.keymap.set(
-        { "n", "v" },
-        "<leader>cc",
-        "<cmd>CodeCompanionChat Toggle<cr>",
-        { noremap = true, silent = true, desc = "Toggle [C]ode [C]ompanion Chat" }
-      )
-      vim.keymap.set(
-        { "n" },
-        "<leader>ca",
-        "<cmd>CodeCompanionActions<cr>",
-        { noremap = true, silent = true, desc = "Start [C]ode Companion [A]ctions" }
-      )
-    end,
-    requires = {
-      "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "MeanderingProgrammer/render-markdown.nvim",
-    },
   },
 
   -- ============================================================================
@@ -965,9 +911,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
       end, { silent = true, buffer = args.buf, desc = "Toggle Inlay [H]ints" })
     end
 
+    -- Enable native document_color when the server advertises it (CSS, Tailwind, …)
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentColor) then
+      vim.lsp.document_color.enable(true, args.buf)
+    end
+
     -- Set up document highlighting if supported
     if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-      local highlight_augroup = vim.api.nvim_create_augroup("xys-lsp-highlight", { clear = false })
+      local highlight_augroup = vim.api.nvim_create_augroup("xyz-lsp-highlight", { clear = false })
 
       -- Highlight references under cursor
       vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
@@ -985,10 +936,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
       -- Clean up when LSP detaches
       vim.api.nvim_create_autocmd("LspDetach", {
-        group = vim.api.nvim_create_augroup("xys-lsp-detach", { clear = true }),
+        group = vim.api.nvim_create_augroup("xyz-lsp-detach", { clear = true }),
         callback = function(event)
           vim.lsp.buf.clear_references()
-          vim.api.nvim_clear_autocmds({ group = "xys-lsp-highlight", buffer = event.buf })
+          vim.api.nvim_clear_autocmds({ group = "xyz-lsp-highlight", buffer = event.buf })
         end,
       })
     end
@@ -1001,14 +952,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set("n", "gd", function()
       vim.lsp.buf.definition()
     end, { silent = true, buffer = args.buf, desc = "[g]oto [d]definition" })
-
-    vim.keymap.set("n", "gt", function()
-      vim.lsp.buf.type_definition()
-    end, { silent = true, buffer = args.buf, desc = "[g]oto [t]ype Definition" })
-
-    vim.keymap.set("n", "ca", function()
-      vim.lsp.buf.code_action()
-    end, { silent = true, buffer = args.buf, desc = "[c]ode [a]ction" })
 
     -- Rename command
     vim.api.nvim_buf_create_user_command(args.buf, "Rename", function()
